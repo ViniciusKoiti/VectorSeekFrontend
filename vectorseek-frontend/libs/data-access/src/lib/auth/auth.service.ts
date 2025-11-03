@@ -97,13 +97,19 @@ export class AuthService {
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http
       .post<AuthApiEnvelope<AuthApiSessionDto>>(AUTH_API_ENDPOINTS.login(), payload)
-      .pipe(map((response) => this.mapSessionResponse(response.data)), catchError((error) => this.handleError('login', error)));
+      .pipe(
+        map((response) => this.mapSessionResponse(response.data)),
+        catchError((error) => this.handleError('login', error)),
+      );
   }
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http
       .post<AuthApiEnvelope<AuthApiSessionDto>>(AUTH_API_ENDPOINTS.register(), payload)
-      .pipe(map((response) => this.mapSessionResponse(response.data)), catchError((error) => this.handleError('register', error)));
+      .pipe(
+        map((response) => this.mapSessionResponse(response.data)),
+        catchError((error) => this.handleError('register', error)),
+      );
   }
 
   requestMagicLink(payload: RequestMagicLinkRequest): Observable<RequestMagicLinkResponse> {
@@ -118,13 +124,19 @@ export class AuthService {
   refresh(payload: RefreshRequest): Observable<RefreshResponse> {
     return this.http
       .post<AuthApiEnvelope<AuthApiTokensDto>>(AUTH_API_ENDPOINTS.refresh(), payload)
-      .pipe(map((response) => this.mapTokens(response.data)), catchError((error) => this.handleError('refresh', error)));
+      .pipe(
+        map((response) => this.mapTokens(response.data)),
+        catchError((error) => this.handleError('refresh', error)),
+      );
   }
 
   me(): Observable<MeResponse> {
     return this.http
       .get<AuthApiEnvelope<AuthApiProfileDto>>(AUTH_API_ENDPOINTS.me())
-      .pipe(map((response) => this.mapProfile(response.data)), catchError((error) => this.handleError('me', error)));
+      .pipe(
+        map((response) => this.mapProfile(response.data)),
+        catchError((error) => this.handleError('me', error)),
+      );
   }
 
   private mapSessionResponse(dto: AuthApiSessionDto): AuthSession {
