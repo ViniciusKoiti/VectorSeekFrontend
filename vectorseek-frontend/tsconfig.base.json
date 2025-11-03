@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@vectorseek/platform/*": ["apps/platform/src/app/*"],
-      "@vectorseek/data-access/*": ["libs/data-access/src/*"]
+      "@vectorseek/data-access/*": ["libs/data-access/src/*"],
+      "@vectorseek/ui/*": ["libs/ui/*"]
     },
     "module": "esnext",
     "target": "es2020",
