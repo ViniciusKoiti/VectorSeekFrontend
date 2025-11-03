@@ -1,0 +1,6 @@
+{
+  "platform": {
+    "title": "VectorSeek Platform",
+    "description": "Angular SSR workspace with internationalisation and Zod forms."
+  }
+}
