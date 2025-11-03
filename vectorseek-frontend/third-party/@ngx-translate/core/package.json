@@ -1,0 +1,6 @@
+{
+  "name": "@ngx-translate/core",
+  "version": "0.0.0-mock",
+  "main": "index.js",
+  "types": "index.d.ts"
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "./schemas/nx-schema.json",
+  "npmScope": "vectorseek",
+  "affected": {
+    "defaultBase": "main"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runner",
+      "options": {}
+    }
+  },
+  "targetDefaults": {
+    "test": {
+      "dependsOn": []
+    }
+  },
+  "projects": {
+    "platform": "apps/platform"
+  }
+}

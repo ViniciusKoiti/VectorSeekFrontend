@@ -1,0 +1,12 @@
+{
+  "$schema": "./schemas/angular-workspace.json",
+  "version": 1,
+  "defaultProject": "platform",
+  "projects": {
+    "platform": {
+      "projectType": "application",
+      "root": "apps/platform",
+      "sourceRoot": "apps/platform/src"
+    }
+  }
+}
