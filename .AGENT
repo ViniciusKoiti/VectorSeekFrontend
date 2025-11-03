@@ -1,0 +1,285 @@
+# VectorSeek Frontend - Guia de Referência para Agentes
+
+Este arquivo serve como referência rápida para agentes de IA que trabalham neste projeto.
+
+## 🎯 Contexto do Projeto
+
+**VectorSeek Frontend** é uma aplicação Angular 17+ em monorepo Nx focada em autenticação e fundação de uma plataforma de descoberta de conhecimento baseada em IA.
+
+## 📁 Estrutura de Diretórios Críticos
+
+```
+vectorseek-frontend/
+├── apps/platform/src/app/
+│   ├── auth/                    # Módulo de autenticação
+│   │   ├── login-page.component.ts
+│   │   ├── register-page.component.ts
+│   │   ├── forgot-password.component.ts
+│   │   ├── auth.routes.ts       # Rotas lazy-loaded
+│   │   ├── schemas/             # Validações Zod
+│   │   └── utils/               # Utilitários de autenticação
+│   └── layouts/                 # Layouts da aplicação
+│       ├── auth-layout.component.ts
+│       └── public-layout.component.ts
+├── libs/data-access/src/lib/auth/
+│   ├── auth.service.ts          # Serviço principal de autenticação
+│   ├── auth.models.ts           # Interfaces e tipos TypeScript
+│   └── auth.api.ts              # Endpoints da API
+└── libs/ui/auth/                # Stories do Storybook
+```
+
+## 🔑 Pontos Importantes
+
+### 1. Arquitetura Standalone
+- **TODOS** os componentes são standalone (sem NgModules)
+- Use `standalone: true` em todos os componentes
+- Importe dependências diretamente no componente
+
+### 2. Lazy Loading
+- Rotas principais usam `loadComponent()` ou `loadChildren()`
+- Nunca importe componentes diretamente em rotas principais
+- Use dynamic imports: `() => import(...).then(m => m.Component)`
+
+### 3. Validação Zod
+- Todos os formulários devem usar schemas Zod
+- Schemas estão em `apps/platform/src/app/auth/schemas/`
+- Mensagens de validação usam chaves de tradução (ex: `'auth.validation.required'`)
+
+### 4. AuthService
+- **Localização**: `libs/data-access/src/lib/auth/auth.service.ts`
+- **Métodos disponíveis**:
+  - `login(LoginRequest): Observable<LoginResponse>`
+  - `register(RegisterRequest): Observable<RegisterResponse>`
+  - `requestMagicLink(RequestMagicLinkRequest): Observable<RequestMagicLinkResponse>`
+  - `refresh(RefreshRequest): Observable<RefreshResponse>`
+  - `me(): Observable<MeResponse>`
+- Todos os métodos retornam `Observable` e tratam erros automaticamente
+
+### 5. Endpoints da API
+- Base path: `/api/auth`
+- Endpoints:
+  - `POST /api/auth/login`
+  - `POST /api/auth/register`
+  - `POST /api/auth/magic-link`
+  - `POST /api/auth/refresh`
+  - `GET /api/auth/me`
+- Todos os endpoints retornam `AuthApiEnvelope<T>` com estrutura `{ data: T }`
+
+### 6. Tratamento de Erros
+- `AuthService` normaliza erros automaticamente
+- Erros retornam `AuthError` com:
+  - `status`: código HTTP
+  - `code`: código de erro
+  - `summary`: mensagem resumida
+  - `description`: descrição detalhada
+  - `fieldErrors`: erros por campo (opcional)
+  - `retryAfterSeconds`: rate limiting (opcional)
+
+### 7. Internacionalização
+- Biblioteca: `@ngx-translate/core`
+- Idioma padrão: `pt-BR`
+- Arquivos: `apps/platform/src/assets/i18n/auth/`
+- Namespace: `auth` para mensagens de autenticação
+- Use `TranslateService` para traduções
+
+### 8. Rotas
+- Rotas principais: `apps/platform/src/app/app.routes.ts`
+- Rotas de auth: `apps/platform/src/app/auth/auth.routes.ts`
+- Layout padrão: `/` → `PublicLayoutComponent`
+- Layout auth: `/auth/*` → `AuthLayoutComponent`
+
+## 🔧 Padrões de Código
+
+### Componente Standalone
+```typescript
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'vectorseek-example',
+  standalone: true,
+  imports: [CommonModule],
+  template: `...`,
+  styles: [`...`]
+})
+export class ExampleComponent {}
+```
+
+### Uso do AuthService
+```typescript
+import { inject } from '@angular/core';
+import { AuthService } from '@vectorseek/data-access';
+import { catchError } from 'rxjs/operators';
+
+export class MyComponent {
+  private authService = inject(AuthService);
+
+  login(email: string, password: string) {
+    this.authService.login({ email, password })
+      .pipe(
+        catchError((error: AuthError) => {
+          // Tratar erro
+          return throwError(() => error);
+        })
+      )
+      .subscribe(session => {
+        // Sucesso
+      });
+  }
+}
+```
+
+### Schema Zod
+```typescript
+import { z } from '@colsen1996/ng-zod-form';
+import type { LoginRequest } from '@vectorseek/data-access/lib/auth/auth.models';
+
+export const myFormSchema: z.ZodType<LoginRequest> = z.object({
+  email: z.string({ required_error: 'auth.validation.required' })
+    .email('auth.validation.email'),
+  password: z.string({ required_error: 'auth.validation.required' })
+    .min(8, 'auth.validation.passwordLength')
+});
+```
+
+## 📦 Dependências Principais
+
+### Core
+- `@angular/core`, `@angular/common`, `@angular/router`
+- `@angular/forms`, `@angular/platform-browser`
+- `rxjs` (programação reativa)
+
+### Validação
+- `zod` (validação de schemas)
+- `@colsen1996/ng-zod-form` (integração Angular + Zod)
+
+### i18n
+- `@ngx-translate/core`
+- `@ngx-translate/http-loader`
+
+### SSR
+- `@nguniversal/express-engine`
+- `express`
+
+### Build
+- `nx` (monorepo)
+- TypeScript strict mode
+
+## 🚫 O Que NÃO Fazer
+
+1. ❌ **NÃO** criar NgModules - use componentes standalone
+2. ❌ **NÃO** importar componentes diretamente em rotas - use lazy loading
+3. ❌ **NÃO** fazer validação manual - use Zod schemas
+4. ❌ **NÃO** chamar HTTP diretamente - use AuthService
+5. ❌ **NÃO** hardcode mensagens - use i18n
+6. ❌ **NÃO** criar serviços em `apps/` - use `libs/data-access`
+7. ❌ **NÃO** misturar lógica de negócio em componentes - use serviços
+
+## ✅ O Que Fazer
+
+1. ✅ Use componentes standalone sempre
+2. ✅ Use lazy loading para rotas
+3. ✅ Valide com Zod schemas
+4. ✅ Use AuthService para todas as chamadas de autenticação
+5. ✅ Use chaves de tradução para mensagens
+6. ✅ Coloque serviços compartilhados em `libs/data-access`
+7. ✅ Mantenha componentes focados em apresentação
+8. ✅ Use `inject()` para injeção de dependências
+9. ✅ Trate erros com catchError do RxJS
+10. ✅ Siga os padrões de nomenclatura (kebab-case para arquivos, PascalCase para classes)
+
+## 🎨 Estilos e Design
+
+- Componentes usam estilos inline (template strings)
+- Paleta de cores baseada em Tailwind CSS
+- Design responsivo e mobile-first
+- Espaçamento consistente com gaps de 1rem, 1.5rem, 2rem
+
+## 🧪 Testes
+
+- Testes em `*.spec.ts`
+- Use `HttpClientTestingModule` para testar AuthService
+- Cobertura mínima: 70% para `libs/data-access/auth`
+- Execute com: `nx test [project]`
+
+## 📝 Nomenclatura
+
+- **Componentes**: `ComponentNameComponent` (PascalCase)
+- **Serviços**: `ServiceNameService` (PascalCase)
+- **Arquivos**: `kebab-case.component.ts`
+- **Selectors**: `vectorseek-kebab-case`
+- **Interfaces**: `InterfaceName` (PascalCase)
+- **Constantes**: `CONSTANT_NAME` (UPPER_SNAKE_CASE)
+
+## 🔍 Locais Importantes
+
+- **Rotas principais**: `apps/platform/src/app/app.routes.ts`
+- **Rotas de auth**: `apps/platform/src/app/auth/auth.routes.ts`
+- **Serviço de auth**: `libs/data-access/src/lib/auth/auth.service.ts`
+- **Modelos**: `libs/data-access/src/lib/auth/auth.models.ts`
+- **Endpoints**: `libs/data-access/src/lib/auth/auth.api.ts`
+- **Main**: `apps/platform/src/main.ts`
+- **Environments**: `apps/platform/src/environments/`
+
+## 🚀 Comandos Úteis
+
+```bash
+# Desenvolvimento
+nx serve platform
+
+# Build
+nx build platform
+
+# Testes
+nx test
+nx test --code-coverage
+
+# Graph de dependências
+nx graph
+```
+
+## 📚 Referências Rápidas
+
+### Modelos de Request/Response
+- `LoginRequest`: `{ email: string, password: string, rememberMe?: boolean }`
+- `RegisterRequest`: `{ fullName: string, email: string, password: string, acceptTerms: boolean }`
+- `RequestMagicLinkRequest`: `{ email: string, redirectUrl?: string, locale?: string }`
+- `RefreshRequest`: `{ refreshToken: string }`
+- `LoginResponse` / `RegisterResponse`: `AuthSession`
+- `AuthSession`: `{ user: AuthUserProfile, tokens: AuthTokens }`
+- `AuthTokens`: `{ accessToken, refreshToken, expiresIn, tokenType }`
+- `AuthUserProfile`: `{ id, email, fullName, avatarUrl? }`
+
+### Chaves de Tradução Comuns
+- `auth.validation.required`
+- `auth.validation.email`
+- `auth.validation.passwordLength`
+- `auth.validation.fullName`
+- `auth.validation.acceptTerms`
+
+## 🎯 Status Atual
+
+- ✅ Rotas de autenticação implementadas
+- ✅ AuthService completo com testes
+- ✅ Schemas Zod criados
+- ✅ Layouts implementados
+- 🚧 Formulários reativos pendentes (próximo incremento)
+- 🚧 Guardas de rota pendentes
+- 🚧 Interceptors HTTP pendentes
+- 🚧 Signal Store para sessão pendente
+
+## 💡 Dicas para Agentes
+
+1. **Sempre verifique** se um componente é standalone antes de criar
+2. **Sempre use** AuthService para operações de autenticação
+3. **Sempre valide** com Zod antes de enviar dados
+4. **Sempre use** lazy loading para novas rotas
+5. **Sempre trate** erros com catchError
+6. **Sempre use** chaves de tradução para mensagens
+7. **Sempre coloque** serviços compartilhados em `libs/data-access`
+8. **Sempre siga** os padrões de nomenclatura estabelecidos
+
+---
+
+**Última atualização**: Baseado na estrutura atual do projeto VectorSeek Frontend
+
