@@ -7,7 +7,7 @@ import { appRoutes } from './app/app.routes';
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(appRoutes),
-    provideTranslate({ defaultLanguage: 'en' })
+    provideTranslate({ defaultLanguage: 'pt-BR' })
   ]
 }).then(() => {
   console.log('Platform application bootstrapped.');

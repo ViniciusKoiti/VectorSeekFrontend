@@ -3,11 +3,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@vectorseek/platform/*": ["apps/platform/src/app/*"]
+      "@vectorseek/platform/*": ["apps/platform/src/app/*"],
+      "@vectorseek/data-access/*": ["libs/data-access/src/*"]
     },
     "module": "esnext",
     "target": "es2020",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": false,

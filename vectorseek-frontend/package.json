@@ -13,6 +13,7 @@
   "dependencies": {
     "@angular/common": "file:third-party/@angular/common",
     "@angular/core": "file:third-party/@angular/core",
+    "@angular/forms": "file:third-party/@angular/forms",
     "@angular/platform-browser": "file:third-party/@angular/platform-browser",
     "@angular/platform-server": "file:third-party/@angular/platform-server",
     "@angular/router": "file:third-party/@angular/router",
