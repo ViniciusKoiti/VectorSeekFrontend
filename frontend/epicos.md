@@ -37,6 +37,16 @@ Este documento traduz o planejamento funcional do VectorSeek para uma organizaç
 4. **Definir roteamento público vs protegido**
    - `app.routes.ts` separando rotas `/auth/*` e `/app/*`.
    - Resolver `UserResolver` para precargar dados (`/api/auth/me`).
+5. **Parametrizar branding (logos, cores, favicon)**
+   - Provider central `BRANDING_CONFIG` para permitir customização por ambiente.
+
+### Backlog detalhado (notas Obsidian)
+
+- [E1-A1 · Configurar módulo de autenticação](obsidian/E1-A1.md)
+- [E1-A2 · Implementar interceptores e refresh token](obsidian/E1-A2.md)
+- [E1-A3 · Construir app shell responsivo](obsidian/E1-A3.md)
+- [E1-A4 · Configurar rotas públicas e protegidas](obsidian/E1-A4.md)
+- [E1-A5 · Parametrizar branding e logos](obsidian/E1-A5.md)
 
 ## Épico 2 — Q&A & Base de Conhecimento
 
@@ -62,6 +72,13 @@ Este documento traduz o planejamento funcional do VectorSeek para uma organizaç
 4. **Feedback loop**
    - Modal `FeedbackDialogComponent` para rating/comentário após cada resposta.
    - Persistir via `/api/qna/feedback` e mostrar toast com `MatSnackBar`.
+
+### Backlog detalhado (notas Obsidian)
+
+- [E2-A1 · Provisionar módulo Q&A](obsidian/E2-A1.md)
+- [E2-A2 · Implementar UI de citações expandíveis](obsidian/E2-A2.md)
+- [E2-A3 · Construir gestão de documentos vetorados](obsidian/E2-A3.md)
+- [E2-A4 · Implementar feedback de respostas](obsidian/E2-A4.md)
 
 ## Épico 3 — Geração de Conteúdo & Exportação
 
@@ -90,6 +107,14 @@ Este documento traduz o planejamento funcional do VectorSeek para uma organizaç
    - `ShareLinksComponent` para criar (`/api/share/create`), listar e revogar (`/api/share/revoke/{token}`).
    - Confirm dialogs com Angular Material `MatDialog`.
 
+### Backlog detalhado (notas Obsidian)
+
+- [E3-A1 · Implementar wizard de geração textual](obsidian/E3-A1.md)
+- [E3-A2 · Monitorar progresso de tarefas de geração](obsidian/E3-A2.md)
+- [E3-A3 · Construir histórico de geração](obsidian/E3-A3.md)
+- [E3-A4 · Implementar fluxo de exportação de documentos](obsidian/E3-A4.md)
+- [E3-A5 · Gerenciar links compartilhados](obsidian/E3-A5.md)
+
 ## Épico 4 — Dashboard Operacional & Quotas
 
 **Objetivo**: oferecer visão consolidada de consumo, custos e alertas.
@@ -109,6 +134,13 @@ Este documento traduz o planejamento funcional do VectorSeek para uma organizaç
 3. **Telemetry hooks**
    - Instrumentar eventos com `@sentry/angular` ou OpenTelemetry caso backend exponha collector.
    - Gravar logs locais em store para troubleshooting (somente visível para admins).
+
+### Backlog detalhado (notas Obsidian)
+
+- [E4-A1 · Construir módulo de dashboard operacional](obsidian/E4-A1.md)
+- [E4-A2 · Visualizar custos por provedor](obsidian/E4-A2.md)
+- [E4-A3 · Implementar alertas de budget e upgrades](obsidian/E4-A3.md)
+- [E4-A4 · Instrumentar telemetria operacional](obsidian/E4-A4.md)
 
 ## Épico 5 — Chat Conversacional & Experiências Multimodais
 
@@ -173,6 +205,13 @@ As atividades do épico 5 foram exportadas para notas individuais compatíveis c
 4. **Roadmap de disponibilidade**
    - Banner informando modelos indisponíveis (OpenAI/Anthropic) com dados do registry.
 
+### Backlog detalhado (notas Obsidian)
+
+- [E6-A1 · Implementar listagem de modelos](obsidian/E6-A1.md)
+- [E6-A2 · Implementar página de detalhes de modelo](obsidian/E6-A2.md)
+- [E6-A3 · Construir estimador de custo](obsidian/E6-A3.md)
+- [E6-A4 · Exibir roadmap e disponibilidade de modelos](obsidian/E6-A4.md)
+
 ## Épico 7 — Setup & Operações
 
 **Objetivo**: disponibilizar wizard operacional para validação de ambiente e automações.
@@ -194,6 +233,13 @@ As atividades do épico 5 foram exportadas para notas individuais compatíveis c
    - `CommandGeneratorComponent` gerando comandos com explicações e botão de cópia.
 4. **Logs detalhados**
    - `LogDrawerComponent` com `MatExpansionPanel` para exibir logs retornados.
+
+### Backlog detalhado (notas Obsidian)
+
+- [E7-A1 · Implementar wizard de setup operacional](obsidian/E7-A1.md)
+- [E7-A2 · Exibir resultados de validação granular](obsidian/E7-A2.md)
+- [E7-A3 · Orquestrar ações automáticas de correção](obsidian/E7-A3.md)
+- [E7-A4 · Gerar comandos operacionais com contexto](obsidian/E7-A4.md)
 
 ## Considerações sobre Abrir o Código do Frontend
 
