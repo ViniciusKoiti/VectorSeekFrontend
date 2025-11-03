@@ -1,9 +1,16 @@
 import { Routes } from '@angular/router';
-import { AppComponent } from './app.component';
 
 export const appRoutes: Routes = [
   {
     path: '',
-    component: AppComponent
+    loadComponent: () => import('./layouts/public-layout.component').then((m) => m.PublicLayoutComponent)
+  },
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.routes').then((m) => m.authRoutes)
+  },
+  {
+    path: '**',
+    redirectTo: ''
   }
 ];
