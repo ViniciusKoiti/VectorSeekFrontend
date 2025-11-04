@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const authRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => import('../layouts/auth-layout.component').then((m) => m.AuthLayoutComponent),
+    loadComponent: () => import('./layouts/auth-layout.component').then((m) => m.AuthLayoutComponent),
     children: [
       {
         path: '',
@@ -25,3 +25,4 @@ export const authRoutes: Routes = [
     ]
   }
 ];
+

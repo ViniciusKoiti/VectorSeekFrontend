@@ -7,8 +7,12 @@
   },
   "scripts": {
     "nx": "node ./tools/nx-cli.js",
-    "graph": "node ./tools/nx-cli.js graph",
-    "test": "node ./tools/nx-cli.js test"
+    "start": "node ./tools/nx-cli.js serve platform",
+    "serve": "node ./tools/nx-cli.js serve platform",
+    "build": "node ./tools/nx-cli.js build platform",
+    "build:prod": "node ./tools/nx-cli.js build platform --configuration=production",
+    "test": "node ./tools/nx-cli.js test",
+    "graph": "node ./tools/nx-cli.js graph"
   },
   "dependencies": {
     "@angular/common": "file:third-party/@angular/common",

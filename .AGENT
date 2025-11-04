@@ -1,0 +1,206 @@
+# VectorSeek Platform - Guia de Referência para Agentes
+
+Este arquivo serve como referência rápida para agentes de IA que trabalham neste projeto.
+
+## 🎯 Contexto do Projeto
+
+**VectorSeek Platform** é uma aplicação Angular 20+ standalone focada em autenticação e fundação de uma plataforma de descoberta de conhecimento baseada em IA.
+
+## 📁 Estrutura de Diretórios Críticos
+
+```
+vectorseek-platform/
+├── src/app/
+│   ├── auth/                    # Módulo de autenticação
+│   │   ├── login-page.component.ts
+│   │   ├── register-page.component.ts
+│   │   ├── forgot-password.component.ts
+│   │   ├── auth.routes.ts       # Rotas lazy-loaded com loadComponent
+│   │   └── layouts/
+│   │       └── auth-layout.component.ts
+│   ├── app.routes.ts            # Rotas principais com lazy loading
+│   └── app.ts                   # Componente raiz standalone
+```
+
+## 📚 Documentação de Referência
+
+### ADRs (Architecture Decision Records)
+- **ADR-001**: `frontend/docs/adr/ADR-001-epico1-autenticacao-shell.md`
+  - Fundação de Autenticação e App Shell
+  - Define padrões de arquitetura standalone
+  - Especifica uso de Zod, i18n, e estrutura de módulos
+
+### TASKS (Atividades do Épico)
+- **E1-A1-1**: `frontend/obsidian/E1-A1-1.md`
+  - Provisionar módulo de autenticação
+  - Rotas: `/auth/login`, `/auth/register`, `/auth/forgot-password`
+  - Componentes standalone com lazy loading
+```
+
+## 🔑 Pontos Importantes
+
+### 1. Arquitetura Standalone
+- **TODOS** os componentes são standalone (sem NgModules)
+- Use `standalone: true` em todos os componentes
+- Importe dependências diretamente no componente
+
+### 2. Lazy Loading
+- Rotas principais usam `loadComponent()` ou `loadChildren()`
+- Nunca importe componentes diretamente em rotas principais
+- Use dynamic imports: `() => import(...).then(m => m.Component)`
+
+### 3. Rotas de Autenticação
+- **E1-A1-1**: Implementado conforme TASK
+- Rotas disponíveis:
+  - `/auth/login` → `LoginPageComponent`
+  - `/auth/register` → `RegisterPageComponent`
+  - `/auth/forgot-password` → `ForgotPasswordComponent`
+- Todas as rotas usam lazy loading com `loadComponent`
+- Layout compartilhado: `AuthLayoutComponent`
+
+### 4. Padrões de Implementação
+- **ADR-001**: Define que todos os componentes devem ser standalone
+- **ADR-001**: Define uso de Zod para validação (próximas TASKS)
+- **ADR-001**: Define estrutura de i18n com namespace `auth`
+- **E1-A1-1**: Todos os componentes implementam `OnInit` e `OnDestroy`
+
+## 🔧 Padrões de Código
+
+### Rotas com Lazy Loading (E1-A1-1)
+```typescript
+// app.routes.ts
+export const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.routes').then((m) => m.authRoutes)
+  }
+];
+
+// auth.routes.ts
+export const authRoutes: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./layouts/auth-layout.component').then((m) => m.AuthLayoutComponent),
+    children: [
+      {
+        path: 'login',
+        loadComponent: () => import('./login-page.component').then((m) => m.LoginPageComponent)
+      }
+    ]
+  }
+];
+```
+
+## 📦 Dependências Principais
+
+### Dependências Core
+- Angular 20+ (standalone components)
+- `@angular/core`, `@angular/common`, `@angular/router`
+- `rxjs` (programação reativa)
+
+### Padrões conforme ADR-001
+- Componentes standalone (obrigatório)
+- Zod para validação (próximas TASKS)
+- @ngx-translate/core para i18n (próximas TASKS)
+
+## 🚫 O Que NÃO Fazer
+
+1. ❌ **NÃO** criar NgModules - use componentes standalone (conforme ADR-001)
+2. ❌ **NÃO** importar componentes diretamente em rotas - use lazy loading com `loadComponent`
+3. ❌ **NÃO** criar componentes sem hooks de ciclo de vida - implemente `OnInit` e `OnDestroy`
+
+## ✅ O Que Fazer
+
+1. ✅ Use componentes standalone sempre (ADR-001)
+2. ✅ Use lazy loading com `loadComponent` para rotas (E1-A1-1)
+3. ✅ Implemente hooks de ciclo de vida (`OnInit`, `OnDestroy`)
+4. ✅ Siga a estrutura de rotas conforme E1-A1-1
+5. ✅ Use `provideRouter` sem NgModule (ADR-001)
+6. ✅ Mantenha componentes focados em apresentação
+7. ✅ Siga os padrões de nomenclatura (kebab-case para arquivos, PascalCase para classes)
+
+## 🎨 Estilos e Design
+
+- Componentes usam estilos inline (template strings)
+- Paleta de cores baseada em Tailwind CSS
+- Design responsivo e mobile-first
+- Espaçamento consistente com gaps de 1rem, 1.5rem, 2rem
+
+## 🧪 Testes
+
+- Testes em `*.spec.ts`
+- Execute com: `npm test` ou `ng test`
+- Cobertura mínima conforme ADR-001: 70% (será implementado em próximas TASKS)
+
+## 📝 Nomenclatura
+
+- **Componentes**: `ComponentNameComponent` (PascalCase)
+- **Arquivos**: `kebab-case.component.ts`
+- **Selectors**: `app-kebab-case` (padrão Angular CLI)
+- **Interfaces**: `InterfaceName` (PascalCase)
+- **Constantes**: `CONSTANT_NAME` (UPPER_SNAKE_CASE)
+
+## 🔍 Locais Importantes
+
+- **Rotas principais**: `src/app/app.routes.ts`
+- **Rotas de auth**: `src/app/auth/auth.routes.ts`
+- **Main**: `src/main.ts`
+- **Config**: `src/app/app.config.ts`
+
+## 🚀 Comandos Úteis
+
+```bash
+# Desenvolvimento
+npm start
+# ou
+ng serve
+
+# Build
+npm run build
+# ou
+ng build
+
+# Testes
+npm test
+# ou
+ng test
+```
+
+## 📚 Referências Rápidas
+
+### ADRs
+- **ADR-001**: Fundação de Autenticação e App Shell
+  - Define padrões de arquitetura standalone
+  - Especifica uso de Zod, i18n, e estrutura de módulos
+  - Localização: `frontend/docs/adr/ADR-001-epico1-autenticacao-shell.md`
+
+### TASKS Implementadas
+- **E1-A1-1**: Provisionar módulo de autenticação
+  - Rotas: `/auth/login`, `/auth/register`, `/auth/forgot-password`
+  - Componentes standalone com lazy loading
+  - Layout placeholder compatível com SSR
+  - Localização: `frontend/obsidian/E1-A1-1.md`
+
+## 🎯 Status Atual (E1-A1-1)
+
+- ✅ Rotas de autenticação implementadas (`/auth/login`, `/auth/register`, `/auth/forgot-password`)
+- ✅ Componentes standalone criados
+- ✅ Lazy loading configurado com `loadComponent`
+- ✅ AuthLayoutComponent placeholder criado
+- ✅ Hooks de ciclo de vida implementados
+- 🚧 Próximas TASKS: AuthService, formulários reativos, i18n, guardas
+
+## 💡 Dicas para Agentes
+
+1. **Sempre consulte** ADR-001 antes de implementar funcionalidades
+2. **Sempre verifique** a TASK correspondente (E1-A1-*) antes de implementar
+3. **Sempre use** componentes standalone (conforme ADR-001)
+4. **Sempre use** lazy loading com `loadComponent` para rotas (conforme E1-A1-1)
+5. **Sempre implemente** hooks de ciclo de vida (`OnInit`, `OnDestroy`)
+6. **Sempre siga** os padrões de nomenclatura estabelecidos
+7. **Sempre referencie** ADR ou TASK no código quando aplicável
+
+---
+
+**Última atualização**: Baseado na implementação E1-A1-1 e ADR-001
+

@@ -111,12 +111,134 @@ function parseCommandLine(argv) {
   return { command, selection, flags };
 }
 
+function serveProject(project, flags = []) {
+  const { spawn } = require('child_process');
+  const projectPath = path.join(workspaceRoot, 'apps', project);
+  const srcPath = path.join(projectPath, 'src');
+  const indexHtmlPath = path.join(srcPath, 'index.html');
+  
+  if (!fs.existsSync(indexHtmlPath)) {
+    console.error(`index.html not found at ${indexHtmlPath}`);
+    console.error('Please ensure index.html exists in the src directory.');
+    process.exitCode = 1;
+    return;
+  }
+
+  const flagSet = new Set(flags);
+  const portIndex = flags.indexOf('--port');
+  const port = portIndex !== -1 && flags[portIndex + 1] 
+    ? flags[portIndex + 1] 
+    : process.env.PORT || '4200';
+
+  // Try to use bundler server first, fallback to simple server
+  const bundlerServerPath = path.join(workspaceRoot, 'tools', 'dev-server-with-bundler.js');
+  const simpleServerPath = path.join(workspaceRoot, 'tools', 'dev-server.js');
+  
+  let serverPath;
+  if (fs.existsSync(bundlerServerPath)) {
+    // Check if esbuild is available
+    try {
+      require.resolve('esbuild');
+      serverPath = bundlerServerPath;
+      console.log('📦 Using bundler for full Angular compilation...\n');
+    } catch (e) {
+      console.log('⚠️  esbuild not found. Using simple static server.');
+      console.log('   Install esbuild for full Angular support: npm install esbuild\n');
+      serverPath = simpleServerPath;
+    }
+  } else if (fs.existsSync(simpleServerPath)) {
+    serverPath = simpleServerPath;
+  } else {
+    console.error('Development server script not found.');
+    process.exitCode = 1;
+    return;
+  }
+
+  // Set PORT environment variable and start server
+  const env = { ...process.env, PORT: port };
+  const serverProcess = spawn('node', [serverPath], {
+    cwd: workspaceRoot,
+    env: env,
+    stdio: 'inherit',
+    shell: true
+  });
+
+  serverProcess.on('error', (error) => {
+    console.error('Error starting server:', error.message);
+    process.exitCode = 1;
+  });
+
+  serverProcess.on('exit', (code) => {
+    if (code !== 0 && code !== null) {
+      process.exitCode = code;
+    }
+  });
+}
+
+function buildProject(project, flags = []) {
+  const { spawn } = require('child_process');
+  const buildScriptPath = path.join(workspaceRoot, 'tools', 'build.js');
+  
+  if (!fs.existsSync(buildScriptPath)) {
+    console.error('Build script not found.');
+    process.exitCode = 1;
+    return;
+  }
+
+  const flagSet = new Set(flags);
+  const isProduction = flagSet.has('--configuration=production') || flagSet.has('--prod');
+  
+  console.log(`Building ${project}...`);
+  console.log(`Mode: ${isProduction ? 'Production' : 'Development'}\n`);
+
+  // Check if esbuild is available
+  try {
+    require.resolve('esbuild');
+    console.log('📦 Using esbuild for compilation...\n');
+  } catch (e) {
+    console.error('❌ esbuild not found.');
+    console.error('   Please install esbuild: npm install esbuild');
+    console.error('   Or use: npm install --save-dev esbuild');
+    process.exitCode = 1;
+    return;
+  }
+
+  // Build arguments
+  const buildArgs = [buildScriptPath];
+  if (isProduction) {
+    buildArgs.push('--prod');
+  }
+
+  // Execute build
+  const buildProcess = spawn('node', buildArgs, {
+    cwd: workspaceRoot,
+    env: process.env,
+    stdio: 'inherit',
+    shell: true
+  });
+
+  buildProcess.on('error', (error) => {
+    console.error('Error during build:', error.message);
+    process.exitCode = 1;
+  });
+
+  buildProcess.on('exit', (code) => {
+    if (code !== 0 && code !== null) {
+      process.exitCode = code;
+    }
+  });
+}
+
 function showHelp() {
-  console.log('Usage: nx <command> [project]');
+  console.log('Usage: nx <command> [project] [options]');
   console.log('Commands:');
   console.log('  graph        Displays a static project graph summary.');
   console.log('  test [proj]  Runs mock tests for a project or all projects.');
   console.log('               Pass --code-coverage to emit mock coverage artefacts.');
+  console.log('  serve [proj] Starts a development server for the project.');
+  console.log('               Options: --port <port>');
+  console.log('  build [proj]  Builds the project.');
+  console.log('               Options: --configuration=production, --prod');
 }
 
 function main() {
@@ -131,6 +253,36 @@ function main() {
       break;
     case 'test':
       runTests(projects, selection, flags);
+      break;
+    case 'serve':
+      if (!selection) {
+        console.error('Please specify a project to serve.');
+        console.log('Available projects:', listProjects(projects).join(', '));
+        process.exitCode = 1;
+        return;
+      }
+      if (!projects[selection]) {
+        console.error(`Unknown project '${selection}'.`);
+        console.log('Available projects:', listProjects(projects).join(', '));
+        process.exitCode = 1;
+        return;
+      }
+      serveProject(selection, flags);
+      break;
+    case 'build':
+      if (!selection) {
+        console.error('Please specify a project to build.');
+        console.log('Available projects:', listProjects(projects).join(', '));
+        process.exitCode = 1;
+        return;
+      }
+      if (!projects[selection]) {
+        console.error(`Unknown project '${selection}'.`);
+        console.log('Available projects:', listProjects(projects).join(', '));
+        process.exitCode = 1;
+        return;
+      }
+      buildProject(selection, flags);
       break;
     case undefined:
     case '--help':

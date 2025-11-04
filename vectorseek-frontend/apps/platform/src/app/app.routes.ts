@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
+import { PublicLayoutComponent } from './layouts/public-layout.component';
 
 export const appRoutes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./layouts/public-layout.component').then((m) => m.PublicLayoutComponent)
+    component: PublicLayoutComponent
   },
   {
     path: 'auth',
