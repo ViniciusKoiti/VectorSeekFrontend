@@ -3,7 +3,14 @@ import { HttpHeaders } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 
 import { AUTH_API_ENDPOINTS } from './auth.api';
-import { AuthError, LoginRequest, RegisterRequest, RequestMagicLinkRequest } from './auth.models';
+import {
+  AuthError,
+  AuthResponseValidationIssue,
+  LoginRequest,
+  RefreshRequest,
+  RegisterRequest,
+  RequestMagicLinkRequest,
+} from './auth.models';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
@@ -88,6 +95,83 @@ describe('AuthService', () => {
       },
       { status: 401, statusText: 'Unauthorized' },
     );
+  });
+
+  it('should reject login responses missing token payloads', () => {
+    const payload: LoginRequest = { email: 'john@example.com', password: 'StrongPassword!23' };
+
+    service.login(payload).subscribe({
+      next: () => fail('Expected login request to error'),
+      error: (error: AuthError) => {
+        expect(error.status).toBe(0);
+        expect(error.summary).toBe('Não foi possível entrar agora');
+        expect(error.code).toBe(AuthResponseValidationIssue.MissingTokens);
+        expect(error.description).toContain('tokens');
+      },
+    });
+
+    const request = httpMock.expectOne(AUTH_API_ENDPOINTS.login());
+    expect(request.request.method).toBe('POST');
+
+    request.flush({
+      data: {
+        tokens: null,
+        user: {
+          id: 'user-123',
+          email: 'john@example.com',
+          full_name: 'John Connor',
+        },
+      },
+    });
+  });
+
+  it('should reject refresh responses with invalid token fields', () => {
+    const payload: RefreshRequest = { refreshToken: 'refresh-token' };
+
+    service.refresh(payload).subscribe({
+      next: () => fail('Expected refresh request to error'),
+      error: (error: AuthError) => {
+        expect(error.status).toBe(0);
+        expect(error.summary).toBe('Sessão expirada');
+        expect(error.code).toBe(AuthResponseValidationIssue.InvalidTokenField);
+        expect(error.description).toContain('expires_in');
+      },
+    });
+
+    const request = httpMock.expectOne(AUTH_API_ENDPOINTS.refresh());
+    expect(request.request.method).toBe('POST');
+
+    request.flush({
+      data: {
+        access_token: 'access-token',
+        refresh_token: 'refresh-token',
+        expires_in: 'invalid',
+        token_type: 'Bearer',
+      },
+    });
+  });
+
+  it('should reject profile responses with missing user fields', () => {
+    service.me().subscribe({
+      next: () => fail('Expected me request to error'),
+      error: (error: AuthError) => {
+        expect(error.status).toBe(0);
+        expect(error.summary).toBe('Não foi possível carregar o perfil');
+        expect(error.code).toBe(AuthResponseValidationIssue.InvalidUserField);
+        expect(error.description).toContain('full_name');
+      },
+    });
+
+    const request = httpMock.expectOne(AUTH_API_ENDPOINTS.me());
+    expect(request.request.method).toBe('GET');
+
+    request.flush({
+      data: {
+        id: 'user-123',
+        email: 'john@example.com',
+        full_name: '',
+      },
+    });
   });
 
   it('should expose retry-after metadata for throttled magic link requests', () => {

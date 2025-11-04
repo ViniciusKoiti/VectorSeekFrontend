@@ -68,6 +68,19 @@ export interface AuthError {
   retryAfterSeconds?: number;
 }
 
+export enum AuthResponseValidationIssue {
+  InvalidSessionPayload = 'invalid_session_payload',
+  MissingTokens = 'missing_tokens',
+  InvalidTokenField = 'invalid_token_field',
+  MissingUser = 'missing_user',
+  InvalidUserField = 'invalid_user_field',
+}
+
+export interface AuthResponseValidationError {
+  issue: AuthResponseValidationIssue;
+  field?: string;
+}
+
 export interface AuthApiErrorPayload {
   code?: string;
   message?: string;
