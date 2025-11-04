@@ -32,24 +32,27 @@
 
 ---
 
-### 🚧 E1-A1-2: PENDENTE
+### 🚧 E1-A1-2: EM PROGRESSO
 
-**Status**: 🚧 Próxima tarefa  
+**Status**: 🚧 Em desenvolvimento — camada `data-access` criada com modelos, endpoints e serviço tipado acompanhados de testes unitários iniciais.
 **Dependência**: E1-A1-1 ✅ (completo)
 
-**O que precisa ser feito:**
-- Criar estrutura `libs/data-access/src/lib/auth/`
-- Implementar `AuthService` com métodos:
-  - `login(LoginRequest): Observable<LoginResponse>`
-  - `register(RegisterRequest): Observable<RegisterResponse>`
-  - `requestMagicLink(RequestMagicLinkRequest): Observable<RequestMagicLinkResponse>`
-  - `refresh(RefreshRequest): Observable<RefreshResponse>`
-  - `me(): Observable<MeResponse>`
-- Criar modelos TypeScript (`auth.models.ts`)
-- Criar configuração de API (`auth.api.ts`)
-- Implementar tratamento de erros padronizado
-- Criar testes unitários com `HttpClientTestingModule`
-- Alcançar cobertura mínima de 70%
+**O que já foi feito até o momento:**
+- Estrutura `libs/data-access/src/lib/auth/` criada dentro do projeto Angular CLI.
+- Contratos TypeScript (`auth.models.ts`) e endpoints (`auth.api.ts`) definidos seguindo o formato envelope/documento descrito nos ADRs.
+- `AuthService` implementado com mapeamento de DTOs para modelos da aplicação e normalização de erros amigáveis.
+- Testes unitários com `HttpClientTestingModule` cobrindo fluxos felizes e principais cenários de falha.
+
+**Próximos passos para concluir a atividade:**
+- Integrar o serviço aos componentes/pages quando os formulários estiverem disponíveis.
+- Acompanhar cobertura de testes para garantir a meta mínima de 70% após integração com demais camadas.
+- Revisar documentação nos ADRs caso ajustes de contrato sejam necessários.
+- Validar `me(): Observable<MeResponse>` assim que o endpoint estiver disponível na API simulada ou ambiente de testes.
+
+**O que ainda falta para encerrar:**
+- Validar contratos contra a API real/mock e ajustar o tratamento de erros quando necessário.
+- Expor o serviço para consumo direto pelas páginas assim que os formulários estiverem prontos.
+- Garantir cobertura mínima de 70% após integração end-to-end (atualmente restrita aos testes de serviço).
 
 **Estrutura necessária:**
 ```
