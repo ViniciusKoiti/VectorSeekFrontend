@@ -3,6 +3,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@vectorseek/data-access": ["libs/data-access/src/index.ts"],
+      "@vectorseek/data-access/*": ["libs/data-access/src/*"]
+    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
