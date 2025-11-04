@@ -10,6 +10,8 @@ import {
   AuthApiSessionDto,
   AuthApiTokensDto,
   AuthError,
+  AuthResponseValidationError,
+  AuthResponseValidationIssue,
   AuthSession,
   AuthTokens,
   AuthUserProfile,
@@ -94,6 +96,8 @@ const ACTION_ERROR_MESSAGES: Record<
 export class AuthService {
   private readonly http = inject(HttpClient);
 
+  private readonly responseFormatSummary = 'Não foi possível interpretar a resposta recebida.';
+
   login(payload: LoginRequest): Observable<LoginResponse> {
     return this.http
       .post<AuthApiEnvelope<AuthApiSessionDto>>(AUTH_API_ENDPOINTS.login(), payload)
@@ -140,6 +144,11 @@ export class AuthService {
   }
 
   private mapSessionResponse(dto: AuthApiSessionDto): AuthSession {
+    this.ensureObject(dto, {
+      issue: AuthResponseValidationIssue.InvalidSessionPayload,
+      field: 'session',
+    });
+
     return {
       tokens: this.mapTokens(dto.tokens),
       user: this.mapProfile(dto.user),
@@ -147,20 +156,68 @@ export class AuthService {
   }
 
   private mapTokens(dto: AuthApiTokensDto): AuthTokens {
+    this.ensureObject(dto, {
+      issue: AuthResponseValidationIssue.MissingTokens,
+      field: 'tokens',
+    });
+
+    const accessToken = this.ensureString(dto.access_token, {
+      issue: AuthResponseValidationIssue.InvalidTokenField,
+      field: 'access_token',
+    });
+    const refreshToken = this.ensureString(dto.refresh_token, {
+      issue: AuthResponseValidationIssue.InvalidTokenField,
+      field: 'refresh_token',
+    });
+    const tokenType = this.ensureString(dto.token_type, {
+      issue: AuthResponseValidationIssue.InvalidTokenField,
+      field: 'token_type',
+    });
+    const expiresIn = this.ensureNumber(dto.expires_in, {
+      issue: AuthResponseValidationIssue.InvalidTokenField,
+      field: 'expires_in',
+    });
+
     return {
-      accessToken: dto.access_token,
-      refreshToken: dto.refresh_token,
-      expiresIn: dto.expires_in,
-      tokenType: dto.token_type,
+      accessToken,
+      refreshToken,
+      expiresIn,
+      tokenType,
     };
   }
 
   private mapProfile(dto: AuthApiProfileDto): AuthUserProfile {
+    this.ensureObject(dto, {
+      issue: AuthResponseValidationIssue.MissingUser,
+      field: 'user',
+    });
+
+    const id = this.ensureString(dto.id, {
+      issue: AuthResponseValidationIssue.InvalidUserField,
+      field: 'id',
+    });
+    const email = this.ensureString(dto.email, {
+      issue: AuthResponseValidationIssue.InvalidUserField,
+      field: 'email',
+    });
+    const fullName = this.ensureString(dto.full_name, {
+      issue: AuthResponseValidationIssue.InvalidUserField,
+      field: 'full_name',
+    });
+
+    let avatarUrl: string | null | undefined = null;
+    if (dto.avatar_url != null) {
+      avatarUrl = this.ensureString(dto.avatar_url, {
+        issue: AuthResponseValidationIssue.InvalidUserField,
+        field: 'avatar_url',
+      });
+    }
+
     return {
-      id: dto.id,
-      email: dto.email,
-      fullName: dto.full_name,
-      avatarUrl: dto.avatar_url ?? null,
+      id,
+      email,
+      fullName,
+      avatarUrl,
     };
   }
 
@@ -169,6 +226,16 @@ export class AuthService {
   }
 
   private normalizeError(action: AuthAction, error: unknown): AuthError {
+    if (error instanceof AuthResponseFormatError) {
+      const fallback = ACTION_ERROR_MESSAGES[action].default;
+      return {
+        status: 0,
+        code: error.detail.issue,
+        summary: fallback.summary,
+        description: error.message ?? this.responseFormatSummary,
+      };
+    }
+
     if (!(error instanceof HttpErrorResponse)) {
       const fallback = ACTION_ERROR_MESSAGES[action].default;
       return {
@@ -269,5 +336,44 @@ export class AuthService {
     }, {});
 
     return Object.keys(entries).length ? entries : undefined;
+  }
+
+  private ensureObject<T extends object>(value: T | null | undefined, detail: AuthResponseValidationError): asserts value is T {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      throw new AuthResponseFormatError(detail, this.buildResponseMessage(detail));
+    }
+  }
+
+  private ensureString(value: unknown, detail: AuthResponseValidationError): string {
+    if (typeof value !== 'string' || !value.trim()) {
+      throw new AuthResponseFormatError(detail, this.buildResponseMessage(detail));
+    }
+
+    return value;
+  }
+
+  private ensureNumber(value: unknown, detail: AuthResponseValidationError): number {
+    if (typeof value !== 'number' || Number.isNaN(value) || !Number.isFinite(value)) {
+      throw new AuthResponseFormatError(detail, this.buildResponseMessage(detail));
+    }
+
+    return value;
+  }
+
+  private buildResponseMessage(detail: AuthResponseValidationError): string {
+    if (detail.field) {
+      return `${this.responseFormatSummary} Campo inválido: ${detail.field}.`;
+    }
+
+    return this.responseFormatSummary;
+  }
+}
+
+class AuthResponseFormatError extends Error {
+  constructor(
+    public readonly detail: AuthResponseValidationError,
+    message?: string,
+  ) {
+    super(message);
   }
 }
