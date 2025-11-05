@@ -1,0 +1,63 @@
+{
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Faça login para continuar explorando a VectorSeek.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "seu@email.com",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
+      "rememberMeLabel": "Lembrar de mim",
+      "submitButton": "Entrar",
+      "submittingButton": "Entrando...",
+      "registerLink": "Criar conta",
+      "forgotPasswordLink": "Esqueci minha senha",
+      "errors": {
+        "required": "Este campo é obrigatório",
+        "email": "Digite um e-mail válido",
+        "minLength": "Senha deve ter no mínimo {{min}} caracteres"
+      }
+    },
+    "register": {
+      "title": "Criar conta",
+      "subtitle": "Junte-se à VectorSeek e descubra o poder da IA.",
+      "fullNameLabel": "Nome completo",
+      "fullNamePlaceholder": "Seu nome completo",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "seu@email.com",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "Crie uma senha segura",
+      "acceptTermsLabel": "Aceito os termos de uso e política de privacidade",
+      "submitButton": "Criar conta",
+      "submittingButton": "Criando conta...",
+      "loginLink": "Já tenho uma conta",
+      "errors": {
+        "required": "Este campo é obrigatório",
+        "email": "Digite um e-mail válido",
+        "minLength": "Senha deve ter no mínimo {{min}} caracteres",
+        "fullNameMinLength": "Nome deve ter no mínimo {{min}} caracteres",
+        "acceptTerms": "Você deve aceitar os termos de uso",
+        "passwordPattern": "A senha deve conter letras maiúsculas, minúsculas, números e caracteres especiais"
+      }
+    },
+    "forgotPassword": {
+      "title": "Recuperar acesso",
+      "subtitle": "Digite seu e-mail e enviaremos um link mágico para você entrar.",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "seu@email.com",
+      "submitButton": "Enviar link mágico",
+      "submittingButton": "Enviando...",
+      "loginLink": "Voltar para login",
+      "successMessage": "Link mágico enviado! Verifique seu e-mail.",
+      "errors": {
+        "required": "Este campo é obrigatório",
+        "email": "Digite um e-mail válido"
+      }
+    },
+    "apiErrors": {
+      "unexpectedError": "Ocorreu um erro inesperado. Tente novamente.",
+      "networkError": "Erro de conexão. Verifique sua internet.",
+      "retryAfter": "Tente novamente em {{seconds}} segundos."
+    }
+  }
+}
