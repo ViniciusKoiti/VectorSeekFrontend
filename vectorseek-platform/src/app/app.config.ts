@@ -2,17 +2,27 @@ import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideTranslateService, TranslateLoader as TranslateLoaderService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { of } from 'rxjs';
 
 import { routes } from './app.routes';
+import ptBR from '../assets/i18n/pt-BR.json';
 
 /**
- * Factory para o TranslateHttpLoader
- * Carrega arquivos de tradução de /assets/i18n/{lang}.json
+ * Loader customizado para traduções
+ * Carrega arquivos de tradução staticamente
  */
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
+export class CustomTranslateLoader implements TranslateLoaderService {
+  getTranslation(lang: string) {
+    // Para produção, poderia carregar dinamicamente via HttpClient
+    // Por enquanto, retorna o JSON importado estaticamente
+    if (lang === 'pt-BR') {
+      return of(ptBR);
+    }
+    return of({});
+  }
 }
 
 export const appConfig: ApplicationConfig = {
@@ -21,15 +31,12 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(),
     provideRouter(routes),
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        defaultLanguage: 'pt-BR',
-        loader: {
-          provide: TranslateLoader,
-          useFactory: HttpLoaderFactory,
-          deps: [HttpClient]
-        }
-      })
-    )
+    provideTranslateService({
+      defaultLanguage: 'pt-BR',
+      loader: {
+        provide: TranslateLoader,
+        useClass: CustomTranslateLoader
+      }
+    })
   ]
 };
