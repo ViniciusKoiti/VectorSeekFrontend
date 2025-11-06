@@ -1,3 +1,7 @@
 export * from './lib/auth/auth.api';
 export * from './lib/auth/auth.models';
 export * from './lib/auth/auth.service';
+
+export * from './lib/qna/qna.api';
+export * from './lib/qna/qna.models';
+export * from './lib/qna/qna.service';
