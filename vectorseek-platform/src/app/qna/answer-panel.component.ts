@@ -1,5 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HighlightTermsPipe } from './pipes/highlight-terms.pipe';
 
 export interface Citation {
   id: string;
@@ -23,18 +24,23 @@ export interface Answer {
 
 /**
  * Componente para exibir respostas e citações do Q&A
- * Conforme especificação E2-A1
+ * Conforme especificações E2-A1 e E2-A2
  */
 @Component({
   selector: 'app-answer-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HighlightTermsPipe],
   template: `
     @if (answer()) {
-      <div class="answer-panel">
+      <div class="answer-panel" role="region" aria-label="Resposta da pergunta">
         <div class="answer-header">
-          <h3>Resposta</h3>
-          <button (click)="onCopy()" class="btn-icon" title="Copiar resposta">
+          <h3 id="answer-title">Resposta</h3>
+          <button
+            (click)="onCopy()"
+            class="btn-icon"
+            aria-label="Copiar resposta para área de transferência"
+            title="Copiar resposta"
+          >
             📋
           </button>
         </div>
@@ -64,27 +70,40 @@ export interface Answer {
         }
 
         @if (answer()!.citations.length > 0) {
-          <div class="citations-section">
-            <h4>Fontes ({{ answer()!.citations.length }})</h4>
-            <div class="citations-list">
-              @for (citation of answer()!.citations; track citation.id) {
+          <div class="citations-section" role="region" aria-label="Citações e fontes">
+            <h4 id="citations-title">Fontes ({{ answer()!.citations.length }})</h4>
+            <div class="citations-list" role="list">
+              @for (citation of answer()!.citations; track citation.id; let index = $index) {
                 <div
                   class="citation-card"
                   [class.expanded]="expandedCitations().has(citation.id)"
+                  role="listitem"
                 >
-                  <div class="citation-header" (click)="toggleCitation(citation.id)">
+                  <button
+                    class="citation-header"
+                    (click)="toggleCitation(citation.id)"
+                    [attr.aria-expanded]="expandedCitations().has(citation.id)"
+                    [attr.aria-controls]="'citation-content-' + citation.id"
+                    [attr.aria-label]="'Citação ' + (index + 1) + ' de ' + citation.documentName + ', relevância ' + (citation.score * 100).toFixed(1) + '%'"
+                  >
                     <div class="citation-info">
                       <strong>{{ citation.documentName }}</strong>
-                      <span class="citation-score">Score: {{ (citation.score * 100).toFixed(1) }}%</span>
+                      <span class="citation-score" aria-label="Relevância">
+                        Score: {{ (citation.score * 100).toFixed(1) }}%
+                      </span>
                     </div>
-                    <span class="expand-icon">
+                    <span class="expand-icon" aria-hidden="true">
                       {{ expandedCitations().has(citation.id) ? '▼' : '▶' }}
                     </span>
-                  </div>
+                  </button>
 
                   @if (expandedCitations().has(citation.id)) {
-                    <div class="citation-content">
-                      <p>{{ citation.chunkText }}</p>
+                    <div
+                      class="citation-content"
+                      [id]="'citation-content-' + citation.id"
+                      role="region"
+                    >
+                      <p [innerHTML]="citation.chunkText | highlightTerms:searchTerms()"></p>
                       @if (citation.metadata && Object.keys(citation.metadata).length > 0) {
                         <div class="citation-metadata">
                           <strong>Metadados:</strong>
@@ -216,10 +235,20 @@ export interface Answer {
         cursor: pointer;
         background: #fafafa;
         transition: background 0.2s;
+        width: 100%;
+        border: none;
+        text-align: left;
+        font-family: inherit;
+        font-size: inherit;
       }
 
       .citation-header:hover {
         background: #f5f5f5;
+      }
+
+      .citation-header:focus {
+        outline: 2px solid #4a90e2;
+        outline-offset: -2px;
       }
 
       .citation-info {
@@ -253,6 +282,14 @@ export interface Answer {
         margin: 0;
         line-height: 1.6;
         color: #333;
+      }
+
+      .citation-content p ::ng-deep mark.highlight {
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 0.125rem 0.25rem;
+        border-radius: 2px;
+        font-weight: 500;
       }
 
       .citation-metadata {
@@ -324,6 +361,7 @@ export interface Answer {
 })
 export class AnswerPanelComponent {
   answer = input.required<Answer | null>();
+  searchTerms = input<string[]>([]);
 
   // Outputs
   copyAnswer = output<void>();

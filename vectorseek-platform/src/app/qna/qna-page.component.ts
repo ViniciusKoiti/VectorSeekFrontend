@@ -1,18 +1,19 @@
-import { Component, OnInit, ViewChild, inject, effect } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QnaService, QnaHistoryEntry } from '@vectorseek/data-access';
 import { QnaStore } from '@vectorseek/state';
 import { QuestionComposerComponent } from './question-composer.component';
 import { AnswerPanelComponent, Answer } from './answer-panel.component';
+import { FeedbackDialogComponent, FeedbackFormData } from './feedback-dialog.component';
 
 /**
  * Página principal do módulo Q&A
- * Conforme especificação E2-A1
+ * Conforme especificações E2-A1 e E2-A4
  */
 @Component({
   selector: 'app-qna-page',
   standalone: true,
-  imports: [CommonModule, QuestionComposerComponent, AnswerPanelComponent],
+  imports: [CommonModule, QuestionComposerComponent, AnswerPanelComponent, FeedbackDialogComponent],
   template: `
     <div class="qna-page">
       <div class="qna-container">
@@ -113,6 +114,14 @@ import { AnswerPanelComponent, Answer } from './answer-panel.component';
           }
         </div>
       </div>
+
+      <!-- Feedback Modal -->
+      @if (showFeedbackDialog()) {
+        <app-feedback-dialog
+          (submitFeedback)="onSubmitFeedback($event)"
+          (cancel)="onCancelFeedback()"
+        />
+      }
     </div>
   `,
   styles: [
@@ -333,9 +342,14 @@ import { AnswerPanelComponent, Answer } from './answer-panel.component';
 })
 export class QnaPageComponent implements OnInit {
   @ViewChild(QuestionComposerComponent) composer?: QuestionComposerComponent;
+  @ViewChild(FeedbackDialogComponent) feedbackDialog?: FeedbackDialogComponent;
 
   private readonly qnaService = inject(QnaService);
   readonly store = inject(QnaStore);
+
+  // Feedback state
+  showFeedbackDialog = signal(false);
+  currentQuestionId = signal<string | null>(null);
 
   constructor() {
     // Effect to handle store errors and update composer
@@ -369,6 +383,7 @@ export class QnaPageComponent implements OnInit {
       next: (response) => {
         this.store.setCurrentAnswer(response.answer);
         this.store.setLoading(false);
+        this.currentQuestionId.set(response.questionId);
 
         // Optionally reload history to include the new question
         this.loadHistory();
@@ -390,8 +405,45 @@ export class QnaPageComponent implements OnInit {
   }
 
   onRequestFeedback(): void {
-    // TODO: Implement feedback modal (E2-A4)
-    console.log('Feedback requested');
+    this.showFeedbackDialog.set(true);
+  }
+
+  onSubmitFeedback(formData: FeedbackFormData): void {
+    if (!this.currentQuestionId()) {
+      console.error('No question ID available for feedback');
+      return;
+    }
+
+    if (this.feedbackDialog) {
+      this.feedbackDialog.setLoading(true);
+      this.feedbackDialog.setError(null);
+    }
+
+    this.qnaService.submitFeedback({
+      questionId: this.currentQuestionId()!,
+      rating: formData.rating,
+      comment: formData.comment
+    }).subscribe({
+      next: () => {
+        if (this.feedbackDialog) {
+          this.feedbackDialog.setLoading(false);
+        }
+        this.showFeedbackDialog.set(false);
+
+        // Reload history to update feedback status
+        this.loadHistory();
+      },
+      error: (error) => {
+        if (this.feedbackDialog) {
+          this.feedbackDialog.setLoading(false);
+          this.feedbackDialog.setError(error);
+        }
+      }
+    });
+  }
+
+  onCancelFeedback(): void {
+    this.showFeedbackDialog.set(false);
   }
 
   onSelectHistoryItem(entry: QnaHistoryEntry): void {
