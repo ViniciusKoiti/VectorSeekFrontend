@@ -7,6 +7,7 @@ import { Routes } from '@angular/router';
  * - Lazy loading do módulo de autenticação usando loadChildren
  * - Rotas públicas separadas da área privada
  * - E2-A1: módulo Q&A
+ * - E2-A3: módulo de Documentos
  */
 export const routes: Routes = [
   {
@@ -19,6 +20,10 @@ export const routes: Routes = [
       {
         path: 'qna',
         loadChildren: () => import('./qna/qna.routes').then((m) => m.qnaRoutes)
+      },
+      {
+        path: 'documents',
+        loadChildren: () => import('./qna/documents/documents.routes').then((m) => m.documentsRoutes)
       }
     ]
   },
