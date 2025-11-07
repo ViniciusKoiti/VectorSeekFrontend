@@ -12,7 +12,10 @@ import {
   GenerationAction,
   GenerationApiEnvelope,
   GenerationApiErrorPayload,
-  GenerationError
+  GenerationError,
+  ListHistoryRequest,
+  ListHistoryResponse,
+  ExportHistoryRequest
 } from './generation.models';
 import { GENERATION_API_ENDPOINTS } from './generation.api';
 
@@ -59,6 +62,22 @@ const ACTION_ERROR_MESSAGES: Record<
     default: {
       summary: 'Não foi possível cancelar a geração',
       description: 'Tente novamente ou aguarde a conclusão da tarefa.'
+    }
+  },
+  history: {
+    default: {
+      summary: 'Não foi possível carregar o histórico',
+      description: 'Tente recarregar a página ou aguarde alguns instantes.'
+    }
+  },
+  export: {
+    default: {
+      summary: 'Não foi possível exportar o histórico',
+      description: 'Tente novamente ou entre em contato com o suporte.'
+    },
+    413: {
+      summary: 'Volume de dados muito grande',
+      description: 'Reduza o período da exportação ou aplique filtros adicionais.'
     }
   }
 };
@@ -132,6 +151,85 @@ export class GenerationService {
       .pipe(
         map((response) => response.data),
         catchError((error) => this.handleError('cancel', error))
+      );
+  }
+
+  /**
+   * Listar histórico de gerações (E3-A3)
+   */
+  listHistory(request?: ListHistoryRequest): Observable<ListHistoryResponse> {
+    let params = new HttpParams();
+
+    if (request?.startDate) {
+      params = params.set('startDate', request.startDate);
+    }
+    if (request?.endDate) {
+      params = params.set('endDate', request.endDate);
+    }
+    if (request?.provider) {
+      params = params.set('provider', request.provider);
+    }
+    if (request?.status) {
+      params = params.set('status', request.status);
+    }
+    if (request?.page !== undefined) {
+      params = params.set('page', request.page.toString());
+    }
+    if (request?.limit !== undefined) {
+      params = params.set('limit', request.limit.toString());
+    }
+    if (request?.sortBy) {
+      params = params.set('sortBy', request.sortBy);
+    }
+    if (request?.sortOrder) {
+      params = params.set('sortOrder', request.sortOrder);
+    }
+
+    return this.http
+      .get<GenerationApiEnvelope<ListHistoryResponse>>(
+        GENERATION_API_ENDPOINTS.listHistory(),
+        { params }
+      )
+      .pipe(
+        map((response) => response.data),
+        catchError((error) => this.handleError('history', error))
+      );
+  }
+
+  /**
+   * Exportar histórico (E3-A3)
+   */
+  exportHistory(request: ExportHistoryRequest): Observable<Blob> {
+    let params = new HttpParams();
+    params = params.set('format', request.format);
+
+    if (request.startDate) {
+      params = params.set('startDate', request.startDate);
+    }
+    if (request.endDate) {
+      params = params.set('endDate', request.endDate);
+    }
+    if (request.provider) {
+      params = params.set('provider', request.provider);
+    }
+    if (request.status) {
+      params = params.set('status', request.status);
+    }
+
+    return this.http
+      .get(GENERATION_API_ENDPOINTS.exportHistory(), {
+        params,
+        responseType: 'blob',
+        observe: 'response'
+      })
+      .pipe(
+        map((response) => {
+          if (!response.body) {
+            throw new Error('Empty response body');
+          }
+          return response.body;
+        }),
+        catchError((error) => this.handleError('export', error))
       );
   }
 

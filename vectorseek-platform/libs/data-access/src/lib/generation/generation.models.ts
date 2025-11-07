@@ -141,7 +141,7 @@ export interface CancelGenerationResponse {
 
 // === Tipos de erro ===
 
-export type GenerationAction = 'generate' | 'progress' | 'templates' | 'cancel';
+export type GenerationAction = 'generate' | 'progress' | 'templates' | 'cancel' | 'history' | 'export';
 
 export interface GenerationError {
   status: number;
@@ -159,4 +159,116 @@ export interface GenerationApiErrorPayload {
 
 export interface GenerationApiEnvelope<T> {
   data: T;
+}
+
+// === E3-T3: Generation History Models ===
+
+export interface GenerationHistoryItem {
+  id: string;
+  taskId: string;
+  title: string;
+  status: 'completed' | 'failed' | 'active' | 'cancelled';
+  provider: string;
+  model?: string;
+  estimatedCost?: number;
+  completedAt?: string;
+  startedAt: string;
+  templateId: string;
+  templateName: string;
+  formData?: GenerationFormData;
+  result?: GeneratedDocument;
+  error?: string;
+}
+
+export interface ListHistoryRequest {
+  startDate?: string;
+  endDate?: string;
+  provider?: string;
+  status?: 'completed' | 'failed' | 'active' | 'cancelled';
+  page?: number;
+  limit?: number;
+  sortBy?: 'completedAt' | 'startedAt' | 'title' | 'estimatedCost';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface ListHistoryResponse {
+  items: GenerationHistoryItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export type HistoryExportFormat = 'pdf' | 'csv';
+
+export interface ExportHistoryRequest {
+  format: HistoryExportFormat;
+  startDate?: string;
+  endDate?: string;
+  provider?: string;
+  status?: 'completed' | 'failed' | 'active' | 'cancelled';
+}
+
+// === E3-T4: Document Export Models ===
+
+export type ExportFormat = 'pdf' | 'docx';
+export type ExportLanguage = 'pt-BR' | 'en-US';
+export type ExportStatus = 'queued' | 'processing' | 'completed' | 'failed';
+
+export interface ExportDocumentRequest {
+  documentId: string;
+  format: ExportFormat;
+  language?: ExportLanguage;
+  workspace?: string;
+  options?: {
+    includeMetadata?: boolean;
+    includeTableOfContents?: boolean;
+    pageSize?: 'A4' | 'Letter';
+    orientation?: 'portrait' | 'landscape';
+  };
+}
+
+export interface ExportDocumentResponse {
+  taskId: string;
+  status: ExportStatus;
+  message: string;
+  estimatedWaitTime?: number; // seconds
+}
+
+export interface ExportProgress {
+  taskId: string;
+  status: ExportStatus;
+  progress: number; // 0-100
+  message: string;
+  downloadUrl?: string;
+  error?: string;
+  startedAt: string;
+  completedAt?: string;
+}
+
+export interface GetExportStatusRequest {
+  taskId: string;
+}
+
+export interface GetExportStatusResponse {
+  taskId: string;
+  status: ExportStatus;
+  progress: number;
+  message: string;
+  downloadUrl?: string;
+  error?: string;
+  startedAt: string;
+  completedAt?: string;
+}
+
+export interface ExportQueueItem {
+  taskId: string;
+  documentId: string;
+  documentTitle: string;
+  format: ExportFormat;
+  status: ExportStatus;
+  progress: number;
+  message: string;
+  downloadUrl?: string;
+  error?: string;
+  createdAt: Date;
 }
