@@ -1,11 +1,13 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { provideTranslateService, TranslateLoader as TranslateLoaderService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { of } from 'rxjs';
+import { provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 import ptBR from '../assets/i18n/pt-BR.json';
@@ -31,6 +33,8 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(),
     provideRouter(routes),
+    provideAnimations(),
+    provideMarkdown(),
     provideTranslateService({
       defaultLanguage: 'pt-BR',
       loader: {
