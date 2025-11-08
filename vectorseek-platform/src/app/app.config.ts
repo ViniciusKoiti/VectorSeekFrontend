@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
@@ -11,6 +11,7 @@ import { provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 import ptBR from '../assets/i18n/pt-BR.json';
+import { apiUrlInterceptor } from './api-url-interceptor';
 
 /**
  * Loader customizado para traduções
@@ -31,7 +32,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([apiUrlInterceptor])),
     provideRouter(routes),
     provideAnimations(),
     provideMarkdown(),

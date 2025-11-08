@@ -1,0 +1,55 @@
+<div class="question-composer">
+  <div class="composer-header">
+    <h2>Faça uma pergunta</h2>
+    <p class="composer-description">
+      Digite sua pergunta e nosso sistema buscará a melhor resposta em sua base de conhecimento
+    </p>
+  </div>
+
+  <div class="composer-body">
+    <textarea
+      [(ngModel)]="questionText"
+      (keydown)="onKeyDown($event)"
+      placeholder="Digite sua pergunta aqui..."
+      [disabled]="disabled()"
+      rows="4"
+      class="question-input"
+    ></textarea>
+
+    <div class="composer-actions">
+      <button
+        (click)="onClear()"
+        [disabled]="disabled() || !questionText.trim()"
+        class="btn btn-secondary"
+        type="button"
+      >
+        Limpar
+      </button>
+      <button
+        (click)="onAsk()"
+        [disabled]="disabled() || !questionText.trim()"
+        class="btn btn-primary"
+        type="button"
+      >
+        @if (disabled()) {
+          <span class="spinner"></span>
+          Processando...
+        } @else {
+          Perguntar
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="composer-error">
+      <span class="error-icon">⚠️</span>
+      <div class="error-content">
+        <strong>{{ error()?.summary }}</strong>
+        @if (error()?.description) {
+          <p>{{ error()?.description }}</p>
+        }
+      </div>
+    </div>
+  }
+</div>

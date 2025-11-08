@@ -1,0 +1,123 @@
+<div class="documents-page">
+  <div class="documents-container">
+    <div class="documents-header">
+      <h1>Documentos Vetorados</h1>
+      <p class="subtitle">Gerencie os documentos indexados na base de conhecimento</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="status-filter">Status:</label>
+        <select id="status-filter" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+          <option value="">Todos</option>
+          <option value="processing">Processando</option>
+          <option value="completed">Concluído</option>
+          <option value="error">Erro</option>
+          <option value="pending">Pendente</option>
+        </select>
+      </div>
+
+      <div class="filter-actions">
+        <button (click)="onRefresh()" class="btn btn-secondary">
+          🔄 Atualizar
+        </button>
+        <button (click)="onExportCSV()" class="btn btn-secondary" [disabled]="documents().length === 0">
+          📥 Exportar CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-panel">
+        <div class="spinner"></div>
+        <p>Carregando documentos...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error()) {
+      <div class="error-panel">
+        <span class="error-icon">⚠️</span>
+        <div class="error-content">
+          <strong>{{ error()?.summary }}</strong>
+          @if (error()?.description) {
+            <p>{{ error()?.description }}</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Documents Table -->
+    @if (!loading() && !error() && documents().length > 0) {
+      <div class="table-container">
+        <table class="documents-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Status</th>
+              <th>Tamanho</th>
+              <th>Workspace</th>
+              <th>Data de Criação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (doc of documents(); track doc.id) {
+              <tr>
+                <td class="doc-title">{{ doc.title }}</td>
+                <td>
+                  <span class="status-badge" [attr.data-status]="doc.status">
+                    {{ getStatusLabel(doc.status) }}
+                  </span>
+                </td>
+                <td>{{ formatSize(doc.size) }}</td>
+                <td>{{ doc.workspaceName || '-' }}</td>
+                <td>{{ formatDate(doc.createdAt) }}</td>
+                <td class="actions-cell">
+                  <button (click)="onViewDetails(doc)" class="btn-icon" title="Ver detalhes">
+                    👁️
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (pagination().totalPages > 1) {
+        <div class="pagination">
+          <button
+            (click)="onPreviousPage()"
+            [disabled]="pagination().page === 1"
+            class="btn btn-secondary"
+          >
+            ← Anterior
+          </button>
+          <span class="pagination-info">
+            Página {{ pagination().page }} de {{ pagination().totalPages }}
+            ({{ pagination().total }} documentos)
+          </span>
+          <button
+            (click)="onNextPage()"
+            [disabled]="pagination().page >= pagination().totalPages"
+            class="btn btn-secondary"
+          >
+            Próxima →
+          </button>
+        </div>
+      }
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && !error() && documents().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📄</div>
+        <h3>Nenhum documento encontrado</h3>
+        <p>Nenhum documento foi indexado ainda ou não corresponde aos filtros aplicados</p>
+      </div>
+    }
+  </div>
+</div>

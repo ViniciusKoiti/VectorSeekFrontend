@@ -17,6 +17,12 @@ export interface AuthSession {
   tokens: AuthTokens;
 }
 
+export enum PlanType {
+  FREE = 'free',
+  PRO = 'pro',
+  ENTERPRISE = 'enterprise'
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -26,9 +32,10 @@ export interface LoginRequest {
 export type LoginResponse = AuthSession;
 
 export interface RegisterRequest {
-  fullName: string;
   email: string;
   password: string;
+  full_name: string;
+  plan: PlanType;
   acceptTerms: boolean;
 }
 

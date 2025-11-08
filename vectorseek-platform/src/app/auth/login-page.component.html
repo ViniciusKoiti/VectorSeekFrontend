@@ -1,0 +1,64 @@
+<section class="auth-page">
+  <header>
+    <h1>{{ 'auth.login.title' | translate }}</h1>
+    <p>{{ 'auth.login.subtitle' | translate }}</p>
+  </header>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+    <!-- Mensagem de erro geral da API -->
+    <div class="api-error" *ngIf="apiError">
+      <span class="error-icon">⚠</span>
+      <div>
+        <strong>{{ apiError.summary }}</strong>
+        <p *ngIf="apiError.description">{{ apiError.description }}</p>
+        <p *ngIf="apiError.retryAfterSeconds" class="retry-info">
+          {{ 'auth.apiErrors.retryAfter' | translate: { seconds: apiError.retryAfterSeconds } }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Campo Email -->
+    <div class="form-field">
+      <label for="email">{{ 'auth.login.emailLabel' | translate }}</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        [placeholder]="'auth.login.emailPlaceholder' | translate"
+        [class.invalid]="emailControl.invalid && emailControl.touched"
+        autocomplete="email"
+      />
+      <app-field-error [control]="emailControl" fieldName="email"></app-field-error>
+    </div>
+
+    <!-- Campo Senha -->
+    <div class="form-field">
+      <label for="password">{{ 'auth.login.passwordLabel' | translate }}</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        [placeholder]="'auth.login.passwordPlaceholder' | translate"
+        [class.invalid]="passwordControl.invalid && passwordControl.touched"
+        autocomplete="current-password"
+      />
+      <app-field-error [control]="passwordControl" fieldName="password"></app-field-error>
+    </div>
+
+    <!-- Checkbox Lembrar -->
+    <div class="form-checkbox">
+      <input id="rememberMe" type="checkbox" formControlName="rememberMe" />
+      <label for="rememberMe">{{ 'auth.login.rememberMeLabel' | translate }}</label>
+    </div>
+
+    <!-- Botão Submit -->
+    <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isSubmitting">
+      {{ isSubmitting ? ('auth.login.submittingButton' | translate) : ('auth.login.submitButton' | translate) }}
+    </button>
+  </form>
+
+  <footer class="auth-footer">
+    <a routerLink="/auth/register">{{ 'auth.login.registerLink' | translate }}</a>
+    <a routerLink="/auth/forgot-password">{{ 'auth.login.forgotPasswordLink' | translate }}</a>
+  </footer>
+</section>

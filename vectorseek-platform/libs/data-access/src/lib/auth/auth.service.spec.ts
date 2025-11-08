@@ -3,7 +3,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 
 import { AUTH_API_ENDPOINTS } from './auth.api';
-import { AuthError, LoginRequest, RegisterRequest, RequestMagicLinkRequest } from './auth.models';
+import { AuthError, LoginRequest, PlanType, RegisterRequest, RequestMagicLinkRequest } from './auth.models';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
@@ -116,9 +116,10 @@ describe('AuthService', () => {
 
   it('should map validation errors on register', () => {
     const payload: RegisterRequest = {
-      fullName: 'John Connor',
       email: 'john@example.com',
       password: 'weak',
+      full_name: 'John Connor',
+      plan: PlanType.FREE,
       acceptTerms: false
     };
 
@@ -152,9 +153,10 @@ describe('AuthService', () => {
 
   it('should successfully register a new user', () => {
     const payload: RegisterRequest = {
-      fullName: 'John Connor',
       email: 'john@example.com',
       password: 'StrongPassword!23',
+      full_name: 'John Connor',
+      plan: PlanType.FREE,
       acceptTerms: true
     };
 

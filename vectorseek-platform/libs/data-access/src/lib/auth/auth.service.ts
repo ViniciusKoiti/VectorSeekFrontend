@@ -30,6 +30,11 @@ interface AuthErrorMessageConfig {
   description: string;
 }
 
+const USER_ALREADY_EXISTS_ERROR_MESSAGE: AuthErrorMessageConfig = {
+  summary: 'E-mail já cadastrado',
+  description: 'Use outro endereço ou faça login caso já possua uma conta.'
+};
+
 const ACTION_ERROR_MESSAGES: Record<
   AuthAction,
   { default: AuthErrorMessageConfig } & Partial<Record<number, AuthErrorMessageConfig>>
@@ -53,6 +58,7 @@ const ACTION_ERROR_MESSAGES: Record<
       summary: 'Não foi possível concluir o cadastro',
       description: 'Revise os dados informados ou tente mais tarde.'
     },
+    409: USER_ALREADY_EXISTS_ERROR_MESSAGE,
     422: {
       summary: 'Dados inválidos',
       description: 'Algumas informações precisam de atenção antes de continuar.'
@@ -87,6 +93,14 @@ const ACTION_ERROR_MESSAGES: Record<
       summary: 'Sessão inválida',
       description: 'Faça login novamente para recuperar o acesso.'
     }
+  }
+};
+
+const ACTION_ERROR_CODE_MESSAGES: Partial<Record<AuthAction, Record<string, AuthErrorMessageConfig>>> = {
+  register: {
+    user_already_exists: USER_ALREADY_EXISTS_ERROR_MESSAGE,
+    useralreadyexistserror: USER_ALREADY_EXISTS_ERROR_MESSAGE,
+    user_exists: USER_ALREADY_EXISTS_ERROR_MESSAGE
   }
 };
 
@@ -182,7 +196,7 @@ export class AuthService {
     const retryAfterSeconds = this.extractRetryAfterSeconds(error.headers);
     const status = error.status ?? 0;
     const payload = this.extractApiErrorPayload(error.error);
-    const messageConfig = ACTION_ERROR_MESSAGES[action][status] ?? ACTION_ERROR_MESSAGES[action].default;
+    const messageConfig = this.resolveErrorMessage(action, status, payload.code);
 
     return {
       status,
@@ -192,6 +206,45 @@ export class AuthService {
       fieldErrors: payload.details,
       retryAfterSeconds: retryAfterSeconds ?? undefined
     };
+  }
+
+  private resolveErrorMessage(action: AuthAction, status: number, code?: string): AuthErrorMessageConfig {
+    const actionMessages = ACTION_ERROR_MESSAGES[action];
+    const statusConfig = actionMessages[status];
+    if (statusConfig) {
+      return statusConfig;
+    }
+
+    if (code) {
+      const variants = new Set<string>();
+      variants.add(code);
+      const trimmed = code.trim();
+      if (trimmed && !variants.has(trimmed)) {
+        variants.add(trimmed);
+      }
+
+      const lower = trimmed.toLowerCase();
+      if (lower && !variants.has(lower)) {
+        variants.add(lower);
+      }
+
+      const sanitized = lower.replace(/[^a-z0-9]+/g, '_');
+      if (sanitized && !variants.has(sanitized)) {
+        variants.add(sanitized);
+      }
+
+      const codeMessages = ACTION_ERROR_CODE_MESSAGES[action];
+      if (codeMessages) {
+        for (const variant of variants) {
+          const match = codeMessages[variant];
+          if (match) {
+            return match;
+          }
+        }
+      }
+    }
+
+    return actionMessages.default;
   }
 
   private extractRetryAfterSeconds(headers: HttpHeaders | null | undefined): number | null {
@@ -241,8 +294,9 @@ export class AuthService {
       code?: string;
       details?: Record<string, unknown>;
       errors?: Record<string, unknown>;
+      detail?: unknown;
     };
-    const nested = maybeEnvelope.error ?? maybeEnvelope;
+    const nested = (maybeEnvelope.error as (AuthApiErrorPayload & { detail?: unknown })) ?? maybeEnvelope;
 
     const code =
       typeof nested.code === 'string'
@@ -253,20 +307,102 @@ export class AuthService {
             ? maybeEnvelope.code
             : undefined;
 
+    const detailValue = (nested as { detail?: unknown }).detail ?? maybeEnvelope.detail;
+    const normalizedDetail = this.normalizeDetail(detailValue);
+
     const message =
       typeof nested.message === 'string'
         ? nested.message
         : typeof maybeEnvelope.message === 'string'
           ? maybeEnvelope.message
-          : undefined;
+          : normalizedDetail.message;
 
     const detailsSource = nested.details ?? nested.errors ?? maybeEnvelope.details ?? maybeEnvelope.errors;
+    const normalizedDetails = this.normalizeDetails(detailsSource) ?? normalizedDetail.details;
 
     return {
       code,
       message,
-      details: this.normalizeDetails(detailsSource)
+      details: normalizedDetails
     };
+  }
+
+  private normalizeDetail(detail: unknown): {
+    message?: string;
+    details?: Record<string, string[]>;
+  } {
+    if (!detail) {
+      return {};
+    }
+
+    if (typeof detail === 'string') {
+      return { message: detail };
+    }
+
+    if (Array.isArray(detail)) {
+      const aggregated = detail.reduce<Record<string, string[]>>((accumulator, item) => {
+        if (!item || typeof item !== 'object') {
+          return accumulator;
+        }
+
+        const record = item as { loc?: unknown; msg?: unknown; message?: unknown };
+        const message =
+          typeof record.msg === 'string'
+            ? record.msg
+            : typeof record.message === 'string'
+              ? record.message
+              : undefined;
+
+        if (!message) {
+          return accumulator;
+        }
+
+        const field = this.extractDetailField(record.loc) ?? 'detail';
+        if (!accumulator[field]) {
+          accumulator[field] = [];
+        }
+        accumulator[field].push(message);
+        return accumulator;
+      }, {});
+
+      return Object.keys(aggregated).length ? { details: aggregated } : {};
+    }
+
+    if (typeof detail === 'object') {
+      const record = detail as { loc?: unknown; msg?: unknown; message?: unknown };
+      const message =
+        typeof record.msg === 'string'
+          ? record.msg
+          : typeof record.message === 'string'
+            ? record.message
+            : undefined;
+
+      const field = this.extractDetailField(record.loc);
+      if (field && message) {
+        return { details: { [field]: [message] } };
+      }
+
+      if (message) {
+        return { message };
+      }
+    }
+
+    return {};
+  }
+
+  private extractDetailField(loc: unknown): string | null {
+    if (typeof loc === 'string' && loc.length) {
+      return loc;
+    }
+
+    if (Array.isArray(loc) && loc.length) {
+      const candidate = loc[loc.length - 1];
+      if (typeof candidate === 'string' && candidate.length) {
+        return candidate;
+      }
+    }
+
+    return null;
   }
 
   private normalizeDetails(details: Record<string, unknown> | undefined): Record<string, string[]> | undefined {

@@ -1,0 +1,72 @@
+<div class="progress-container">
+  <!-- Header -->
+  <div class="progress-header">
+    <h3>Progresso da Geração</h3>
+    @if (!isCompleted() && !hasFailed()) {
+      <button (click)="onStopMonitoring()" class="btn-cancel" title="Parar acompanhamento">
+        Cancelar
+      </button>
+    }
+  </div>
+
+  <!-- Progress Bar -->
+  @if (!hasFailed()) {
+    <div class="progress-bar-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="percentage()"></div>
+      </div>
+      <span class="progress-percentage">{{ percentage() }}%</span>
+    </div>
+  }
+
+  <!-- Status Message -->
+  <div class="status-message" [class.error]="hasFailed()">
+    <span class="status-icon">{{ getStatusIcon() }}</span>
+    <span class="status-text">{{ message() }}</span>
+  </div>
+
+  <!-- Stages -->
+  @if (!hasFailed()) {
+    <div class="stages">
+      <div class="stage" [class.active]="isStageActive('context')" [class.completed]="isStageCompleted('context')">
+        <span class="stage-icon">{{ getStageIcon('context') }}</span>
+        <span class="stage-label">Contexto</span>
+      </div>
+      <div class="stage-divider"></div>
+      <div class="stage" [class.active]="isStageActive('rendering')" [class.completed]="isStageCompleted('rendering')">
+        <span class="stage-icon">{{ getStageIcon('rendering') }}</span>
+        <span class="stage-label">Renderização</span>
+      </div>
+      <div class="stage-divider"></div>
+      <div class="stage" [class.active]="isStageActive('completed')" [class.completed]="isStageCompleted('completed')">
+        <span class="stage-icon">{{ getStageIcon('completed') }}</span>
+        <span class="stage-label">Concluído</span>
+      </div>
+    </div>
+  }
+
+  <!-- ETA -->
+  @if (eta() && !isCompleted() && !hasFailed()) {
+    <div class="eta">
+      <span>Tempo estimado: {{ formatEta(eta()!) }}</span>
+    </div>
+  }
+
+  <!-- Error Actions -->
+  @if (hasFailed()) {
+    <div class="error-actions">
+      <button (click)="onRetry()" class="btn btn-primary">
+        Reiniciar Processo
+      </button>
+    </div>
+  }
+
+  <!-- Success Actions -->
+  @if (isCompleted() && result()) {
+    <div class="success-actions">
+      <button (click)="onViewResult()" class="btn btn-primary">
+        Ver Resultado
+      </button>
+    </div>
+  }
+</div>

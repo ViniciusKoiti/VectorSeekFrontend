@@ -1,0 +1,102 @@
+<div class="feedback-overlay" (click)="onCancel()">
+  <div class="feedback-dialog" (click)="$event.stopPropagation()" role="dialog" aria-labelledby="feedback-title" aria-modal="true">
+    <div class="dialog-header">
+      <h3 id="feedback-title">Avaliar Resposta</h3>
+      <button
+        (click)="onCancel()"
+        class="btn-close"
+        aria-label="Fechar modal"
+        type="button"
+      >
+        ✕
+      </button>
+    </div>
+
+    <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
+      <div class="dialog-content">
+        <div class="form-group">
+          <label for="rating" class="form-label required">
+            Como você avalia esta resposta?
+          </label>
+          <div class="rating-stars" role="radiogroup" aria-label="Avaliação de 1 a 5 estrelas">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <button
+                type="button"
+                class="star-button"
+                [class.active]="(feedbackForm.value.rating || 0) >= star"
+                [class.hover]="hoverRating() >= star"
+                (click)="setRating(star)"
+                (mouseenter)="setHoverRating(star)"
+                (mouseleave)="setHoverRating(0)"
+                [attr.aria-label]="star + ' estrela' + (star > 1 ? 's' : '')"
+                [attr.aria-checked]="feedbackForm.value.rating === star"
+                role="radio"
+              >
+                {{ (feedbackForm.value.rating || 0) >= star || hoverRating() >= star ? '★' : '☆' }}
+              </button>
+            }
+          </div>
+          @if (feedbackForm.controls.rating.invalid && feedbackForm.controls.rating.touched) {
+            <div class="form-error" role="alert">
+              Por favor, selecione uma avaliação
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="comment" class="form-label">
+            Comentários adicionais (opcional)
+          </label>
+          <textarea
+            id="comment"
+            formControlName="comment"
+            placeholder="Compartilhe sua opinião sobre a resposta..."
+            rows="4"
+            class="form-textarea"
+            [attr.aria-invalid]="feedbackForm.controls.comment.invalid && feedbackForm.controls.comment.touched"
+          ></textarea>
+          @if (feedbackForm.controls.comment.invalid && feedbackForm.controls.comment.touched) {
+            <div class="form-error" role="alert">
+              {{ getCommentError() }}
+            </div>
+          }
+        </div>
+
+        @if (error()) {
+          <div class="dialog-error" role="alert">
+            <span class="error-icon">⚠️</span>
+            <div class="error-content">
+              <strong>{{ error()?.summary }}</strong>
+              @if (error()?.description) {
+                <p>{{ error()?.description }}</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="dialog-actions">
+        <button
+          type="button"
+          (click)="onCancel()"
+          class="btn btn-secondary"
+          [disabled]="loading()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="loading() || feedbackForm.invalid"
+        >
+          @if (loading()) {
+            <span class="spinner"></span>
+            Enviando...
+          } @else {
+            Enviar Feedback
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

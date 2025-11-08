@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PlanType } from '../../../../libs/data-access/src/lib/auth/auth.models';
 
 /**
  * Schema de validação para o formulário de login
@@ -36,11 +37,8 @@ export const registerSchema = z.object({
   password: z
     .string()
     .min(1, { message: 'auth.register.errors.required' })
-    .min(8, { message: 'auth.register.errors.minLength' })
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-      { message: 'auth.register.errors.passwordPattern' }
-    ),
+    .min(8, { message: 'auth.register.errors.minLength' }),
+  plan: z.nativeEnum(PlanType).default(PlanType.FREE),
   acceptTerms: z
     .boolean()
     .refine((val) => val === true, {

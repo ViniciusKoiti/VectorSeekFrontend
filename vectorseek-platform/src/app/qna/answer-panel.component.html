@@ -1,0 +1,100 @@
+@if (answer()) {
+  <div class="answer-panel" role="region" aria-label="Resposta da pergunta">
+    <div class="answer-header">
+      <h3 id="answer-title">Resposta</h3>
+      <button
+        (click)="onCopy()"
+        class="btn-icon"
+        aria-label="Copiar resposta para área de transferência"
+        title="Copiar resposta"
+      >
+        📋
+      </button>
+    </div>
+
+    <div class="answer-content">
+      <p>{{ answer()!.text }}</p>
+    </div>
+
+    @if (answer()!.modelUsed || answer()!.provider) {
+      <div class="answer-metadata">
+        @if (answer()!.provider) {
+          <span class="metadata-item">
+            <strong>Provedor:</strong> {{ answer()!.provider }}
+          </span>
+        }
+        @if (answer()!.modelUsed) {
+          <span class="metadata-item">
+            <strong>Modelo:</strong> {{ answer()!.modelUsed }}
+          </span>
+        }
+        @if (answer()!.tokensUsed) {
+          <span class="metadata-item">
+            <strong>Tokens:</strong> {{ answer()!.tokensUsed!.input + answer()!.tokensUsed!.output }}
+          </span>
+        }
+      </div>
+    }
+
+    @if (answer()!.citations.length > 0) {
+      <div class="citations-section" role="region" aria-label="Citações e fontes">
+        <h4 id="citations-title">Fontes ({{ answer()!.citations.length }})</h4>
+        <div class="citations-list" role="list">
+          @for (citation of answer()!.citations; track citation.id; let index = $index) {
+            <div
+              class="citation-card"
+              [class.expanded]="expandedCitations().has(citation.id)"
+              role="listitem"
+            >
+              <button
+                class="citation-header"
+                (click)="toggleCitation(citation.id)"
+                [attr.aria-expanded]="expandedCitations().has(citation.id)"
+                [attr.aria-controls]="'citation-content-' + citation.id"
+                [attr.aria-label]="'Citação ' + (index + 1) + ' de ' + citation.documentName + ', relevância ' + (citation.score * 100).toFixed(1) + '%'"
+              >
+                <div class="citation-info">
+                  <strong>{{ citation.documentName }}</strong>
+                  <span class="citation-score" aria-label="Relevância">
+                    Score: {{ (citation.score * 100).toFixed(1) }}%
+                  </span>
+                </div>
+                <span class="expand-icon" aria-hidden="true">
+                  {{ expandedCitations().has(citation.id) ? '▼' : '▶' }}
+                </span>
+              </button>
+
+              @if (expandedCitations().has(citation.id)) {
+                <div
+                  class="citation-content"
+                  [id]="'citation-content-' + citation.id"
+                  role="region"
+                >
+                  <p [innerHTML]="citation.chunkText | highlightTerms:searchTerms()"></p>
+                  @if (citation.metadata && Object.keys(citation.metadata).length > 0) {
+                    <div class="citation-metadata">
+                      <strong>Metadados:</strong>
+                      <pre>{{ citation.metadata | json }}</pre>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="answer-actions">
+      <button (click)="onFeedback()" class="btn btn-secondary">
+        Avaliar resposta
+      </button>
+    </div>
+
+    @if (copySuccess()) {
+      <div class="copy-notification">
+        ✓ Resposta copiada!
+      </div>
+    }
+  </div>
+}

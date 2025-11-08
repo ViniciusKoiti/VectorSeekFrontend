@@ -1,0 +1,135 @@
+<div class="template-step">
+  <h2>Selecione um Template</h2>
+  <p class="subtitle">Escolha o formato do documento que deseja gerar</p>
+
+  @if (loading()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Carregando templates...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-box">
+      <p>{{ error() }}</p>
+      <button (click)="loadTemplates()" class="btn btn-secondary">
+        Tentar Novamente
+      </button>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <!-- Template Selection -->
+    <div class="templates-grid">
+      @for (template of templates(); track template.id) {
+        <div
+          class="template-card"
+          [class.selected]="selectedTemplateId() === template.id"
+          (click)="selectTemplate(template)"
+        >
+          <h3>{{ template.name }}</h3>
+          <p class="template-description">{{ template.description }}</p>
+          <span class="template-category">{{ template.category }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Template Variables -->
+    @if (selectedTemplate()) {
+      <div class="variables-section">
+        <h3>Variáveis do Template</h3>
+        <p class="subtitle-small">Preencha as variáveis customizadas</p>
+
+        <form #form="ngForm">
+          @for (variable of selectedTemplate()!.variables; track variable.name) {
+            <div class="form-group">
+              <label [for]="variable.name">
+                {{ variable.label }}
+                @if (variable.required) {
+                  <span class="required">*</span>
+                }
+              </label>
+
+              @if (variable.description) {
+                <small class="help-text">{{ variable.description }}</small>
+              }
+
+              <!-- Text input -->
+              @if (variable.type === 'text') {
+                <input
+                  type="text"
+                  [id]="variable.name"
+                  [name]="variable.name"
+                  [(ngModel)]="customVariables[variable.name]"
+                  [placeholder]="variable.defaultValue?.toString() || ''"
+                  class="form-control"
+                  [class.error]="variableErrors()[variable.name]"
+                />
+              }
+
+              <!-- Textarea -->
+              @if (variable.type === 'textarea') {
+                <textarea
+                  [id]="variable.name"
+                  [name]="variable.name"
+                  [(ngModel)]="customVariables[variable.name]"
+                  [placeholder]="variable.defaultValue?.toString() || ''"
+                  rows="4"
+                  class="form-control"
+                  [class.error]="variableErrors()[variable.name]"
+                ></textarea>
+              }
+
+              <!-- Number input -->
+              @if (variable.type === 'number') {
+                <input
+                  type="number"
+                  [id]="variable.name"
+                  [name]="variable.name"
+                  [(ngModel)]="customVariables[variable.name]"
+                  [placeholder]="variable.defaultValue?.toString() || ''"
+                  class="form-control"
+                  [class.error]="variableErrors()[variable.name]"
+                />
+              }
+
+              <!-- Select -->
+              @if (variable.type === 'select' && variable.options) {
+                <select
+                  [id]="variable.name"
+                  [name]="variable.name"
+                  [(ngModel)]="customVariables[variable.name]"
+                  class="form-control"
+                  [class.error]="variableErrors()[variable.name]"
+                >
+                  <option value="">Selecione...</option>
+                  @for (option of variable.options; track option) {
+                    <option [value]="option">{{ option }}</option>
+                  }
+                </select>
+              }
+
+              @if (variableErrors()[variable.name]) {
+                <span class="error-message">{{ variableErrors()[variable.name] }}</span>
+              }
+            </div>
+          }
+        </form>
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button (click)="onBack()" class="btn btn-secondary">
+        Voltar
+      </button>
+      <button
+        (click)="onNext()"
+        class="btn btn-primary"
+        [disabled]="!selectedTemplateId()"
+      >
+        Próximo
+      </button>
+    </div>
+  }
+</div>

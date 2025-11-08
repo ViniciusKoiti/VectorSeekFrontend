@@ -1,0 +1,77 @@
+<div class="form-step">
+  <h2>Informações Básicas</h2>
+  <p class="subtitle">Preencha as informações principais do documento</p>
+
+  <form (ngSubmit)="onSubmit()" #form="ngForm">
+    <!-- Title -->
+    <div class="form-group">
+      <label for="title">
+        Título <span class="required">*</span>
+      </label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        [(ngModel)]="formData.title"
+        placeholder="Ex: Artigo sobre IA"
+        class="form-control"
+        [class.error]="errors()['title']"
+        required
+      />
+      @if (errors()['title']) {
+        <span class="error-message">{{ errors()['title'] }}</span>
+      }
+    </div>
+
+    <!-- Briefing -->
+    <div class="form-group">
+      <label for="briefing">
+        Briefing <span class="required">*</span>
+      </label>
+      <textarea
+        id="briefing"
+        name="briefing"
+        [(ngModel)]="formData.briefing"
+        placeholder="Descreva o que deseja gerar..."
+        rows="8"
+        class="form-control"
+        [class.error]="errors()['briefing']"
+        required
+      ></textarea>
+      <small class="help-text">
+        Mínimo 10 caracteres, máximo 5000 caracteres
+      </small>
+      @if (errors()['briefing']) {
+        <span class="error-message">{{ errors()['briefing'] }}</span>
+      }
+    </div>
+
+    <!-- Model Override (opcional) -->
+    <div class="form-group">
+      <label for="modelOverride">
+        Modelo (opcional)
+      </label>
+      <select
+        id="modelOverride"
+        name="modelOverride"
+        [(ngModel)]="formData.modelOverride"
+        class="form-control"
+      >
+        <option value="">Padrão do sistema</option>
+        <option value="gpt-4">GPT-4</option>
+        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+        <option value="claude-3">Claude 3</option>
+      </select>
+      <small class="help-text">
+        Escolha um modelo específico ou use o padrão
+      </small>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        Próximo
+      </button>
+    </div>
+  </form>
+</div>

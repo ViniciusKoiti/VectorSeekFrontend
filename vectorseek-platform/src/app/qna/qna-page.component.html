@@ -1,0 +1,108 @@
+<div class="qna-page">
+  <div class="qna-container">
+    <div class="qna-header">
+      <h1>Perguntas e Respostas</h1>
+      <p class="subtitle">
+        Faça perguntas sobre sua base de conhecimento e receba respostas baseadas em documentos
+      </p>
+    </div>
+
+    <div class="qna-content">
+      <!-- Question Composer -->
+      <app-question-composer
+        (askQuestion)="onAskQuestion($event)"
+        (clearQuestion)="onClearQuestion()"
+      />
+
+      <!-- Loading State -->
+      @if (store.loading()) {
+        <div class="loading-panel">
+          <div class="spinner-large"></div>
+          <p>Processando sua pergunta...</p>
+        </div>
+      }
+
+      <!-- Answer Panel -->
+      @if (store.currentAnswer() && !store.loading()) {
+        <app-answer-panel
+          [answer]="store.currentAnswer()"
+          (copyAnswer)="onCopyAnswer()"
+          (requestFeedback)="onRequestFeedback()"
+        />
+      }
+
+      <!-- History Section -->
+      @if (store.hasHistory()) {
+        <div class="history-section">
+          <div class="history-header">
+            <h2>Histórico</h2>
+            <button (click)="onRefreshHistory()" class="btn-icon" title="Atualizar">
+              🔄
+            </button>
+          </div>
+
+          <div class="history-list">
+            @for (entry of store.history(); track entry.id) {
+              <div class="history-item" (click)="onSelectHistoryItem(entry)">
+                <div class="history-question">
+                  <strong>{{ entry.question.text }}</strong>
+                  <span class="history-timestamp">
+                    {{ formatTimestamp(entry.timestamp) }}
+                  </span>
+                </div>
+                <div class="history-answer-preview">
+                  {{ truncateText(entry.answer.text, 150) }}
+                </div>
+                @if (entry.feedbackRating) {
+                  <div class="history-rating">
+                    ⭐ {{ entry.feedbackRating }}/5
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Pagination -->
+          @if (store.pagination().totalPages > 1) {
+            <div class="pagination">
+              <button
+                (click)="onPreviousPage()"
+                [disabled]="store.isFirstPage()"
+                class="btn btn-secondary"
+              >
+                ← Anterior
+              </button>
+              <span class="pagination-info">
+                Página {{ store.pagination().page }} de {{ store.pagination().totalPages }}
+              </span>
+              <button
+                (click)="onNextPage()"
+                [disabled]="store.isLastPage()"
+                class="btn btn-secondary"
+              >
+                Próxima →
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!store.hasHistory() && !store.loading() && !store.currentAnswer()) {
+        <div class="empty-state">
+          <div class="empty-icon">💬</div>
+          <h3>Nenhuma pergunta ainda</h3>
+          <p>Faça sua primeira pergunta para começar</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  @if (showFeedbackDialog()) {
+    <app-feedback-dialog
+      (submitFeedback)="onSubmitFeedback($event)"
+      (cancel)="onCancelFeedback()"
+    />
+  }
+</div>

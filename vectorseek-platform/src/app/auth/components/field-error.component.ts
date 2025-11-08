@@ -18,46 +18,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   selector: 'app-field-error',
   standalone: true,
   imports: [CommonModule, TranslateModule],
-  template: `
-    <div class="field-error" *ngIf="shouldShowError()">
-      <span class="error-icon">⚠</span>
-      <span class="error-message">{{ getErrorMessage() }}</span>
-    </div>
-  `,
-  styles: [
-    `
-      .field-error {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-        margin-top: 0.375rem;
-        font-size: 0.875rem;
-        color: #dc2626;
-        animation: slideDown 0.2s ease-out;
-      }
-
-      .error-icon {
-        flex-shrink: 0;
-        font-size: 1rem;
-        line-height: 1.25rem;
-      }
-
-      .error-message {
-        line-height: 1.25rem;
-      }
-
-      @keyframes slideDown {
-        from {
-          opacity: 0;
-          transform: translateY(-0.25rem);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    `
-  ]
+  templateUrl: './field-error.component.html',
+  styleUrls: ['./field-error.component.css']
 })
 export class FieldErrorComponent {
   @Input() control: AbstractControl | null = null;
@@ -101,9 +63,7 @@ export class FieldErrorComponent {
       });
     }
 
-    if (errors['pattern']) {
-      return this.translate.instant('auth.register.errors.passwordPattern');
-    }
+
 
     // Erro genérico
     return this.translate.instant('auth.apiErrors.unexpectedError');

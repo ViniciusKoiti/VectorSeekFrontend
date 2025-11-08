@@ -1,0 +1,83 @@
+<div class="review-step">
+  <h2>Revise as Informações</h2>
+  <p class="subtitle">Confirme os dados antes de iniciar a geração</p>
+
+  <div class="review-sections">
+    <!-- Informações Básicas -->
+    <div class="review-section">
+      <h3>Informações Básicas</h3>
+      <div class="review-item">
+        <span class="review-label">Título:</span>
+        <span class="review-value">{{ wizardData.title }}</span>
+      </div>
+      <div class="review-item">
+        <span class="review-label">Briefing:</span>
+        <div class="review-value briefing-preview">
+          {{ wizardData.briefing }}
+        </div>
+      </div>
+      @if (wizardData.modelOverride) {
+        <div class="review-item">
+          <span class="review-label">Modelo:</span>
+          <span class="review-value">{{ wizardData.modelOverride }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Template -->
+    <div class="review-section">
+      <h3>Template</h3>
+      <div class="review-item">
+        <span class="review-label">Template ID:</span>
+        <span class="review-value">{{ wizardData.templateId }}</span>
+      </div>
+      @if (templateName) {
+        <div class="review-item">
+          <span class="review-label">Nome:</span>
+          <span class="review-value">{{ templateName }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Variáveis Customizadas -->
+    @if (hasCustomVariables()) {
+      <div class="review-section">
+        <h3>Variáveis Customizadas</h3>
+        @for (variable of getCustomVariablesArray(); track variable.key) {
+          <div class="review-item">
+            <span class="review-label">{{ variable.key }}:</span>
+            <span class="review-value">{{ variable.value }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Info Box -->
+  <div class="info-box">
+    <div class="info-icon">ℹ️</div>
+    <div class="info-content">
+      <strong>Importante:</strong> A geração pode levar alguns minutos dependendo da complexidade do documento.
+      Você poderá acompanhar o progresso em tempo real.
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="form-actions">
+    <button (click)="onBack()" class="btn btn-secondary" [disabled]="generating">
+      Voltar
+    </button>
+    <button
+      (click)="onGenerate()"
+      class="btn btn-primary"
+      [disabled]="generating"
+    >
+      @if (generating) {
+        <span class="spinner-small"></span>
+        <span>Iniciando...</span>
+      } @else {
+        <span>Gerar Documento</span>
+      }
+    </button>
+  </div>
+</div>

@@ -1,0 +1,122 @@
+<div class="wizard-container">
+  <div class="wizard-header">
+    <h1>Geração de Conteúdo</h1>
+    <p class="subtitle">Crie documentos personalizados em minutos</p>
+  </div>
+
+  @if (!showProgress() && !showResult()) {
+    <mat-stepper #stepper linear>
+      <!-- Step 1: Form -->
+      <mat-step [completed]="formData() !== null">
+        <ng-template matStepLabel>Informações</ng-template>
+        <app-form-step
+          (next)="onFormNext($event)"
+        />
+      </mat-step>
+
+      <!-- Step 2: Template -->
+      <mat-step [completed]="templateData() !== null">
+        <ng-template matStepLabel>Template</ng-template>
+        <app-template-step
+          (next)="onTemplateNext($event)"
+          (back)="stepper.previous()"
+        />
+      </mat-step>
+
+      <!-- Step 3: Review -->
+      <mat-step>
+        <ng-template matStepLabel>Revisão</ng-template>
+        @if (getWizardData()) {
+          <app-review-step
+            [wizardData]="getWizardData()!"
+            [templateName]="selectedTemplateName()"
+            [generating]="generating()"
+            (generate)="onGenerate()"
+            (back)="stepper.previous()"
+          />
+        }
+      </mat-step>
+    </mat-stepper>
+  }
+
+  <!-- Progress View -->
+  @if (showProgress() && taskId()) {
+    <div class="progress-view">
+      <app-generation-progress
+        [taskId]="taskId()!"
+        (completed)="onGenerationCompleted($event)"
+        (failed)="onGenerationFailed($event)"
+        (cancelled)="onGenerationCancelled()"
+      />
+    </div>
+  }
+
+  <!-- Result View -->
+  @if (showResult() && result()) {
+    <div class="result-view">
+      <div class="result-header">
+        <h2>✅ Documento Gerado com Sucesso!</h2>
+        <p class="subtitle">Seu documento está pronto para uso</p>
+      </div>
+
+      <div class="result-info">
+        <div class="info-item">
+          <strong>Título:</strong> {{ result()!.title }}
+        </div>
+        @if (result()!.metadata) {
+          <div class="info-item">
+            <strong>Modelo:</strong> {{ result()!.metadata!.modelUsed || 'Padrão' }}
+          </div>
+          @if (result()!.metadata!.tokensUsed) {
+            <div class="info-item">
+              <strong>Tokens:</strong>
+              {{ result()!.metadata!.tokensUsed!.input + result()!.metadata!.tokensUsed!.output }}
+              ({{ result()!.metadata!.tokensUsed!.input }} input + {{ result()!.metadata!.tokensUsed!.output }} output)
+            </div>
+          }
+        }
+      </div>
+
+      <div class="result-content">
+        <div class="content-header">
+          <h3>Conteúdo Gerado</h3>
+          <div class="content-actions">
+            <button (click)="copyToClipboard()" class="btn btn-secondary">
+              📋 Copiar
+            </button>
+            <button (click)="downloadMarkdown()" class="btn btn-secondary">
+              📥 Baixar Markdown
+            </button>
+          </div>
+        </div>
+        <div class="content-preview">
+          <pre>{{ result()!.content }}</pre>
+        </div>
+      </div>
+
+      @if (copySuccess()) {
+        <div class="success-message">
+          ✅ Conteúdo copiado para a área de transferência!
+        </div>
+      }
+
+      <div class="result-actions">
+        <button (click)="startNewGeneration()" class="btn btn-primary">
+          ➕ Nova Geração
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Error View -->
+  @if (error()) {
+    <div class="error-view">
+      <div class="error-icon">❌</div>
+      <h2>{{ error()!.summary }}</h2>
+      <p>{{ error()!.description }}</p>
+      <button (click)="clearError()" class="btn btn-primary">
+        Tentar Novamente
+      </button>
+    </div>
+  }
+</div>
