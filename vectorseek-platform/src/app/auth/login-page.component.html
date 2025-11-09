@@ -7,15 +7,16 @@
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
     <!-- Mensagem de erro geral da API -->
     <div class="api-error" *ngIf="apiError">
-      <span class="error-icon">⚠</span>
-      <div>
-        <strong>{{ apiError.summary }}</strong>
-        <p *ngIf="apiError.description">{{ apiError.description }}</p>
-        <p *ngIf="apiError.retryAfterSeconds" class="retry-info">
-          {{ 'auth.apiErrors.retryAfter' | translate: { seconds: apiError.retryAfterSeconds } }}
-        </p>
-      </div>
+    <span class="error-icon">⚠</span>
+    <div>
+      <strong>{{ apiError.summary | authError }}</strong>
+      <p *ngIf="apiError.description">
+        {{ apiError.description | authError }}
+      </p>
+
+
     </div>
+  </div>
 
     <!-- Campo Email -->
     <div class="form-field">

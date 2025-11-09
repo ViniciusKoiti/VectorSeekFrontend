@@ -10,11 +10,12 @@ import { AuthStore } from '../../../libs/state/src/lib/auth/auth.store';
 import { FieldErrorComponent } from './components/field-error.component';
 import { loginSchema, LoginFormData } from './schemas/auth.schemas';
 import { zodValidator } from './utils/zod-validators';
+import { AuthErrorPipe } from '@vectorseek/data-access/lib/auth/auth-error.pipe';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent, AuthErrorPipe],
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css']
 })
@@ -30,7 +31,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   apiError: AuthError | null = null;
 
   ngOnInit(): void {
-    console.info('LoginPageComponent inicializado');
     this.translate.use('pt-BR');
     this.initForm();
   }

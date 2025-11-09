@@ -5,7 +5,6 @@
   </header>
 
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
-    <!-- Mensagem de erro geral da API -->
     <div class="api-error" *ngIf="apiError">
       <span class="error-icon">⚠</span>
       <div>

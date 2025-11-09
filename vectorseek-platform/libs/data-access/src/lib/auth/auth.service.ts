@@ -186,68 +186,44 @@ export class AuthService {
 
   private normalizeError(action: AuthAction, error: unknown): AuthError {
     if (!(error instanceof HttpErrorResponse)) {
-      const fallback = ACTION_ERROR_MESSAGES[action].default;
       return {
         status: 0,
         code: 'unexpected_error',
-        summary: fallback.summary,
-        description: fallback.description
+        summary: `auth.apiErrors.${action}.default.summary`,
+        description: `auth.apiErrors.${action}.default.description`
       };
     }
 
     const retryAfterSeconds = this.extractRetryAfterSeconds(error.headers);
     const status = error.status ?? 0;
     const payload = this.extractApiErrorPayload(error.error);
-    const messageConfig = this.resolveErrorMessage(action, status, payload.code);
+    const errorKey = this.buildErrorKey(action, status, payload.code);
 
     return {
       status,
       code: payload.code ?? `http_${status || 0}`,
-      summary: messageConfig.summary,
-      description: payload.message ?? messageConfig.description,
+      summary: `${errorKey}.summary`,
+      description: `${errorKey}.description`,
       fieldErrors: payload.details,
       retryAfterSeconds: retryAfterSeconds ?? undefined
     };
-  }
-
-  private resolveErrorMessage(action: AuthAction, status: number, code?: string): AuthErrorMessageConfig {
-    const actionMessages = ACTION_ERROR_MESSAGES[action];
-    const statusConfig = actionMessages[status];
-    if (statusConfig) {
-      return statusConfig;
-    }
-
+  } 
+  private buildErrorKey(action: AuthAction, status: number, code?: string): string {
+    const baseKey = `auth.apiErrors.${action}`;
+    
     if (code) {
-      const variants = new Set<string>();
-      variants.add(code);
-      const trimmed = code.trim();
-      if (trimmed && !variants.has(trimmed)) {
-        variants.add(trimmed);
-      }
-
-      const lower = trimmed.toLowerCase();
-      if (lower && !variants.has(lower)) {
-        variants.add(lower);
-      }
-
-      const sanitized = lower.replace(/[^a-z0-9]+/g, '_');
-      if (sanitized && !variants.has(sanitized)) {
-        variants.add(sanitized);
-      }
-
-      const codeMessages = ACTION_ERROR_CODE_MESSAGES[action];
-      if (codeMessages) {
-        for (const variant of variants) {
-          const match = codeMessages[variant];
-          if (match) {
-            return match;
-          }
-        }
-      }
+      return `${baseKey}.${code}`;
     }
 
-    return actionMessages.default;
+    // Depois tenta status HTTP
+    if (status && status !== 0) {
+      return `${baseKey}.${status}`;
+    }
+
+    // Por último usa padrão
+    return `${baseKey}.default`;
   }
+
 
   private extractRetryAfterSeconds(headers: HttpHeaders | null | undefined): number | null {
     if (!headers) {

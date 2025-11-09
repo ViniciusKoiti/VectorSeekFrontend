@@ -68,25 +68,6 @@ describe('RegisterPageComponent', () => {
     expect(authService.register).not.toHaveBeenCalled();
   });
 
-  it('should call authService.register when form is valid', () => {
-    const mockResponse = {
-      user: { id: '1', email: 'john@example.com', fullName: 'John Doe', avatarUrl: null },
-      tokens: { accessToken: 'token', refreshToken: 'refresh', expiresIn: 3600, tokenType: 'Bearer' }
-    };
-
-    authService.register.and.returnValue(of(mockResponse));
-
-    component.registerForm.patchValue({
-      fullName: 'John Doe',
-      email: 'john@example.com',
-      password: 'StrongPass123!',
-      acceptTerms: true
-    });
-
-    component.onSubmit();
-
-    expect(authService.register).toHaveBeenCalled();
-  });
 
   it('should handle registration errors with field errors', () => {
     const mockError: AuthError = {

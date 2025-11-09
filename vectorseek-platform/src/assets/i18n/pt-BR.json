@@ -57,7 +57,83 @@
     "apiErrors": {
       "unexpectedError": "Ocorreu um erro inesperado. Tente novamente.",
       "networkError": "Erro de conexão. Verifique sua internet.",
-      "retryAfter": "Tente novamente em {{seconds}} segundos."
+      "retryAfter": "Tente novamente em {{seconds}} segundos.",
+      "login": {
+        "default": {
+          "summary": "Não foi possível entrar agora",
+          "description": "Tente novamente em instantes ou entre em contato com o suporte."
+        },
+        "401": {
+          "summary": "Credenciais inválidas",
+          "description": "Verifique e-mail e senha informados e tente novamente."
+        },
+        "429": {
+          "summary": "Muitas tentativas de login",
+          "description": "Aguarde alguns instantes antes de tentar novamente."
+        }
+      },
+      "register": {
+        "default": {
+          "summary": "Não foi possível concluir o cadastro",
+          "description": "Revise os dados informados ou tente mais tarde."
+        },
+        "409": {
+          "summary": "E-mail já cadastrado",
+          "description": "Use outro endereço ou faça login caso já possua uma conta."
+        },
+        "422": {
+          "summary": "Dados inválidos",
+          "description": "Algumas informações precisam de atenção antes de continuar."
+        },
+        "user_already_exists": {
+          "summary": "E-mail já cadastrado",
+          "description": "Use outro endereço ou faça login caso já possua uma conta."
+        },
+        "useralreadyexistserror": {
+          "summary": "E-mail já cadastrado",
+          "description": "Use outro endereço ou faça login caso já possua uma conta."
+        },
+        "user_exists": {
+          "summary": "E-mail já cadastrado",
+          "description": "Use outro endereço ou faça login caso já possua uma conta."
+        }
+      },
+      "requestMagicLink": {
+        "default": {
+          "summary": "Não foi possível enviar o link mágico",
+          "description": "Tente novamente em instantes ou valide o endereço de e-mail."
+        },
+        "429": {
+          "summary": "Muitas solicitações",
+          "description": "Aguarde alguns instantes antes de tentar novamente."
+        }
+      },
+      "refresh": {
+        "default": {
+          "summary": "Sessão expirada",
+          "description": "Faça login novamente para continuar navegando."
+        },
+        "401": {
+          "summary": "Sessão inválida",
+          "description": "Faça login novamente para recuperar o acesso."
+        }
+      },
+      "me": {
+        "default": {
+          "summary": "Não foi possível carregar o perfil",
+          "description": "Recarregue a página ou tente novamente mais tarde."
+        },
+        "401": {
+          "summary": "Sessão inválida",
+          "description": "Faça login novamente para recuperar o acesso."
+        }
+      }
     }
+  },
+  "fields": {
+    "email": "E-mail",
+    "password": "Senha",
+    "fullName": "Nome completo",
+    "acceptTerms": "Termos de uso"
   }
 }
