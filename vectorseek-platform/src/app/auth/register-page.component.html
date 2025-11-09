@@ -1,82 +1,83 @@
-<section class="auth-page">
-  <header>
-    <h1>{{ 'auth.register.title' | translate }}</h1>
-    <p>{{ 'auth.register.subtitle' | translate }}</p>
-  </header>
+<section class="login-page-container">
+  <div class="animated-logo"></div>
+  <div class="login-container">
+    <header>
+      <h1>{{ 'auth.register.title' | translate }}</h1>
+      <p>{{ 'auth.register.subtitle' | translate }}</p>
+    </header>
 
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
-    <div class="api-error" *ngIf="apiError">
-      <span class="error-icon">⚠</span>
-      <div>
-        <strong>{{ apiError.summary }}</strong>
-        <p *ngIf="apiError.description">{{ apiError.description }}</p>
-        <ul *ngIf="apiError.fieldErrors" class="field-errors-list">
-          <li *ngFor="let field of getFieldErrors()">
-            <strong>{{ field.field }}:</strong> {{ field.errors.join(', ') }}
-          </li>
-        </ul>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Mensagem de erro geral da API -->
+      <div class="api-error" *ngIf="apiError">
+        <span class="error-icon">⚠</span>
+        <div>
+          <strong>{{ apiError.summary | authError }}</strong>
+          <p *ngIf="apiError.description">
+            {{ apiError.description | authError }}
+          </p>
+        </div>
       </div>
-    </div>
 
-    <!-- Campo Nome Completo -->
-    <div class="form-field">
-      <label for="fullName">{{ 'auth.register.fullNameLabel' | translate }}</label>
-      <input
-        id="fullName"
-        type="text"
-        formControlName="fullName"
-        [placeholder]="'auth.register.fullNamePlaceholder' | translate"
-        [class.invalid]="fullNameControl.invalid && fullNameControl.touched"
-        autocomplete="name"
-      />
-      <app-field-error [control]="fullNameControl" fieldName="fullName"></app-field-error>
-    </div>
-
-    <!-- Campo Email -->
-    <div class="form-field">
-      <label for="email">{{ 'auth.register.emailLabel' | translate }}</label>
-      <input
-        id="email"
-        type="email"
-        formControlName="email"
-        [placeholder]="'auth.register.emailPlaceholder' | translate"
-        [class.invalid]="emailControl.invalid && emailControl.touched"
-        autocomplete="email"
-      />
-      <app-field-error [control]="emailControl" fieldName="email"></app-field-error>
-    </div>
-
-    <!-- Campo Senha -->
-    <div class="form-field">
-      <label for="password">{{ 'auth.register.passwordLabel' | translate }}</label>
-      <input
-        id="password"
-        type="password"
-        formControlName="password"
-        [placeholder]="'auth.register.passwordPlaceholder' | translate"
-        [class.invalid]="passwordControl.invalid && passwordControl.touched"
-        autocomplete="new-password"
-      />
-      <app-field-error [control]="passwordControl" fieldName="password"></app-field-error>
-      <div class="password-hint" *ngIf="!passwordControl.touched">
-        <small>Mínimo 8 caracteres, incluindo maiúsculas, minúsculas, números e caracteres especiais</small>
+      <!-- Campo Nome Completo -->
+      <div class="form-field">
+        <label for="fullName">{{ 'auth.register.fullNameLabel' | translate }}</label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          [placeholder]="'auth.register.fullNamePlaceholder' | translate"
+          [class.invalid]="fullNameControl.invalid && fullNameControl.touched"
+          autocomplete="name"
+        />
+        <app-field-error [control]="fullNameControl" fieldName="fullName"></app-field-error>
       </div>
-    </div>
 
-    <!-- Checkbox Aceitar Termos -->
-    <div class="form-checkbox">
-      <input id="acceptTerms" type="checkbox" formControlName="acceptTerms" />
-      <label for="acceptTerms">{{ 'auth.register.acceptTermsLabel' | translate }}</label>
-    </div>
-    <app-field-error [control]="acceptTermsControl" fieldName="acceptTerms"></app-field-error>
+      <!-- Campo Email -->
+      <div class="form-field">
+        <label for="email">{{ 'auth.register.emailLabel' | translate }}</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          [placeholder]="'auth.register.emailPlaceholder' | translate"
+          [class.invalid]="emailControl.invalid && emailControl.touched"
+          autocomplete="email"
+        />
+        <app-field-error [control]="emailControl" fieldName="email"></app-field-error>
+      </div>
 
-    <!-- Botão Submit -->
-    <button type="submit" class="btn-primary" [disabled]="registerForm.invalid || isSubmitting">
-      {{ isSubmitting ? ('auth.register.submittingButton' | translate) : ('auth.register.submitButton' | translate) }}
-    </button>
-  </form>
+      <!-- Campo Senha -->
+      <div class="form-field">
+        <label for="password">{{ 'auth.register.passwordLabel' | translate }}</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          [placeholder]="'auth.register.passwordPlaceholder' | translate"
+          [class.invalid]="passwordControl.invalid && passwordControl.touched"
+          autocomplete="new-password"
+        />
+        <app-field-error [control]="passwordControl" fieldName="password"></app-field-error>
+        <div class="password-hint" *ngIf="!passwordControl.touched">
+          <small>Mínimo 8 caracteres, incluindo maiúsculas, minúsculas, números e caracteres especiais</small>
+        </div>
+      </div>
 
-  <footer class="auth-footer">
-    <a routerLink="/auth/login">{{ 'auth.register.loginLink' | translate }}</a>
-  </footer>
+      <!-- Checkbox Aceitar Termos -->
+      <div class="form-checkbox">
+        <input id="acceptTerms" type="checkbox" formControlName="acceptTerms" />
+        <label for="acceptTerms">{{ 'auth.register.acceptTermsLabel' | translate }}</label>
+      </div>
+      <app-field-error [control]="acceptTermsControl" fieldName="acceptTerms"></app-field-error>
+
+      <!-- Botão Submit -->
+      <button type="submit" class="btn-primary" [disabled]="registerForm.invalid || isSubmitting">
+        {{ isSubmitting ? ('auth.register.submittingButton' | translate) : ('auth.register.submitButton' | translate) }}
+      </button>
+    </form>
+
+    <footer class="auth-footer">
+      <a routerLink="/auth/login">{{ 'auth.register.loginLink' | translate }}</a>
+    </footer>
+  </div>
 </section>

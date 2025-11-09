@@ -10,11 +10,12 @@ import { AuthError, PlanType, RegisterRequest } from '../../../libs/data-access/
 import { FieldErrorComponent } from './components/field-error.component';
 import { registerSchema, RegisterFormData } from './schemas/auth.schemas';
 import { zodValidator } from './utils/zod-validators';
+import { AuthErrorPipe } from '@vectorseek/data-access/lib/auth/auth-error.pipe';
 
 @Component({
   selector: 'app-register-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent, AuthErrorPipe],
   templateUrl: './register-page.component.html',
   styleUrls: ['./register-page.component.css']
 })

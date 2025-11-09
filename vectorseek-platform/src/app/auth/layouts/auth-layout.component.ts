@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeToggleComponent } from '../../core/components/theme-toggle/theme-toggle.component';
 
 /**
  * AuthLayoutComponent - Layout placeholder para páginas de autenticação
@@ -10,7 +11,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-auth-layout',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ThemeToggleComponent],
   templateUrl: './auth-layout.component.html',
   styleUrls: ['./auth-layout.component.scss']
 })
