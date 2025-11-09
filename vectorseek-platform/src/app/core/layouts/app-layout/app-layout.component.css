@@ -1,0 +1,55 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a0f2e 100%);
+  position: relative;
+}
+
+/* Background animation */
+.app-layout::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+  padding-top: 1rem;
+}
+
+/* Scrollbar styling */
+.app-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.app-content::-webkit-scrollbar-track {
+  background: rgba(138, 43, 226, 0.1);
+}
+
+.app-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #8a2be2 0%, #ff006e 100%);
+  border-radius: 5px;
+}
+
+.app-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #9d3ff5 0%, #ff1a7f 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-content {
+    padding-top: 0.75rem;
+  }
+}

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AppLayoutComponent } from './core/layouts/app-layout/app-layout.component';
 
 /**
  * Rotas principais da aplicação
@@ -9,6 +10,9 @@ import { Routes } from '@angular/router';
  * - E2-A1: módulo Q&A
  * - E2-A3: módulo de Documentos
  * - E3-A1: módulo de Geração de Conteúdo
+ *
+ * Layout modular:
+ * - AppLayoutComponent envolve todas as rotas protegidas com Navbar
  */
 export const routes: Routes = [
   {
@@ -17,6 +21,7 @@ export const routes: Routes = [
   },
   {
     path: 'app',
+    component: AppLayoutComponent,
     children: [
       {
         path: 'qna',

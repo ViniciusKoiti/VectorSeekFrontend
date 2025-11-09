@@ -1,0 +1,81 @@
+<!-- Sidebar Desktop -->
+<aside 
+  class="sidebar"
+  [class.expanded]="isExpanded"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon" [innerHTML]="getIcon('search')"></div>
+    <span class="logo-text">VectorSeek</span>
+  </div>
+
+  <!-- Navegação -->
+  <nav class="sidebar-nav">
+    <a
+      *ngFor="let item of navItems"
+      [routerLink]="item.path"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="nav-item"
+      [title]="item.description"
+    >
+      <div class="nav-icon" [innerHTML]="getIcon(item.icon)"></div>
+      <span class="nav-label">{{ item.label }}</span>
+      <div class="nav-indicator"></div>
+    </a>
+  </nav>
+
+  <!-- Theme Toggle -->
+  <div class="sidebar-footer">
+    <app-theme-toggle></app-theme-toggle>
+  </div>
+</aside>
+
+<!-- Mobile Header -->
+<header class="mobile-header">
+  <div class="mobile-logo">
+    <div class="logo-icon" [innerHTML]="getIcon('search')"></div>
+    <span class="logo-text">VectorSeek</span>
+  </div>
+
+  <button 
+    class="mobile-toggle"
+    (click)="toggleMobileMenu()"
+    [attr.aria-label]="isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'"
+  >
+    <div [innerHTML]="isMobileMenuOpen ? getIcon('close') : getIcon('menu')"></div>
+  </button>
+</header>
+
+<!-- Mobile Menu -->
+<div 
+  class="mobile-menu"
+  [class.open]="isMobileMenuOpen"
+>
+  <nav class="mobile-nav">
+    <a
+      *ngFor="let item of navItems"
+      [routerLink]="item.path"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="mobile-nav-item"
+      (click)="closeMobileMenu()"
+    >
+      <div class="nav-icon" [innerHTML]="getIcon(item.icon)"></div>
+      <span class="nav-label">{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <div class="mobile-footer">
+    <app-theme-toggle></app-theme-toggle>
+  </div>
+</div>
+
+<!-- Mobile Overlay -->
+<div 
+  class="mobile-overlay"
+  *ngIf="isMobileMenuOpen"
+  (click)="closeMobileMenu()"
+></div>

@@ -51,21 +51,6 @@
   margin-bottom: 0.25rem;
 }
 
-.auth-footer {
-  display: flex;
-  justify-content: center;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e2e8f0;
-}
-.auth-footer a {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #2563eb;
-  text-decoration: none;
-}
-.auth-footer a:hover {
-  text-decoration: underline;
-}
 
 .login-container {
   background: var(--background-surface);
@@ -79,4 +64,9 @@
   box-shadow: 0 0 30px var(--accent-primary-glow);
   position: relative;
   z-index: 1;
+}
+.auth-footer {
+  text-align: center;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
 }
