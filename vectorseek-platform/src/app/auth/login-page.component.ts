@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../../libs/data-access/src/lib/auth/auth.service';
 import { AuthError } from '../../../libs/data-access/src/lib/auth/auth.models';
+import { AuthStore } from '../../../libs/state/src/lib/auth/auth.store';
 import { FieldErrorComponent } from './components/field-error.component';
 import { loginSchema, LoginFormData } from './schemas/auth.schemas';
 import { zodValidator } from './utils/zod-validators';
@@ -20,6 +21,7 @@ import { zodValidator } from './utils/zod-validators';
 export class LoginPageComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private authStore = inject(AuthStore);
   private router = inject(Router);
   private translate = inject(TranslateService);
 
@@ -65,10 +67,23 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     const formData = this.loginForm.value as LoginFormData;
 
     this.authService.login(formData).subscribe({
-      next: (response) => {
-        console.info('Login realizado com sucesso', response);
-        this.router.navigate(['/app/dashboard']);
-        this.isSubmitting = false;
+      next: (session) => {
+        console.info('Login realizado com sucesso', session);
+        this.authStore.setSession(session);
+
+        this.authService.me().subscribe({
+          next: (user) => {
+            this.authStore.setUser(user);
+            this.router.navigate(['/app/qna']);
+            this.isSubmitting = false;
+          },
+          error: (error: AuthError) => {
+            console.error('Erro ao buscar perfil do usuário', error);
+            this.apiError = error;
+            this.isSubmitting = false;
+            this.authStore.clearSession();
+          }
+        });
       },
       error: (error: AuthError) => {
         console.error('Erro no login', error);

@@ -90,8 +90,8 @@ export class DocumentsPageComponent implements OnInit {
   }
 
   onViewDetails(doc: Document): void {
-    console.log('View details for document:', doc.id);
-    // TODO: Implement detail modal or navigation
+    console.log('Visualizando detalhes do documento:', doc.id);
+    // TODO: Implementar navegação para a página de detalhes do documento
   }
 
   onExportCSV(): void {

@@ -7,14 +7,13 @@ export interface AuthTokens {
 
 export interface AuthUserProfile {
   id: string;
-  email: string;
-  fullName: string;
+  email?: string;
+  fullName?: string;
   avatarUrl?: string | null;
 }
 
 export interface AuthSession {
-  user: AuthUserProfile;
-  tokens: AuthTokens;
+  raw?: AuthApiSessionDto;
 }
 
 export enum PlanType {
@@ -82,25 +81,6 @@ export interface AuthApiErrorPayload {
   errors?: Record<string, unknown>;
 }
 
-export interface AuthApiEnvelope<T> {
-  data: T;
-}
-
-export interface AuthApiSessionDto {
-  tokens: {
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-    token_type: string;
-  };
-  user: {
-    id: string;
-    email: string;
-    full_name: string;
-    avatar_url?: string | null;
-  };
-}
-
 export interface AuthApiProfileDto {
   id: string;
   email: string;
@@ -113,4 +93,16 @@ export interface AuthApiTokensDto {
   refresh_token: string;
   expires_in: number;
   token_type: string;
+}
+
+export interface AuthApiSessionDto {
+  user_id?: string;
+  access_token?: string;
+  refresh_token?: string;
+  token_type?: string;
+  expires_in?: number;
+  refresh_expires_in?: number;
+  scopes?: string[];
+  issued_at?: string;
+  plan?: string | null;
 }

@@ -4,7 +4,6 @@ import { Observable, catchError, map, throwError } from 'rxjs';
 
 import {
   AuthAction,
-  AuthApiEnvelope,
   AuthApiErrorPayload,
   AuthApiProfileDto,
   AuthApiSessionDto,
@@ -109,57 +108,58 @@ export class AuthService {
   private readonly http = inject(HttpClient);
 
   login(payload: LoginRequest): Observable<LoginResponse> {
-    return this.http
-      .post<AuthApiEnvelope<AuthApiSessionDto>>(AUTH_API_ENDPOINTS.login(), payload)
-      .pipe(
-        map((response) => this.mapSessionResponse(response.data)),
-        catchError((error) => this.handleError('login', error))
-      );
-  }
+  return this.http
+    .post<AuthApiSessionDto>(AUTH_API_ENDPOINTS.login(), payload)
+    .pipe(
+      map((response) => {
+        return this.mapSessionResponse(response);
+      }),
+      catchError((error) => this.handleError('login', error))
+    );
+}
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http
-      .post<AuthApiEnvelope<AuthApiSessionDto>>(AUTH_API_ENDPOINTS.register(), payload)
+      .post<AuthApiSessionDto>(AUTH_API_ENDPOINTS.register(), payload)
       .pipe(
-        map((response) => this.mapSessionResponse(response.data)),
+        map((response) => this.mapSessionResponse(response)),
         catchError((error) => this.handleError('register', error))
       );
   }
 
   requestMagicLink(payload: RequestMagicLinkRequest): Observable<RequestMagicLinkResponse> {
     return this.http
-      .post<AuthApiEnvelope<{ message: string }>>(AUTH_API_ENDPOINTS.requestMagicLink(), payload)
+      .post<{ message: string }>(AUTH_API_ENDPOINTS.requestMagicLink(), payload)
       .pipe(
-        map((response) => ({ message: response.data.message } as RequestMagicLinkResponse)),
+        map((response) => ({ message: response.message } as RequestMagicLinkResponse)),
         catchError((error) => this.handleError('requestMagicLink', error))
       );
   }
 
   refresh(payload: RefreshRequest): Observable<RefreshResponse> {
     return this.http
-      .post<AuthApiEnvelope<AuthApiTokensDto>>(AUTH_API_ENDPOINTS.refresh(), payload)
+      .post<AuthApiTokensDto>(AUTH_API_ENDPOINTS.refresh(), payload)
       .pipe(
-        map((response) => this.mapTokens(response.data)),
+        map((response) => this.mapTokens(response)),
         catchError((error) => this.handleError('refresh', error))
       );
   }
 
   me(): Observable<MeResponse> {
     return this.http
-      .get<AuthApiEnvelope<AuthApiProfileDto>>(AUTH_API_ENDPOINTS.me())
+      .get<AuthApiProfileDto>(AUTH_API_ENDPOINTS.me())
       .pipe(
-        map((response) => this.mapProfile(response.data)),
+        map((response) => this.mapProfile(response)),
         catchError((error) => this.handleError('me', error))
       );
   }
 
   private mapSessionResponse(dto: AuthApiSessionDto): AuthSession {
     return {
-      tokens: this.mapTokens(dto.tokens),
-      user: this.mapProfile(dto.user)
+      raw: dto
     };
   }
-
+  
   private mapTokens(dto: AuthApiTokensDto): AuthTokens {
     return {
       accessToken: dto.access_token,
@@ -168,7 +168,9 @@ export class AuthService {
       tokenType: dto.token_type
     };
   }
+  
 
+  
   private mapProfile(dto: AuthApiProfileDto): AuthUserProfile {
     return {
       id: dto.id,
@@ -177,7 +179,7 @@ export class AuthService {
       avatarUrl: dto.avatar_url ?? null
     };
   }
-
+  
   private handleError(action: AuthAction, error: unknown): Observable<never> {
     return throwError(() => this.normalizeError(action, error));
   }

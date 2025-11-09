@@ -12,6 +12,7 @@ import { provideMarkdown } from 'ngx-markdown';
 import { routes } from './app.routes';
 import ptBR from '../assets/i18n/pt-BR.json';
 import { apiUrlInterceptor } from './api-url-interceptor';
+import { authInterceptor } from './auth.interceptor';
 
 /**
  * Loader customizado para traduções
@@ -32,7 +33,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideHttpClient(withInterceptors([apiUrlInterceptor])),
+    provideHttpClient(withInterceptors([apiUrlInterceptor, authInterceptor])),
     provideRouter(routes),
     provideAnimations(),
     provideMarkdown(),
