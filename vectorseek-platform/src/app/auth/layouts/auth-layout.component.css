@@ -1,3 +1,12 @@
+@keyframes move-stars {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
+
 :host {
   display: flex;
   align-items: center;
@@ -5,6 +14,7 @@
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  background-color: var(--background-base);
 }
 
 .background-animation-container {
@@ -13,11 +23,46 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-  background-size: cover;
-  background-position: center;
-  filter: brightness(0.3) blur(5px);
-  z-index: -1;
+  z-index: 0;
+}
+
+.stars, .stars2, .stars3 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.stars {
+  background-image: radial-gradient(1px 1px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 130px 80px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0, 0, 0, 0));
+  animation: move-stars 200s linear infinite;
+}
+
+.stars2 {
+  background-image: radial-gradient(1px 1px at 10px 90px, #eee, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 30px 50px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 70px 140px, #ddd, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 110px 20px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 140px 60px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 180px 100px, #ddd, rgba(0, 0, 0, 0));
+  animation: move-stars 150s linear infinite;
+}
+
+.stars3 {
+  background-image: radial-gradient(2px 2px at 5px 120px, #eee, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 25px 30px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 80px 100px, #ddd, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 120px 50px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(1px 1px at 150px 90px, #fff, rgba(0, 0, 0, 0)),
+                    radial-gradient(2px 2px at 190px 140px, #ddd, rgba(0, 0, 0, 0));
+  animation: move-stars 100s linear infinite;
 }
 
 .auth-content {

@@ -1,9 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
+:root {
+  --background-base: #0c0a1d;
+  --background-surface: rgba(12, 10, 29, 0.6);
+  --text-primary: #f8fafc;
+  --text-secondary: #a7b5c7;
+  --accent-primary: #00f6ff;
+  --accent-primary-darker: #0c0a1d;
+  --accent-primary-glow: rgba(0, 246, 255, 0.5);
+  --accent-primary-border: rgba(0, 246, 255, 0.2);
+  --error-primary: #ff0055;
+  --error-surface: rgba(255, 0, 85, 0.1);
+  --error-border: rgba(255, 0, 85, 0.5);
+  --error-text: #ffcdd9;
+}
+
+[data-theme="light"] {
+  --background-base: #f1f5f9;
+  --background-surface: rgba(255, 255, 255, 0.6);
+  --text-primary: #0c0a1d;
+  --text-secondary: #475569;
+  --accent-primary: #0891b2;
+  --accent-primary-darker: #ffffff;
+  --accent-primary-glow: rgba(8, 145, 178, 0.5);
+  --accent-primary-border: rgba(8, 145, 178, 0.2);
+  --error-primary: #dc2626;
+  --error-surface: rgba(220, 38, 38, 0.1);
+  --error-border: rgba(220, 38, 38, 0.5);
+  --error-text: #fca5a5;
+}
+
+
 body {
   margin: 0;
-  background-color: #0c0a1d;
-  color: #f8fafc;
+  background-color: var(--background-base);
+  color: var(--text-primary);
   font-family: 'Space Mono', monospace;
 }
