@@ -1,8 +1,10 @@
 <div class="content-wrapper">
-  <div class="documents-container">
+  <div class="page-header">
     <div class="documents-header">
-      <h1>Documentos Vetorados</h1>
-      <p class="subtitle">Gerencie os documentos indexados na base de conhecimento</p>
+    <div>
+        <h1 class="page-title">Documentos</h1>
+        <p class="page-description">Gerencie seus documentos</p>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -20,10 +22,10 @@
 
       <div class="filter-actions">
         <button (click)="onRefresh()" class="btn btn-secondary">
-          🔄 Atualizar
+          Atualizar
         </button>
         <button (click)="onExportCSV()" class="btn btn-secondary" [disabled]="documents().length === 0">
-          📥 Exportar CSV
+          Exportar CSV
         </button>
       </div>
     </div>
