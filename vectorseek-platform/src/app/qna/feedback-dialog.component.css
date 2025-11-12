@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--background-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,9 +13,9 @@
 }
 
 .feedback-dialog {
-  background: white;
+  background: var(--background-surface);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--accent-primary-border);
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
@@ -27,20 +27,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--accent-primary-border);
 }
 
 .dialog-header h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .btn-close {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #666;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0.25rem;
   line-height: 1;
@@ -48,11 +48,11 @@
 }
 
 .btn-close:hover {
-  color: #333;
+  color: var(--text-primary);
 }
 
 .btn-close:focus {
-  outline: 2px solid #4a90e2;
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -73,12 +73,12 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .form-label.required::after {
   content: ' *';
-  color: #d32f2f;
+  color: var(--error-primary);
 }
 
 .rating-stars {
@@ -90,7 +90,7 @@
   background: none;
   border: none;
   font-size: 2rem;
-  color: #ccc;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
   padding: 0.25rem;
@@ -99,7 +99,7 @@
 
 .star-button.active,
 .star-button.hover {
-  color: #ffc107;
+  color: var(--accent-primary);
 }
 
 .star-button:hover {
@@ -107,7 +107,7 @@
 }
 
 .star-button:focus {
-  outline: 2px solid #4a90e2;
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -115,27 +115,29 @@
 .form-textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--accent-primary-border);
   border-radius: 4px;
   font-size: 1rem;
   font-family: inherit;
   resize: vertical;
   min-height: 100px;
+  background-color: var(--background-elevated);
+  color: var(--text-primary);
 }
 
 .form-textarea:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-glow);
 }
 
 .form-textarea[aria-invalid='true'] {
-  border-color: #d32f2f;
+  border-color: var(--error-primary);
 }
 
 .form-error {
   margin-top: 0.5rem;
-  color: #d32f2f;
+  color: var(--error-text);
   font-size: 0.875rem;
 }
 
@@ -143,10 +145,10 @@
   display: flex;
   gap: 0.75rem;
   padding: 1rem;
-  background: #fff3f3;
-  border: 1px solid #ffcdd2;
+  background: var(--error-surface);
+  border: 1px solid var(--error-border);
   border-radius: 4px;
-  color: #c62828;
+  color: var(--error-primary);
   margin-top: 1rem;
 }
 
@@ -174,20 +176,7 @@
   gap: 0.75rem;
   justify-content: flex-end;
   padding: 1.5rem;
-  border-top: 1px solid #e0e0e0;
-}
-
-.btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+  border-top: 1px solid var(--accent-primary-border);
 }
 
 .btn:disabled {
@@ -196,33 +185,37 @@
 }
 
 .btn:focus {
-  outline: 2px solid #4a90e2;
+  outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
 
 .btn-primary {
-  background: #4a90e2;
-  color: white;
+  background: var(--accent-primary);
+  color: var(--accent-primary-darker);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #357abd;
+  background: transparent;
+  color: var(--accent-primary);
 }
 
 .btn-secondary {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--background-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--accent-primary-border);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #e0e0e0;
+  background: var(--background-overlay);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border: 2px solid var(--accent-primary-border);
+  border-top-color: var(--accent-primary);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }

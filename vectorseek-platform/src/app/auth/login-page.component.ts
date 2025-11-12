@@ -68,9 +68,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
     this.authService.login(formData).subscribe({
       next: (session) => {
-        console.info('Login realizado com sucesso', session);
         this.authStore.setSession(session);
-
         this.authService.me().subscribe({
           next: (user) => {
             this.authStore.setUser(user);
@@ -78,7 +76,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
             this.isSubmitting = false;
           },
           error: (error: AuthError) => {
-            console.error('Erro ao buscar perfil do usuário', error);
             this.apiError = error;
             this.isSubmitting = false;
             this.authStore.clearSession();
@@ -86,7 +83,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         });
       },
       error: (error: AuthError) => {
-        console.error('Erro no login', error);
         this.apiError = error;
         this.isSubmitting = false;
       }

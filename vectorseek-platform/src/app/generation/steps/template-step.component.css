@@ -5,19 +5,19 @@
 
 h2 {
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
+  color: var(--text-primary);
   font-size: 1.75rem;
 }
 
 .subtitle {
   margin: 0 0 2rem 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 1rem;
 }
 
 .subtitle-small {
   margin: 0 0 1rem 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
@@ -31,8 +31,8 @@ h2 {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(74, 144, 226, 0.2);
-  border-top-color: #4a90e2;
+  border: 3px solid var(--accent-primary-border);
+  border-top-color: var(--accent-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -43,8 +43,8 @@ h2 {
 
 .error-box {
   padding: 1.5rem;
-  background: #fee;
-  border: 1px solid #dc3545;
+  background: var(--error-surface);
+  border: 1px solid var(--error-border);
   border-radius: 4px;
   text-align: center;
 }
@@ -58,31 +58,31 @@ h2 {
 
 .template-card {
   padding: 1.5rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--accent-primary-border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .template-card:hover {
-  border-color: #4a90e2;
-  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 2px 8px var(--accent-primary-glow);
 }
 
 .template-card.selected {
-  border-color: #4a90e2;
-  background: #f0f8ff;
+  border-color: var(--accent-primary);
+  background: var(--background-surface);
 }
 
 .template-card h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .template-description {
   margin: 0 0 0.75rem 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -90,10 +90,10 @@ h2 {
 .template-category {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: #e0e0e0;
+  background: var(--accent-primary-border);
   border-radius: 12px;
   font-size: 0.75rem;
-  color: #666;
+  color: var(--accent-primary);
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -101,13 +101,13 @@ h2 {
 .variables-section {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--accent-primary-border);
 }
 
 .variables-section h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.25rem;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .form-group {
@@ -118,43 +118,46 @@ label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .required {
-  color: #dc3545;
+  color: var(--error-primary);
 }
 
 .form-control {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--accent-primary-border);
   border-radius: 4px;
   font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.2s;
+  background-color: var(--background-surface);
+  color: var(--text-primary);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #4a90e2;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-primary-glow);
 }
 
 .form-control.error {
-  border-color: #dc3545;
+  border-color: var(--error-primary);
 }
 
 .help-text {
   display: block;
   margin-bottom: 0.5rem;
-  color: #999;
+  color: var(--text-secondary);
   font-size: 0.875rem;
 }
 
 .error-message {
   display: block;
   margin-top: 0.25rem;
-  color: #dc3545;
+  color: var(--error-text);
   font-size: 0.875rem;
 }
 
@@ -163,38 +166,27 @@ label {
   justify-content: space-between;
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e0e0e0;
-}
-
-.btn {
-  padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  border-top: 1px solid var(--accent-primary-border);
 }
 
 .btn-primary {
-  background: #4a90e2;
-  color: white;
+  background: var(--accent-primary);
+  color: var(--accent-primary-darker);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #357abd;
+  background: transparent;
+  color: var(--accent-primary);
 }
 
 .btn-secondary {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--background-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--accent-primary-border);
 }
 
 .btn-secondary:hover {
-  background: #e0e0e0;
+  background: var(--background-overlay);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }

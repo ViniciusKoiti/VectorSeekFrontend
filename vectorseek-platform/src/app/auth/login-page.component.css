@@ -29,7 +29,7 @@
   height: 80px;
   margin: 0 auto 1.5rem;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--accent-primary) 0%, var(--background-base) 70%);
+  background: radial-gradient(circle, var(--logo-animation-start) 0%, var(--logo-animation-end) 70%);
   box-shadow: 0 0 15px var(--accent-primary-glow), 0 0 30px var(--accent-primary-glow);
   animation: pulse 4s ease-in-out infinite;
 }

@@ -108,15 +108,16 @@ export class AuthService {
   private readonly http = inject(HttpClient);
 
   login(payload: LoginRequest): Observable<LoginResponse> {
-  return this.http
-    .post<AuthApiSessionDto>(AUTH_API_ENDPOINTS.login(), payload)
-    .pipe(
-      map((response) => {
-        return this.mapSessionResponse(response);
-      }),
-      catchError((error) => this.handleError('login', error))
-    );
-}
+    return this.http
+      .post<AuthApiSessionDto>(AUTH_API_ENDPOINTS.login(), payload)
+      .pipe(
+        map((response) => {
+          const mapped = this.mapSessionResponse(response);
+          return mapped;
+        }),
+        catchError((error) => this.handleError('login', error))
+      );
+  }
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http

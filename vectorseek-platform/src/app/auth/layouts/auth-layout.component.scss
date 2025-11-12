@@ -38,14 +38,14 @@
 
 .stars {
   background-image: 
-    radial-gradient(2px 2px at 20px 30px, #eee, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 130px 80px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 160px 120px, #ddd, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 190px 10px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 60px 200px, #eee, rgba(0, 0, 0, 0));
+    radial-gradient(2px 2px at 20px 30px, var(--star-color-1), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 40px 70px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 50px 160px, var(--star-color-3), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 90px 40px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 130px 80px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 160px 120px, var(--star-color-3), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 190px 10px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 60px 200px, var(--star-color-1), rgba(0, 0, 0, 0));
   background-size: 200px 200px;
   animation: move-stars 200s linear infinite;
   opacity: 0.5;
@@ -53,13 +53,13 @@
 
 .stars2 {
   background-image: 
-    radial-gradient(1px 1px at 10px 90px, #eee, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 30px 50px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 70px 140px, #ddd, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 110px 20px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 140px 60px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 180px 100px, #ddd, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 95px 170px, #eee, rgba(0, 0, 0, 0));
+    radial-gradient(1px 1px at 10px 90px, var(--star-color-1), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 30px 50px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 70px 140px, var(--star-color-3), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 110px 20px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 140px 60px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 180px 100px, var(--star-color-3), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 95px 170px, var(--star-color-1), rgba(0, 0, 0, 0));
   background-size: 200px 200px;
   background-repeat: repeat;
   animation: move-stars 150s linear infinite;
@@ -68,13 +68,13 @@
 
 .stars3 {
   background-image: 
-    radial-gradient(2px 2px at 5px 120px, #eee, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 25px 30px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 80px 100px, #ddd, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 120px 50px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 150px 90px, #fff, rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 190px 140px, #ddd, rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 45px 180px, #fff, rgba(0, 0, 0, 0));
+    radial-gradient(2px 2px at 5px 120px, var(--star-color-1), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 25px 30px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 80px 100px, var(--star-color-3), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 120px 50px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 150px 90px, var(--star-color-2), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 190px 140px, var(--star-color-3), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 45px 180px, var(--star-color-2), rgba(0, 0, 0, 0));
   background-size: 200px 200px;
   background-repeat: repeat;
   animation: move-stars 100s linear infinite;

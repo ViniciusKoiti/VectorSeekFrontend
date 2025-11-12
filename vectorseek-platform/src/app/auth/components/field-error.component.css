@@ -4,7 +4,7 @@
   gap: 0.5rem;
   margin-top: 0.375rem;
   font-size: 0.875rem;
-  color: #dc2626;
+  color: var(--error-primary);
   animation: slideDown 0.2s ease-out;
 }
 

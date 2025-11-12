@@ -3,9 +3,9 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
-  background: white;
+  background: var(--background-surface);
+  border: 1px solid var(--accent-primary-border);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .answer-header {
@@ -17,7 +17,7 @@
 .answer-header h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .btn-icon {
@@ -28,15 +28,17 @@
   padding: 0.5rem;
   border-radius: 4px;
   transition: background 0.2s;
+  color: var(--text-secondary);
 }
 
 .btn-icon:hover {
-  background: #f5f5f5;
+  background: var(--background-elevated);
+  color: var(--accent-primary);
 }
 
 .answer-content {
   padding: 1rem;
-  background: #f9f9f9;
+  background: var(--background-elevated);
   border-radius: 4px;
   line-height: 1.6;
 }
@@ -51,17 +53,17 @@
   flex-wrap: wrap;
   gap: 1rem;
   padding: 0.75rem;
-  background: #f5f5f5;
+  background: var(--background-elevated);
   border-radius: 4px;
   font-size: 0.875rem;
 }
 
 .metadata-item {
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .metadata-item strong {
-  color: #333;
+  color: var(--text-primary);
 }
 
 .citations-section {
@@ -71,7 +73,7 @@
 .citations-section h4 {
   margin: 0 0 0.75rem 0;
   font-size: 1rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .citations-list {
@@ -81,14 +83,14 @@
 }
 
 .citation-card {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--accent-primary-border);
   border-radius: 4px;
   overflow: hidden;
   transition: all 0.2s;
 }
 
 .citation-card.expanded {
-  border-color: #4a90e2;
+  border-color: var(--accent-primary);
 }
 
 .citation-header {
@@ -97,7 +99,7 @@
   align-items: center;
   padding: 0.75rem;
   cursor: pointer;
-  background: #fafafa;
+  background: var(--background-elevated);
   transition: background 0.2s;
   width: 100%;
   border: none;
@@ -107,11 +109,11 @@
 }
 
 .citation-header:hover {
-  background: #f5f5f5;
+  background: var(--background-overlay);
 }
 
 .citation-header:focus {
-  outline: 2px solid #4a90e2;
+  outline: 2px solid var(--accent-primary);
   outline-offset: -2px;
 }
 
@@ -123,34 +125,34 @@
 }
 
 .citation-info strong {
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .citation-score {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .expand-icon {
-  color: #4a90e2;
+  color: var(--accent-primary);
   font-size: 0.875rem;
 }
 
 .citation-content {
   padding: 1rem;
-  background: white;
-  border-top: 1px solid #e0e0e0;
+  background: var(--background-surface);
+  border-top: 1px solid var(--accent-primary-border);
 }
 
 .citation-content p {
   margin: 0;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-secondary);
 }
 
 .citation-content p ::ng-deep mark.highlight {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: var(--accent-primary-glow);
+  color: var(--accent-primary);
   padding: 0.125rem 0.25rem;
   border-radius: 2px;
   font-weight: 500;
@@ -159,14 +161,14 @@
 .citation-metadata {
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--accent-primary-border);
   font-size: 0.875rem;
 }
 
 .citation-metadata pre {
   margin: 0.5rem 0 0 0;
   padding: 0.5rem;
-  background: #f9f9f9;
+  background: var(--background-base);
   border-radius: 4px;
   overflow-x: auto;
   font-size: 0.8rem;
@@ -179,23 +181,16 @@
   margin-top: 0.5rem;
 }
 
-.btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
 .btn-secondary {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--background-elevated);
+  color: var(--text-secondary);
+  border: 1px solid var(--accent-primary-border);
 }
 
 .btn-secondary:hover {
-  background: #e0e0e0;
+  background: var(--background-overlay);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 .copy-notification {
@@ -203,10 +198,10 @@
   bottom: 2rem;
   right: 2rem;
   padding: 1rem 1.5rem;
-  background: #4caf50;
-  color: white;
+  background: var(--accent-primary);
+  color: var(--accent-primary-darker);
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--accent-primary-glow);
   animation: slideIn 0.3s ease-out;
 }
 

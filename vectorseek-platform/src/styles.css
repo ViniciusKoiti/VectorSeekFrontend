@@ -16,6 +16,11 @@
   --error-surface: rgba(255, 0, 85, 0.1);
   --error-border: rgba(255, 0, 85, 0.5);
   --error-text: #ffcdd9;
+  --logo-animation-start: var(--accent-primary);
+  --logo-animation-end: var(--background-base);
+  --star-color-1: #eee;
+  --star-color-2: #fff;
+  --star-color-3: #ddd;
 }
 
 [data-theme="light"] {
@@ -33,6 +38,11 @@
   --error-surface: rgba(220, 38, 38, 0.1);
   --error-border: rgba(220, 38, 38, 0.5);
   --error-text: #fca5a5;
+  --logo-animation-start: var(--accent-primary);
+  --logo-animation-end: var(--background-surface);
+  --star-color-1: #475569;
+  --star-color-2: #0c0a1d;
+  --star-color-3: #475569;
 }
 
 
