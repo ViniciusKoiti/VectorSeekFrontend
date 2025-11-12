@@ -3,7 +3,9 @@
   <div class="login-container">
     <header>
       <h1>{{ 'auth.login.title' | translate }}</h1>
-      <p>{{ 'auth.login.subtitle' | translate }}</p>
+      <p aria-live="polite">
+        <app-typewriter></app-typewriter>
+      </p>
     </header>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">

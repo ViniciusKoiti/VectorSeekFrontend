@@ -12,6 +12,7 @@
       "submittingButton": "Entrando...",
       "registerLink": "Criar conta",
       "forgotPasswordLink": "Esqueci minha senha",
+      "disableAnimationsLabel": "Desativar animações",
       "errors": {
         "required": "Este campo é obrigatório",
         "email": "Digite um e-mail válido",

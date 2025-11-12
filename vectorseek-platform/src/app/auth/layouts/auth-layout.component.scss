@@ -34,6 +34,7 @@
   width: 200%;
   height: 200%;
   background-repeat: repeat;
+  transition: transform 0.1s ease-out;
 }
 
 .stars {
@@ -79,6 +80,18 @@
   background-repeat: repeat;
   animation: move-stars 100s linear infinite;
   opacity: 0.7;
+}
+
+.animations-disabled .stars,
+.animations-disabled .stars2,
+.animations-disabled .stars3 {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars, .stars2, .stars3 {
+    animation: none;
+  }
 }
 
 .auth-content {

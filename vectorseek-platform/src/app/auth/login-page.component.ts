@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,11 +11,12 @@ import { FieldErrorComponent } from './components/field-error.component';
 import { loginSchema, LoginFormData } from './schemas/auth.schemas';
 import { zodValidator } from './utils/zod-validators';
 import { AuthErrorPipe } from '@vectorseek/data-access/lib/auth/auth-error.pipe';
+import { TypewriterComponent } from './components/typewriter/typewriter.component';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent, AuthErrorPipe],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent, AuthErrorPipe, TypewriterComponent],
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css']
 })
@@ -29,14 +30,29 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   isSubmitting = false;
   apiError: AuthError | null = null;
+  animationsDisabled = false;
+
+  @HostBinding('class.animations-disabled') get animationsDisabledClass() {
+    return this.animationsDisabled;
+  }
 
   ngOnInit(): void {
     this.translate.use('pt-BR');
     this.initForm();
+    if (typeof localStorage !== 'undefined') {
+      this.animationsDisabled = localStorage.getItem('animationsDisabled') === 'true';
+    }
   }
 
   ngOnDestroy(): void {
     console.info('LoginPageComponent destruído');
+  }
+
+  toggleAnimations(): void {
+    this.animationsDisabled = !this.animationsDisabled;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('animationsDisabled', this.animationsDisabled.toString());
+    }
   }
 
   private initForm(): void {

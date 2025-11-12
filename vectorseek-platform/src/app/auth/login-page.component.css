@@ -96,8 +96,38 @@
   color: var(--accent-primary);
   text-decoration: none;
   transition: all 0.2s ease-in-out;
+  position: relative;
 }
+
+.auth-footer a::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 1px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--accent-primary);
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.auth-footer a:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
 .auth-footer a:hover {
   text-decoration: none;
   text-shadow: 0 0 10px var(--accent-primary-glow);
+}
+
+.animations-disabled .auth-footer a::after {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-footer a::after {
+    transition: none;
+  }
 }
