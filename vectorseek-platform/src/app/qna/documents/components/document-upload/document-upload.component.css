@@ -50,8 +50,23 @@
   background: var(--background-overlay);
   border-radius: 8px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.5rem;
   font-size: 0.95rem;
+}
+
+.file-info > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-size-badge {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
 
 .form-grid {
@@ -91,4 +106,111 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+}
+
+/* ===========================================
+   Preview de Arquivo
+   =========================================== */
+
+.file-preview-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 246, 255, 0.05);
+  border: 1px solid var(--accent-primary-border);
+  border-radius: 8px;
+}
+
+.preview-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.preview-icon {
+  font-size: 1.5rem;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.preview-message p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.preview-actions .btn {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* ===========================================
+   Acessibilidade (A11y)
+   =========================================== */
+
+/**
+ * Classe para elementos visíveis apenas para leitores de tela
+ * Esconde visualmente mas mantém acessível para tecnologias assistivas
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/**
+ * Indicadores de foco melhorados para navegação por teclado
+ * Usa :focus-visible para mostrar outline apenas em navegação por teclado
+ */
+.dropzone:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px rgba(0, 246, 255, 0.1);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(0, 246, 255, 0.1);
+}
+
+.form-field input:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 0;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(0, 246, 255, 0.1);
+}
+
+/**
+ * Estado disabled para dropzone
+ * Reduz opacidade e muda cursor quando upload está em andamento
+ */
+.dropzone[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/**
+ * Transições suaves para interações
+ */
+.dropzone,
+button,
+.form-field input {
+  transition: outline 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
