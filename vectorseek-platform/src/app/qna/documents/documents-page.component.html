@@ -13,6 +13,21 @@
     <!-- Filters -->
     <div class="filters-section">
       <div class="filter-group">
+        <label for="workspace-filter">Workspace:</label>
+        <select
+          id="workspace-filter"
+          [(ngModel)]="selectedWorkspaceId"
+          (change)="onWorkspaceChange()"
+          [disabled]="isLoadingWorkspaces()"
+        >
+          <option value="">Todos</option>
+          @for (workspace of workspaces(); track workspace.id) {
+            <option [value]="workspace.id">{{ workspace.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
         <label for="status-filter">Status:</label>
         <select id="status-filter" [(ngModel)]="statusFilter" (change)="onFilterChange()">
           <option value="">Todos</option>
