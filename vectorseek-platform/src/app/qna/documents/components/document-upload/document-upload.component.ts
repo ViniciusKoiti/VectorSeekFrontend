@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   DestroyRef,
   ElementRef,
@@ -25,7 +26,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './document-upload.component.html',
   styleUrls: ['./document-upload.component.css']
 })
-export class DocumentUploadComponent implements OnDestroy {
+export class DocumentUploadComponent implements OnDestroy, AfterViewInit {
   private readonly documentsService = inject(DocumentsService);
   protected readonly dialogRef = inject<MatDialogRef<DocumentUploadComponent> | null>(
     MatDialogRef,
@@ -35,6 +36,7 @@ export class DocumentUploadComponent implements OnDestroy {
 
   @Output() uploadComplete = new EventEmitter<DocumentUploadResponse>();
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('dropzone') dropzone?: ElementRef<HTMLDivElement>;
 
   readonly isDragging = signal(false);
   readonly isUploading = signal(false);
@@ -43,6 +45,7 @@ export class DocumentUploadComponent implements OnDestroy {
   readonly errorMessage = signal<string | null>(null);
   readonly selectedFileName = signal<string | null>(null);
   readonly selectedFileSize = signal<number | null>(null);
+  readonly selectedFile = signal<File | null>(null);
 
   title = '';
   workspaceId = '';
@@ -89,6 +92,32 @@ export class DocumentUploadComponent implements OnDestroy {
     this.fileInput?.nativeElement.click();
   }
 
+  onStartUpload(): void {
+    const file = this.selectedFile();
+    if (!file) {
+      this.errorMessage.set('Nenhum arquivo selecionado.');
+      return;
+    }
+
+    this.startUpload(file);
+  }
+
+  onCancelSelection(): void {
+    this.selectedFile.set(null);
+    this.selectedFileName.set(null);
+    this.selectedFileSize.set(null);
+    this.errorMessage.set(null);
+    this.statusMessage.set('Arraste e solte ou selecione um arquivo para enviar.');
+
+    // Limpar input
+    if (this.fileInput?.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
+
+    // Anunciar para leitores de tela
+    this.announceToScreenReader('Seleção cancelada. Escolha outro arquivo.');
+  }
+
   cancelUpload(): void {
     if (!this.isUploading()) {
       return;
@@ -97,6 +126,16 @@ export class DocumentUploadComponent implements OnDestroy {
     this.uploadSubscription = null;
     this.isUploading.set(false);
     this.statusMessage.set('Upload cancelado.');
+
+    // Anunciar cancelamento
+    this.announceToScreenReader('Upload cancelado.');
+  }
+
+  ngAfterViewInit(): void {
+    // Focar na dropzone quando o modal abre para melhor acessibilidade
+    setTimeout(() => {
+      this.dropzone?.nativeElement.focus();
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -108,9 +147,13 @@ export class DocumentUploadComponent implements OnDestroy {
       return;
     }
 
+    this.selectedFile.set(file);
     this.selectedFileName.set(file.name);
     this.selectedFileSize.set(file.size);
-    this.startUpload(file);
+    this.statusMessage.set('Arquivo pronto para upload. Clique em "Enviar" para continuar.');
+
+    // Anunciar para leitores de tela
+    this.announceToScreenReader(`Arquivo ${file.name} selecionado. Pronto para enviar.`);
   }
 
   private validateFile(file: File): boolean {
@@ -183,6 +226,10 @@ export class DocumentUploadComponent implements OnDestroy {
     this.uploadProgress.set(100);
     this.statusMessage.set('Upload concluído. Processamento iniciado.');
     this.uploadSubscription = null;
+
+    // Anunciar sucesso para leitores de tela
+    this.announceToScreenReader('Upload concluído com sucesso');
+
     this.uploadComplete.emit(response);
     this.dialogRef?.close(response);
   }
@@ -208,5 +255,23 @@ export class DocumentUploadComponent implements OnDestroy {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     const value = bytes / Math.pow(1024, i);
     return `${value.toFixed(1)} ${sizes[i]}`;
+  }
+
+  /**
+   * Anuncia mensagem para leitores de tela via live region
+   * Cria elemento temporário com role="status" para anúncio acessível
+   */
+  private announceToScreenReader(message: string): void {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('role', 'status');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    document.body.appendChild(announcement);
+
+    // Remover elemento após 1 segundo
+    setTimeout(() => {
+      document.body.removeChild(announcement);
+    }, 1000);
   }
 }
