@@ -1,0 +1,26 @@
+<div class="modal-container" [class.modal-danger]="data.danger">
+  <div class="modal-icon" [attr.data-danger]="data.danger">
+    {{ data.danger ? '⚠️' : 'ℹ️' }}
+  </div>
+  <h2>{{ data.title }}</h2>
+  <p class="modal-message">{{ data.message }}</p>
+  @if (data.description) {
+    <p class="modal-description">{{ data.description }}</p>
+  }
+
+  <div class="modal-actions">
+    <button type="button" class="btn btn-secondary" (click)="onCancel()">
+      {{ data.cancelLabel || 'Cancelar' }}
+    </button>
+
+    <button
+      type="button"
+      class="btn"
+      [class.btn-danger]="data.danger"
+      [class.btn-primary]="!data.danger"
+      (click)="onConfirm()"
+    >
+      {{ data.confirmLabel || 'Confirmar' }}
+    </button>
+  </div>
+</div>

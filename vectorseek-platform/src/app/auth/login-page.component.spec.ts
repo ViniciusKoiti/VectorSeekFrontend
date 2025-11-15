@@ -67,8 +67,13 @@ describe('LoginPageComponent', () => {
 
   it('should call authService.login when form is valid', () => {
     const mockResponse = {
-      user: { id: '1', email: 'test@example.com', fullName: 'Test User', avatarUrl: null },
-      tokens: { accessToken: 'token', refreshToken: 'refresh', expiresIn: 3600, tokenType: 'Bearer' }
+      raw: {
+        user_id: '1',
+        access_token: 'token',
+        refresh_token: 'refresh',
+        expires_in: 3600,
+        token_type: 'Bearer'
+      }
     };
 
     authService.login.and.returnValue(of(mockResponse));

@@ -1,0 +1,61 @@
+<div class="upload-card" [class.is-dragging]="isDragging()">
+  <div
+    class="dropzone"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="dropzone-icon">📄</div>
+    <p class="dropzone-title">Arraste e solte o arquivo aqui</p>
+    <p class="dropzone-subtitle">ou</p>
+    <button type="button" class="btn btn-primary" (click)="onSelectFileClick()" [disabled]="isUploading()">
+      Selecionar arquivo
+    </button>
+    <input
+      #fileInput
+      type="file"
+      class="hidden-input"
+      accept=".pdf,.docx,.txt,.md"
+      (change)="onFileSelected($event)"
+    />
+    <p class="dropzone-note">
+      Tipos aceitos: PDF, DOCX, TXT, MD · Limite: 100MB
+    </p>
+  </div>
+
+  <div class="file-info" *ngIf="selectedFileName()">
+    <div>
+      <strong>{{ selectedFileName() }}</strong>
+      <span>{{ formatFileSize(selectedFileSize()) }}</span>
+    </div>
+  </div>
+
+  <div class="form-grid">
+    <label class="form-field">
+      <span>Título (opcional)</span>
+      <input type="text" [(ngModel)]="title" [disabled]="isUploading()" placeholder="Usaremos o nome do arquivo se vazio" />
+    </label>
+    <label class="form-field">
+      <span>Workspace ID (opcional)</span>
+      <input type="text" [(ngModel)]="workspaceId" [disabled]="isUploading()" placeholder="Informe para associar a um workspace" />
+    </label>
+  </div>
+
+  <app-upload-progress
+    *ngIf="isUploading()"
+    [progress]="uploadProgress()"
+    [status]="statusMessage()"
+  ></app-upload-progress>
+
+  <p class="status-message" *ngIf="!isUploading()">{{ statusMessage() }}</p>
+  <p class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+  <div class="actions">
+    <button type="button" class="btn btn-secondary" (click)="cancelUpload()" [disabled]="!isUploading()">
+      Cancelar Upload
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="dialogRef?.close()" *ngIf="!isUploading()">
+      Fechar
+    </button>
+  </div>
+</div>

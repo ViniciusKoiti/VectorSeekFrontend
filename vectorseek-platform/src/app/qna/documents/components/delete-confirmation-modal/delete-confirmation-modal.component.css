@@ -1,0 +1,79 @@
+.modal-container {
+  padding: 2rem;
+  background: var(--background-surface);
+  border-radius: 12px;
+  border: 1px solid var(--accent-primary-border);
+  color: var(--text-primary);
+  min-width: 320px;
+}
+
+.modal-container.modal-danger {
+  border-color: var(--error-border);
+  background: var(--error-surface);
+}
+
+.modal-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.modal-icon[data-danger='true'] {
+  color: var(--error-primary);
+}
+
+.modal-message {
+  margin: 0;
+  font-weight: 600;
+}
+
+.modal-description {
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--accent-primary-border);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--background-overlay);
+}
+
+.btn-primary {
+  background: var(--accent-primary);
+  color: var(--accent-primary-darker);
+}
+
+.btn-danger {
+  background: var(--error-primary);
+  color: white;
+}
+
+.btn-primary:hover,
+.btn-danger:hover {
+  opacity: 0.9;
+}

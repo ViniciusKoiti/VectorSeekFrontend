@@ -3,7 +3,14 @@ import { HttpHeaders } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 
 import { AUTH_API_ENDPOINTS } from './auth.api';
-import { AuthError, LoginRequest, PlanType, RegisterRequest, RequestMagicLinkRequest } from './auth.models';
+import {
+  AuthError,
+  LoginRequest,
+  PlanType,
+  RegisterRequest,
+  RequestMagicLinkRequest,
+  AuthApiSessionDto
+} from './auth.models';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
@@ -25,44 +32,24 @@ describe('AuthService', () => {
 
   it('should map login responses to session models', () => {
     const payload: LoginRequest = { email: 'john@example.com', password: 'StrongPassword!23' };
+    const apiResponse: AuthApiSessionDto = {
+      user_id: 'user-123',
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      token_type: 'Bearer',
+      expires_in: 3600
+    };
 
     service.login(payload).subscribe((response) => {
-      expect(response).toEqual({
-        tokens: {
-          accessToken: 'access-token',
-          refreshToken: 'refresh-token',
-          expiresIn: 3600,
-          tokenType: 'Bearer'
-        },
-        user: {
-          id: 'user-123',
-          email: 'john@example.com',
-          fullName: 'John Connor',
-          avatarUrl: 'https://cdn.vectorseek.ai/avatar.png'
-        }
-      });
+      expect(response.raw).toEqual(apiResponse);
+      expect(response.raw?.access_token).toBe('access-token');
     });
 
     const request = httpMock.expectOne(AUTH_API_ENDPOINTS.login());
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(payload);
 
-    request.flush({
-      data: {
-        tokens: {
-          access_token: 'access-token',
-          refresh_token: 'refresh-token',
-          expires_in: 3600,
-          token_type: 'Bearer'
-        },
-        user: {
-          id: 'user-123',
-          email: 'john@example.com',
-          full_name: 'John Connor',
-          avatar_url: 'https://cdn.vectorseek.ai/avatar.png'
-        }
-      }
-    });
+    request.flush(apiResponse);
   });
 
   it('should convert 401 errors on login into friendly payloads', () => {
@@ -72,8 +59,8 @@ describe('AuthService', () => {
       next: () => fail('Expected login request to error'),
       error: (error: AuthError) => {
         expect(error.status).toBe(401);
-        expect(error.summary).toBe('Credenciais inválidas');
-        expect(error.description).toContain('Verifique e-mail');
+        expect(error.summary).toBe('auth.apiErrors.login.401.summary');
+        expect(error.description).toBe('auth.apiErrors.login.401.description');
         expect(error.code).toBe('AUTH_INVALID');
       }
     });
@@ -97,7 +84,8 @@ describe('AuthService', () => {
       next: () => fail('Expected request to fail'),
       error: (error: AuthError) => {
         expect(error.status).toBe(429);
-        expect(error.summary).toBe('Muitas solicitações');
+        expect(error.summary).toBe('auth.apiErrors.requestMagicLink.429.summary');
+        expect(error.description).toBe('auth.apiErrors.requestMagicLink.429.description');
         expect(error.retryAfterSeconds).toBe(120);
       }
     });
@@ -127,7 +115,8 @@ describe('AuthService', () => {
       next: () => fail('Expected register request to error'),
       error: (error: AuthError) => {
         expect(error.status).toBe(422);
-        expect(error.summary).toBe('Dados inválidos');
+        expect(error.summary).toBe('auth.apiErrors.register.VALIDATION_FAILED.summary');
+        expect(error.description).toBe('auth.apiErrors.register.VALIDATION_FAILED.description');
         expect(error.fieldErrors).toEqual({
           password: ['A senha deve conter ao menos 12 caracteres.'],
           acceptTerms: ['É necessário aceitar os termos de uso.']
@@ -160,31 +149,23 @@ describe('AuthService', () => {
       acceptTerms: true
     };
 
+    const apiResponse: AuthApiSessionDto = {
+      user_id: 'user-456',
+      access_token: 'new-access-token',
+      refresh_token: 'new-refresh-token',
+      expires_in: 3600,
+      token_type: 'Bearer'
+    };
+
     service.register(payload).subscribe((response) => {
-      expect(response.user.email).toBe('john@example.com');
-      expect(response.user.fullName).toBe('John Connor');
-      expect(response.tokens.accessToken).toBeTruthy();
+      expect(response.raw).toEqual(apiResponse);
+      expect(response.raw?.user_id).toBe('user-456');
     });
 
     const request = httpMock.expectOne(AUTH_API_ENDPOINTS.register());
     expect(request.request.method).toBe('POST');
 
-    request.flush({
-      data: {
-        tokens: {
-          access_token: 'new-access-token',
-          refresh_token: 'new-refresh-token',
-          expires_in: 3600,
-          token_type: 'Bearer'
-        },
-        user: {
-          id: 'user-456',
-          email: 'john@example.com',
-          full_name: 'John Connor',
-          avatar_url: null
-        }
-      }
-    });
+    request.flush(apiResponse);
   });
 
   it('should successfully request magic link', () => {
@@ -199,11 +180,7 @@ describe('AuthService', () => {
     const request = httpMock.expectOne(AUTH_API_ENDPOINTS.requestMagicLink());
     expect(request.request.method).toBe('POST');
 
-    request.flush({
-      data: {
-        message: 'Magic link sent to your email'
-      }
-    });
+    request.flush({ message: 'Magic link sent to your email' });
   });
 
   it('should successfully refresh tokens', () => {
@@ -220,12 +197,10 @@ describe('AuthService', () => {
     expect(request.request.method).toBe('POST');
 
     request.flush({
-      data: {
-        access_token: 'new-access-token',
-        refresh_token: 'new-refresh-token',
-        expires_in: 3600,
-        token_type: 'Bearer'
-      }
+      access_token: 'new-access-token',
+      refresh_token: 'new-refresh-token',
+      expires_in: 3600,
+      token_type: 'Bearer'
     });
   });
 
@@ -236,7 +211,7 @@ describe('AuthService', () => {
       next: () => fail('Expected refresh to error'),
       error: (error: AuthError) => {
         expect(error.status).toBe(401);
-        expect(error.summary).toBe('Sessão inválida');
+        expect(error.summary).toBe('auth.apiErrors.refresh.401.summary');
       }
     });
 
@@ -259,12 +234,10 @@ describe('AuthService', () => {
     expect(request.request.method).toBe('GET');
 
     request.flush({
-      data: {
-        id: 'user-123',
-        email: 'john@example.com',
-        full_name: 'John Connor',
-        avatar_url: 'https://cdn.vectorseek.ai/avatar.png'
-      }
+      id: 'user-123',
+      email: 'john@example.com',
+      full_name: 'John Connor',
+      avatar_url: 'https://cdn.vectorseek.ai/avatar.png'
     });
   });
 
@@ -273,7 +246,7 @@ describe('AuthService', () => {
       next: () => fail('Expected me() to error'),
       error: (error: AuthError) => {
         expect(error.status).toBe(401);
-        expect(error.summary).toBe('Sessão inválida');
+        expect(error.summary).toBe('auth.apiErrors.me.401.summary');
       }
     });
 
@@ -292,7 +265,7 @@ describe('AuthService', () => {
       error: (error: AuthError) => {
         expect(error.status).toBe(0);
         expect(error.code).toBe('unexpected_error');
-        expect(error.summary).toBe('Não foi possível entrar agora');
+        expect(error.summary).toBe('auth.apiErrors.login.default.summary');
       }
     });
 
@@ -320,29 +293,17 @@ describe('AuthService', () => {
     );
   });
 
-  it('should handle avatar_url as null', () => {
-    const payload: LoginRequest = { email: 'john@example.com', password: 'password' };
-
-    service.login(payload).subscribe((response) => {
-      expect(response.user.avatarUrl).toBeNull();
+  it('should handle avatar_url as null when fetching profile', () => {
+    service.me().subscribe((response) => {
+      expect(response.avatarUrl).toBeNull();
     });
 
-    const request = httpMock.expectOne(AUTH_API_ENDPOINTS.login());
+    const request = httpMock.expectOne(AUTH_API_ENDPOINTS.me());
     request.flush({
-      data: {
-        tokens: {
-          access_token: 'token',
-          refresh_token: 'refresh',
-          expires_in: 3600,
-          token_type: 'Bearer'
-        },
-        user: {
-          id: 'user-123',
-          email: 'john@example.com',
-          full_name: 'John Connor',
-          avatar_url: null
-        }
-      }
+      id: 'user-123',
+      email: 'john@example.com',
+      full_name: 'John Connor',
+      avatar_url: null
     });
   });
 });

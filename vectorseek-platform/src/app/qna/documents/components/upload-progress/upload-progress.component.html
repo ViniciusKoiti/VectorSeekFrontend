@@ -1,0 +1,12 @@
+<div class="progress-wrapper">
+  <div class="progress-bar" [class.indeterminate]="indeterminate">
+    <div
+      class="progress-bar__fill"
+      [style.width.%]="indeterminate ? 100 : progress"
+    ></div>
+  </div>
+  <div class="progress-meta">
+    <span class="progress-value" *ngIf="!indeterminate">{{ progressLabel() }}</span>
+    <span class="progress-status">{{ status }}</span>
+  </div>
+</div>

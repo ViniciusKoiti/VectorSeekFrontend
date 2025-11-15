@@ -22,6 +22,11 @@ export const DOCUMENTS_API_ENDPOINTS = {
   reprocess: (id: string) => `${DOCUMENTS_BASE_PATH}/${id}/reprocess`,
 
   /**
+   * POST /api/documents/upload - Upload de documento
+   */
+  upload: () => `${DOCUMENTS_BASE_PATH}/upload`,
+
+  /**
    * DELETE /api/documents/:id - Deletar documento
    */
   delete: (id: string) => `${DOCUMENTS_BASE_PATH}/${id}`,

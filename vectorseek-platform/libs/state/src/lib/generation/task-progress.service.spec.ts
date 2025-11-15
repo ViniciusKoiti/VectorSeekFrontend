@@ -71,7 +71,7 @@ describe('TaskProgressService', () => {
     let callCount = 0;
     generationService.getProgress.and.callFake(() => {
       const response = responses[callCount++];
-      return of(response).pipe(delay(100));
+      return of<GetProgressResponse>(response).pipe(delay(100));
     });
 
     const results: GetProgressResponse[] = [];
@@ -112,7 +112,7 @@ describe('TaskProgressService', () => {
   it('should allow manual cancellation', (done) => {
     const taskId = 'task-123';
     generationService.getProgress.and.returnValue(
-      of({
+      of<GetProgressResponse>({
         taskId,
         status: 'processing',
         stage: 'context',

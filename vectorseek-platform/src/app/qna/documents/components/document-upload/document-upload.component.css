@@ -1,0 +1,94 @@
+.upload-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--background-surface);
+  border: 1px solid var(--accent-primary-border);
+  border-radius: 16px;
+  min-width: 360px;
+}
+
+.dropzone {
+  border: 2px dashed var(--accent-primary-border);
+  border-radius: 12px;
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.upload-card.is-dragging .dropzone {
+  border-color: var(--accent-primary);
+  background: rgba(0, 246, 255, 0.05);
+}
+
+.dropzone-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.dropzone-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dropzone-subtitle,
+.dropzone-note {
+  margin: 0.25rem 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.hidden-input {
+  display: none;
+}
+
+.file-info {
+  padding: 0.75rem 1rem;
+  background: var(--background-overlay);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.form-field input {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--accent-primary-border);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.status-message {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.error-message {
+  margin: 0;
+  color: var(--error-primary);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

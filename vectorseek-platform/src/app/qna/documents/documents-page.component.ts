@@ -1,7 +1,13 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DocumentsService, Document, DocumentStatus } from '@vectorseek/data-access';
+import { Router, RouterModule } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { DocumentsService, Document, DocumentStatus, DocumentsError } from '@vectorseek/data-access';
+import { DeleteConfirmationModalComponent } from './components/delete-confirmation-modal/delete-confirmation-modal.component';
+import { DocumentUploadComponent } from './components/document-upload/document-upload.component';
+import { Subject, takeUntil } from 'rxjs';
 
 /**
  * Página de gestão de documentos vetorados
@@ -10,16 +16,20 @@ import { DocumentsService, Document, DocumentStatus } from '@vectorseek/data-acc
 @Component({
   selector: 'app-documents-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule, MatDialogModule, MatSnackBarModule],
   templateUrl: './documents-page.component.html',
   styleUrls: ['./documents-page.component.css']
 })
-export class DocumentsPageComponent implements OnInit {
+export class DocumentsPageComponent implements OnInit, OnDestroy {
   private readonly documentsService = inject(DocumentsService);
+  private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly destroy$ = new Subject<void>();
 
   documents = signal<Document[]>([]);
   loading = signal(false);
-  error = signal<{ summary: string; description?: string } | null>(null);
+  error = signal<DocumentsError | null>(null);
   pagination = signal({
     total: 0,
     page: 1,
@@ -28,9 +38,15 @@ export class DocumentsPageComponent implements OnInit {
   });
 
   statusFilter: DocumentStatus | '' = '';
+  private actionStatus = signal<Record<string, 'reprocess' | 'delete' | undefined>>({});
 
   ngOnInit(): void {
     this.loadDocuments();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadDocuments(page: number = 1): void {
@@ -45,14 +61,28 @@ export class DocumentsPageComponent implements OnInit {
         sortBy: 'createdAt',
         sortOrder: 'desc'
       })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          // Map to Document format
+          // Map API payload to Document format
           const docs: Document[] = response.documents.map((doc) => ({
-            ...doc,
+            id: doc.id,
+            title: doc.title ?? undefined,
+            filename: doc.filename,
+            size: doc.size,
+            status: doc.status,
+            workspaceId: doc.workspaceId ?? undefined,
+            workspaceName: doc.workspaceName ?? undefined,
             createdAt: new Date(doc.createdAt),
             updatedAt: new Date(doc.updatedAt),
-            indexedAt: doc.indexedAt ? new Date(doc.indexedAt) : undefined
+            processedAt: doc.processedAt ? new Date(doc.processedAt) : undefined,
+            indexedAt: doc.indexedAt ? new Date(doc.indexedAt) : undefined,
+            contentPreview: doc.contentPreview ?? undefined,
+            embeddingCount: doc.embeddingCount ?? 0,
+            chunkCount: doc.chunkCount ?? undefined,
+            processingTimeSeconds: doc.processingTimeSeconds ?? undefined,
+            fingerprint: doc.fingerprint ?? undefined,
+            error: doc.error ?? undefined
           }));
 
           this.documents.set(docs);
@@ -90,8 +120,67 @@ export class DocumentsPageComponent implements OnInit {
   }
 
   onViewDetails(doc: Document): void {
-    console.log('Visualizando detalhes do documento:', doc.id);
-    // TODO: Implementar navegação para a página de detalhes do documento
+    this.router.navigate(['/app/documents', doc.id]);
+  }
+
+  openUploadDialog(): void {
+    const dialogRef = this.dialog.open(DocumentUploadComponent, {
+      width: '520px',
+      disableClose: true
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.loadDocuments(1);
+        }
+      });
+  }
+
+  onReprocessDocument(doc: Document): void {
+    this.dialog
+      .open(DeleteConfirmationModalComponent, {
+        width: '420px',
+        data: {
+          title: 'Reprocessar documento',
+          message: `Deseja reprocessar "${doc.title ?? doc.filename}"?`,
+          confirmLabel: 'Reprocessar'
+        }
+      })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) {
+          return;
+        }
+        this.executeReprocess(doc.id);
+      });
+  }
+
+  onDeleteDocument(doc: Document): void {
+    this.dialog
+      .open(DeleteConfirmationModalComponent, {
+        width: '420px',
+        data: {
+          title: 'Deletar documento',
+          message: `Tem certeza que deseja deletar "${doc.title ?? doc.filename}"?`,
+          description: 'Esta ação não pode ser desfeita. Todos os chunks serão removidos.',
+          confirmLabel: 'Deletar',
+          danger: true
+        }
+      })
+      .afterClosed()
+      .subscribe((confirmed: boolean) => {
+        if (!confirmed) {
+          return;
+        }
+        this.executeDelete(doc.id);
+      });
+  }
+
+  isActionLoading(documentId: string, action: 'reprocess' | 'delete'): boolean {
+    return this.actionStatus()[documentId] === action;
   }
 
   onExportCSV(): void {
@@ -129,7 +218,7 @@ export class DocumentsPageComponent implements OnInit {
     const labels: Record<DocumentStatus, string> = {
       processing: 'Processando',
       completed: 'Concluído',
-      error: 'Erro',
+      failed: 'Erro',
       pending: 'Pendente'
     };
     return labels[status] || status;
@@ -150,5 +239,60 @@ export class DocumentsPageComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  }
+
+  private executeReprocess(id: string): void {
+    this.setActionStatus(id, 'reprocess');
+
+    this.documentsService
+      .reprocessDocument(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+      next: () => {
+        this.snackBar.open('Documento enviado para reprocessamento', 'Fechar', {
+          duration: 3000
+        });
+        this.updateDocumentStatus(id, 'processing');
+        this.setActionStatus(id);
+      },
+      error: (err: DocumentsError) => {
+        this.setActionStatus(id);
+        this.snackBar.open(err.summary, 'Fechar', { duration: 4000 });
+      }
+    });
+  }
+
+  private executeDelete(id: string): void {
+    this.setActionStatus(id, 'delete');
+
+    this.documentsService
+      .deleteDocument(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+      next: () => {
+        this.snackBar.open('Documento deletado com sucesso', 'Fechar', {
+          duration: 3000
+        });
+        this.setActionStatus(id);
+        this.loadDocuments(this.pagination().page);
+      },
+      error: (err: DocumentsError) => {
+        this.setActionStatus(id);
+        this.snackBar.open(err.summary, 'Fechar', { duration: 4000 });
+      }
+    });
+  }
+
+  private updateDocumentStatus(id: string, status: DocumentStatus): void {
+    this.documents.update((docs) => {
+      return docs.map((doc) => (doc.id === id ? { ...doc, status } : doc));
+    });
+  }
+
+  private setActionStatus(id: string, status?: 'reprocess' | 'delete'): void {
+    this.actionStatus.update((current) => ({
+      ...current,
+      [id]: status
+    }));
   }
 }

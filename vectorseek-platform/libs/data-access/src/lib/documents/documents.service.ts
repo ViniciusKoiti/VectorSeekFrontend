@@ -1,16 +1,29 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+﻿import { HttpClient, HttpErrorResponse, HttpParams, HttpEvent, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, throwError } from 'rxjs';
 
 import {
   Document,
+  DocumentApiResponse,
+  DocumentDeleteApiResponse,
+  DocumentDeleteResult,
+  DocumentDetail,
+  DocumentDetailApiResponse,
+  DocumentReprocessApiResponse,
+  DocumentReprocessResult,
+  DocumentStatus,
+  DocumentUploadApiResponse,
+  DocumentUploadResponse,
   DocumentsAction,
   DocumentsApiEnvelope,
   DocumentsApiErrorPayload,
   DocumentsError,
+  DocumentsListApiResponse,
   DocumentsListRequest,
-  DocumentsListResponse,
-  DocumentDetailResponse,
+  DocumentsListResult,
+  LegacyDocumentApiResponse,
+  LegacyDocumentDetailResponse,
+  LegacyDocumentsListResponse,
   Workspace,
   WorkspacesListResponse
 } from './documents.models';
@@ -52,6 +65,12 @@ const ACTION_ERROR_MESSAGES: Record<
       summary: 'Não foi possível deletar o documento',
       description: 'Verifique suas permissões e tente novamente.'
     }
+  },
+  upload: {
+    default: {
+      summary: 'Falha ao enviar o documento',
+      description: 'Verifique o arquivo selecionado e tente novamente.'
+    }
   }
 };
 
@@ -59,94 +78,314 @@ const ACTION_ERROR_MESSAGES: Record<
 export class DocumentsService {
   private readonly http = inject(HttpClient);
 
-  /**
-   * Listar documentos com filtros e paginação
-   */
-  listDocuments(request?: DocumentsListRequest): Observable<DocumentsListResponse> {
+  listDocuments(request?: DocumentsListRequest): Observable<DocumentsListResult> {
+    const params = this.buildListParams(request);
+
+    return this.http
+      .get<DocumentsListApiResponse | DocumentsApiEnvelope<LegacyDocumentsListResponse> | LegacyDocumentsListResponse>(
+        DOCUMENTS_API_ENDPOINTS.list(),
+        { params }
+      )
+      .pipe(
+        map((response) => this.normalizeListResponse(response)),
+        catchError((error) => this.handleError('list', error))
+      );
+  }
+
+  getDocumentDetail(id: string): Observable<DocumentDetail> {
+    return this.http
+      .get<DocumentDetailApiResponse | LegacyDocumentDetailResponse | DocumentsApiEnvelope<DocumentDetailApiResponse>>(
+        DOCUMENTS_API_ENDPOINTS.detail(id)
+      )
+      .pipe(
+        map((response) => this.normalizeDetailResponse(response)),
+        catchError((error) => this.handleError('detail', error))
+      );
+  }
+
+  reprocessDocument(id: string, force = false): Observable<DocumentReprocessResult> {
+    return this.http
+      .post<DocumentReprocessApiResponse>(DOCUMENTS_API_ENDPOINTS.reprocess(id), { force })
+      .pipe(
+        map((response) => ({
+          documentId: response.document_id,
+          taskId: response.task_id,
+          status: response.status
+        })),
+        catchError((error) => this.handleError('reprocess', error))
+      );
+  }
+
+  deleteDocument(id: string): Observable<DocumentDeleteResult> {
+    return this.http
+      .delete<DocumentDeleteApiResponse>(DOCUMENTS_API_ENDPOINTS.delete(id))
+      .pipe(
+        map((response) => ({
+          id: response.id,
+          deletedAt: this.toDate(response.deleted_at) ?? new Date()
+        })),
+        catchError((error) => this.handleError('delete', error))
+      );
+  }
+
+  uploadDocument(payload: {
+    file: File;
+    workspaceId?: string;
+    title?: string;
+  }): Observable<HttpEvent<DocumentUploadResponse>> {
+    const formData = new FormData();
+    formData.append('file', payload.file);
+
+    if (payload.workspaceId) {
+      formData.append('workspace_id', payload.workspaceId);
+    }
+
+    if (payload.title) {
+      formData.append('title', payload.title);
+    }
+
+    return this.http
+      .post<DocumentUploadApiResponse>(DOCUMENTS_API_ENDPOINTS.upload(), formData, {
+        reportProgress: true,
+        observe: 'events',
+        responseType: 'json'
+      })
+      .pipe(
+        map((event): HttpEvent<DocumentUploadResponse> => this.mapUploadEvent(event)),
+        catchError((error) => this.handleError('upload', error))
+      );
+  }
+
+  listWorkspaces(): Observable<Workspace[]> {
+    return this.http
+      .get<WorkspacesListResponse | DocumentsApiEnvelope<WorkspacesListResponse>>(DOCUMENTS_API_ENDPOINTS.workspaces())
+      .pipe(
+        map((response) => this.unwrapEnvelope(response).workspaces ?? []),
+        catchError((error) => this.handleError('list', error))
+      );
+  }
+
+  private buildListParams(request?: DocumentsListRequest): HttpParams {
     let params = new HttpParams();
 
-    if (request?.page !== undefined) {
-      params = params.set('page', request.page.toString());
+    if (request?.limit !== undefined) {
+      params = params.set('limit', request.limit.toString());
     }
-    if (request?.pageSize !== undefined) {
-      params = params.set('pageSize', request.pageSize.toString());
+    if (request?.offset !== undefined) {
+      params = params.set('offset', request.offset.toString());
     }
     if (request?.status) {
       params = params.set('status', request.status);
     }
     if (request?.workspaceId) {
-      params = params.set('workspaceId', request.workspaceId);
+      params = params.set('workspace_id', request.workspaceId);
     }
-    if (request?.dateRange) {
-      params = params.set('dateStart', request.dateRange.start);
-      params = params.set('dateEnd', request.dateRange.end);
-    }
-    if (request?.sortBy) {
-      params = params.set('sortBy', request.sortBy);
-    }
-    if (request?.sortOrder) {
-      params = params.set('sortOrder', request.sortOrder);
+    if (request?.search) {
+      params = params.set('search', request.search);
     }
 
-    return this.http
-      .get<DocumentsApiEnvelope<DocumentsListResponse>>(DOCUMENTS_API_ENDPOINTS.list(), { params })
-      .pipe(
-        map((response) => response.data),
-        catchError((error) => this.handleError('list', error))
-      );
+    return params;
   }
 
-  /**
-   * Buscar detalhes de um documento
-   */
-  getDocumentDetail(id: string): Observable<DocumentDetailResponse> {
-    return this.http
-      .get<DocumentsApiEnvelope<DocumentDetailResponse>>(DOCUMENTS_API_ENDPOINTS.detail(id))
-      .pipe(
-        map((response) => response.data),
-        catchError((error) => this.handleError('detail', error))
-      );
+  private normalizeListResponse(response: unknown): DocumentsListResult {
+    const payload = this.unwrapEnvelope<DocumentsListApiResponse | LegacyDocumentsListResponse>(response);
+
+    if (this.isDocumentsListApiResponse(payload)) {
+      return {
+        data: payload.data.map((doc) => this.mapDocumentResponse(doc)),
+        total: payload.total,
+        limit: payload.limit,
+        offset: payload.offset
+      };
+    }
+
+    if (this.isLegacyListResponse(payload)) {
+      const { pagination } = payload;
+      const offset = (pagination.page - 1) * pagination.pageSize;
+      return {
+        data: payload.documents.map((doc) => this.mapDocumentResponse(doc)),
+        total: pagination.total,
+        limit: pagination.pageSize,
+        offset
+      };
+    }
+
+    throw new Error('Invalid response payload for documents list');
   }
 
-  /**
-   * Reprocessar um documento
-   */
-  reprocessDocument(id: string): Observable<{ success: boolean; message: string }> {
-    return this.http
-      .post<DocumentsApiEnvelope<{ success: boolean; message: string }>>(
-        DOCUMENTS_API_ENDPOINTS.reprocess(id),
-        {}
-      )
-      .pipe(
-        map((response) => response.data),
-        catchError((error) => this.handleError('reprocess', error))
-      );
+  private normalizeDetailResponse(response: unknown): DocumentDetail {
+    const payload = this.unwrapEnvelope<DocumentDetailApiResponse | LegacyDocumentDetailResponse>(response);
+
+    if (this.isDocumentApiResponse(payload)) {
+      return this.mapDocumentResponse(payload);
+    }
+
+    if (this.isLegacyDocument(payload)) {
+      return this.mapDocumentResponse(payload);
+    }
+
+    if (payload && typeof payload === 'object' && 'document' in payload) {
+      const nested = (payload as { document?: LegacyDocumentApiResponse }).document;
+      if (nested) {
+        return this.mapDocumentResponse(nested);
+      }
+    }
+
+    throw new Error('Invalid response payload for document detail');
   }
 
-  /**
-   * Deletar um documento
-   */
-  deleteDocument(id: string): Observable<{ success: boolean; message: string }> {
-    return this.http
-      .delete<DocumentsApiEnvelope<{ success: boolean; message: string }>>(
-        DOCUMENTS_API_ENDPOINTS.delete(id)
-      )
-      .pipe(
-        map((response) => response.data),
-        catchError((error) => this.handleError('delete', error))
-      );
+  private mapUploadEvent(event: HttpEvent<DocumentUploadApiResponse>): HttpEvent<DocumentUploadResponse> {
+    if (event instanceof HttpResponse) {
+      return event.clone({ body: this.mapUploadResponse(event.body) });
+    }
+    return event as HttpEvent<DocumentUploadResponse>;
   }
 
-  /**
-   * Listar workspaces disponíveis
-   */
-  listWorkspaces(): Observable<Workspace[]> {
-    return this.http
-      .get<DocumentsApiEnvelope<WorkspacesListResponse>>(DOCUMENTS_API_ENDPOINTS.workspaces())
-      .pipe(
-        map((response) => response.data.workspaces),
-        catchError((error) => this.handleError('list', error))
-      );
+  private mapDocumentResponse(dto: DocumentApiResponse | LegacyDocumentApiResponse): Document {
+    if (this.isLegacyDocument(dto)) {
+      return this.mapLegacyDocument(dto);
+    }
+
+    const metadata = dto.metadata ?? undefined;
+
+    return {
+      id: dto.id,
+      filename: dto.filename,
+      size: dto.size,
+      status: this.normalizeStatus(dto.status),
+      workspaceId: dto.workspace_id ?? undefined,
+      workspaceName: dto.workspace_name ?? undefined,
+      createdAt: this.toDate(dto.created_at) ?? new Date(),
+      updatedAt: this.toDate(dto.updated_at) ?? new Date(),
+      processedAt: this.toDate(dto.processed_at),
+      indexedAt: this.toDate(dto.indexed_at),
+      contentPreview: dto.content_preview ?? undefined,
+      embeddingCount: dto.embedding_count ?? 0,
+      chunkCount: dto.chunk_count ?? undefined,
+      processingTimeSeconds: dto.processing_time_seconds ?? undefined,
+      title: metadata?.title ?? undefined,
+      description: metadata?.description ?? undefined,
+      fingerprint: dto.fingerprint ?? undefined,
+      error: dto.error ?? undefined,
+      metadata
+    };
+  }
+
+  private mapLegacyDocument(dto: LegacyDocumentApiResponse): Document {
+    const metadata =
+      dto.metadata || dto.title
+        ? {
+            title: dto.metadata?.title ?? dto.title ?? undefined,
+            description: dto.metadata?.description ?? undefined
+          }
+        : undefined;
+
+    return {
+      id: dto.id,
+      filename: dto.filename ?? dto.title ?? 'Documento',
+      size: dto.size ?? 0,
+      status: this.normalizeStatus(dto.status ?? undefined),
+      workspaceId: dto.workspaceId ?? undefined,
+      workspaceName: dto.workspaceName ?? undefined,
+      createdAt: this.toDate(dto.createdAt) ?? new Date(),
+      updatedAt: this.toDate(dto.updatedAt) ?? new Date(),
+      processedAt: this.toDate(dto.processedAt),
+      indexedAt: this.toDate(dto.indexedAt),
+      contentPreview: dto.contentPreview ?? undefined,
+      embeddingCount: dto.embeddingCount ?? 0,
+      chunkCount: dto.chunkCount ?? undefined,
+      processingTimeSeconds: dto.processingTimeSeconds ?? undefined,
+      title: dto.title ?? metadata?.title,
+      description: metadata?.description,
+      fingerprint: dto.fingerprint ?? undefined,
+      error: dto.error ?? undefined,
+      metadata
+    };
+  }
+
+  private unwrapEnvelope<T>(response: unknown): T {
+    if (
+      response &&
+      typeof response === 'object' &&
+      'data' in response &&
+      !('total' in response) &&
+      !('limit' in response) &&
+      !('offset' in response)
+    ) {
+      const envelope = response as DocumentsApiEnvelope<T>;
+      return envelope.data;
+    }
+
+    return response as T;
+  }
+
+  private isDocumentsListApiResponse(payload: unknown): payload is DocumentsListApiResponse {
+    if (!payload || typeof payload !== 'object') {
+      return false;
+    }
+
+    const candidate = payload as DocumentsListApiResponse;
+    return (
+      Array.isArray(candidate.data) &&
+      typeof candidate.total === 'number' &&
+      typeof candidate.limit === 'number' &&
+      typeof candidate.offset === 'number'
+    );
+  }
+
+  private isLegacyListResponse(payload: unknown): payload is LegacyDocumentsListResponse {
+    if (!payload || typeof payload !== 'object') {
+      return false;
+    }
+
+    const candidate = payload as LegacyDocumentsListResponse;
+    return Array.isArray(candidate.documents) && !!candidate.pagination;
+  }
+
+  private isDocumentApiResponse(payload: unknown): payload is DocumentApiResponse {
+    return !!payload && typeof payload === 'object' && 'created_at' in payload;
+  }
+
+  private isLegacyDocument(payload: unknown): payload is LegacyDocumentApiResponse {
+    if (!payload || typeof payload !== 'object') {
+      return false;
+    }
+    const candidate = payload as Record<string, unknown>;
+    return !('created_at' in candidate) && ('createdAt' in candidate || 'title' in candidate);
+  }
+
+  private normalizeStatus(value?: DocumentStatus | string | null): DocumentStatus {
+    switch ((value ?? 'pending').toString().toLowerCase()) {
+      case 'processing':
+        return 'processing';
+      case 'completed':
+        return 'completed';
+      case 'failed':
+        return 'failed';
+      default:
+        return 'pending';
+    }
+  }
+
+  private toDate(value?: string | Date | null): Date | undefined {
+    if (!value) {
+      return undefined;
+    }
+    if (value instanceof Date) {
+      return value;
+    }
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+  }
+
+  private mapUploadResponse(response?: DocumentUploadApiResponse): DocumentUploadResponse {
+    return {
+      documentId: response?.document_id ?? '',
+      filename: response?.filename ?? '',
+      size: response?.size ?? 0,
+      status: response?.status ?? 'processing',
+      createdAt: this.toDate(response?.created_at) ?? new Date()
+    };
   }
 
   private handleError(action: DocumentsAction, error: unknown): Observable<never> {

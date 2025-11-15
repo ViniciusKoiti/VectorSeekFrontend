@@ -1,0 +1,97 @@
+<div class="detail-wrapper">
+  <button class="back-button" (click)="goBack()">← Voltar para Documentos</button>
+
+  @if (loading()) {
+    <div class="loading-panel">
+      <div class="spinner"></div>
+      <p>Carregando detalhes do documento...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-panel">
+      <div class="error-icon">⚠️</div>
+      <div>
+        <h2>{{ error()?.summary }}</h2>
+        @if (error()?.description) {
+          <p>{{ error()?.description }}</p>
+        }
+      </div>
+    </div>
+  } @else if (document()) {
+    <div class="detail-card">
+      <div class="detail-header">
+        <div>
+          <p class="document-id">ID: {{ document()?.id }}</p>
+          <h1>{{ document()?.title || document()?.filename }}</h1>
+          <p class="document-meta">
+            Criado em {{ formatDate(document()?.createdAt) }} · Atualizado em
+            {{ formatDate(document()?.updatedAt) }}
+          </p>
+        </div>
+        <div class="status-section">
+          <span class="status-label">Status atual</span>
+          <span class="status-badge" [attr.data-status]="document()?.status">
+            {{ getStatusLabel(document()?.status || 'pending') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button
+          class="btn btn-secondary"
+          [disabled]="actionInProgress() === 'reprocess'"
+          (click)="onReprocess()"
+        >
+          {{ actionInProgress() === 'reprocess' ? 'Reprocessando...' : 'Reprocessar' }}
+        </button>
+        <button
+          class="btn btn-danger"
+          [disabled]="actionInProgress() === 'delete'"
+          (click)="onDelete()"
+        >
+          {{ actionInProgress() === 'delete' ? 'Deletando...' : 'Deletar' }}
+        </button>
+      </div>
+
+      <div class="metadata-grid">
+        <div class="meta-item">
+          <span class="meta-label">Workspace</span>
+          <strong>{{ document()?.workspaceName || 'N/A' }}</strong>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Tamanho</span>
+          <strong>{{ formatSize(document()?.size || 0) }}</strong>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Chunks Processados</span>
+          <strong>{{ document()?.chunkCount || document()?.embeddingCount || 0 }}</strong>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Tempo de Processamento</span>
+          <strong>{{ getProcessingTime() || '-' }}</strong>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Processado em</span>
+          <strong>{{ formatDate(document()?.processedAt) }}</strong>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Fingerprint</span>
+          <strong>{{ document()?.fingerprint || '-' }}</strong>
+        </div>
+      </div>
+
+      @if (document()?.error) {
+        <div class="error-alert">
+          <strong>Erro durante o processamento</strong>
+          <p>{{ document()?.error }}</p>
+        </div>
+      }
+
+      @if (document()?.contentPreview) {
+        <div class="content-preview">
+          <h3>Prévia do Conteúdo</h3>
+          <p>{{ document()?.contentPreview }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

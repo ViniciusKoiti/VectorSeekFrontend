@@ -1,10 +1,13 @@
 <div class="content-wrapper">
   <div class="page-header">
     <div class="documents-header">
-    <div>
+      <div>
         <h1 class="page-title">Documentos</h1>
         <p class="page-description">Gerencie seus documentos</p>
       </div>
+      <button class="btn btn-primary upload-button" (click)="openUploadDialog()">
+        + Upload Documento
+      </button>
     </div>
 
     <!-- Filters -->
@@ -15,7 +18,7 @@
           <option value="">Todos</option>
           <option value="processing">Processando</option>
           <option value="completed">Concluído</option>
-          <option value="error">Erro</option>
+          <option value="failed">Erro</option>
           <option value="pending">Pendente</option>
         </select>
       </div>
@@ -62,13 +65,14 @@
               <th>Tamanho</th>
               <th>Workspace</th>
               <th>Data de Criação</th>
+              <th>Chunks</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             @for (doc of documents(); track doc.id) {
               <tr>
-                <td class="doc-title">{{ doc.title }}</td>
+                <td class="doc-title">{{ doc.title || doc.filename }}</td>
                 <td>
                   <span class="status-badge" [attr.data-status]="doc.status">
                     {{ getStatusLabel(doc.status) }}
@@ -77,10 +81,27 @@
                 <td>{{ formatSize(doc.size) }}</td>
                 <td>{{ doc.workspaceName || '-' }}</td>
                 <td>{{ formatDate(doc.createdAt) }}</td>
+                <td>{{ doc.embeddingCount }}</td>
                 <td class="actions-cell">
-                  <button (click)="onViewDetails(doc)" class="btn-icon" title="Ver detalhes">
-                    👁️
-                  </button>
+                  <div class="action-buttons">
+                    <button (click)="onViewDetails(doc)" class="btn-link" title="Ver detalhes">
+                      Detalhes
+                    </button>
+                    <button
+                      (click)="onReprocessDocument(doc)"
+                      class="btn-action"
+                      [disabled]="isActionLoading(doc.id, 'reprocess')"
+                    >
+                      {{ isActionLoading(doc.id, 'reprocess') ? 'Processando...' : 'Reprocessar' }}
+                    </button>
+                    <button
+                      (click)="onDeleteDocument(doc)"
+                      class="btn-action btn-action-danger"
+                      [disabled]="isActionLoading(doc.id, 'delete')"
+                    >
+                      {{ isActionLoading(doc.id, 'delete') ? 'Deletando...' : 'Deletar' }}
+                    </button>
+                  </div>
                 </td>
               </tr>
             }
