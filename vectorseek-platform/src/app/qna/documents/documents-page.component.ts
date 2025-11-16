@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { DocumentsService, Document, DocumentStatus, DocumentsError } from '@vectorseek/data-access';
+import { DocumentsService, Document, DocumentStatus, DocumentsError, Workspace } from '@vectorseek/data-access';
 import { DeleteConfirmationModalComponent } from './components/delete-confirmation-modal/delete-confirmation-modal.component';
 import { DocumentUploadComponent } from './components/document-upload/document-upload.component';
 import { Subject, takeUntil } from 'rxjs';
@@ -38,9 +38,14 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
   });
 
   statusFilter: DocumentStatus | '' = '';
+  workspaces = signal<Workspace[]>([]);
+  selectedWorkspaceId: string = '';
+  isLoadingWorkspaces = signal(false);
   private actionStatus = signal<Record<string, 'reprocess' | 'delete' | undefined>>({});
 
   ngOnInit(): void {
+    this.loadWorkspacePreference();
+    this.loadWorkspaces();
     this.loadDocuments();
   }
 
@@ -58,6 +63,7 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
         page,
         pageSize: 20,
         status: this.statusFilter || undefined,
+        workspaceId: this.selectedWorkspaceId || undefined,
         sortBy: 'createdAt',
         sortOrder: 'desc'
       })
@@ -239,6 +245,41 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  }
+
+  loadWorkspaces(): void {
+    this.isLoadingWorkspaces.set(true);
+
+    this.documentsService
+      .listWorkspaces()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (workspaces) => {
+          this.workspaces.set(workspaces);
+          this.isLoadingWorkspaces.set(false);
+        },
+        error: (error) => {
+          console.error('Erro ao carregar workspaces:', error);
+          this.isLoadingWorkspaces.set(false);
+          // Fallback: continuar sem workspaces
+        }
+      });
+  }
+
+  onWorkspaceChange(): void {
+    this.loadDocuments(1);
+    this.saveWorkspacePreference();
+  }
+
+  private saveWorkspacePreference(): void {
+    localStorage.setItem('selectedWorkspaceId', this.selectedWorkspaceId || '');
+  }
+
+  private loadWorkspacePreference(): void {
+    const saved = localStorage.getItem('selectedWorkspaceId');
+    if (saved !== null) {
+      this.selectedWorkspaceId = saved;
+    }
   }
 
   private executeReprocess(id: string): void {
