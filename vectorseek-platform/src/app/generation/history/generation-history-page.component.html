@@ -1,0 +1,173 @@
+<div class="content-wrapper">
+  <div class="page-header">
+    <div class="history-header">
+      <div>
+        <h1 class="page-title">Histórico de Gerações</h1>
+        <p class="page-description">Visualize e gerencie o histórico de gerações de documentos</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="workspace-filter">Workspace:</label>
+        <select
+          id="workspace-filter"
+          [(ngModel)]="selectedWorkspaceId"
+          (change)="onWorkspaceChange()"
+          [disabled]="isLoadingWorkspaces()"
+        >
+          <option value="">Todos</option>
+          @for (workspace of workspaces(); track workspace.id) {
+            <option [value]="workspace.id">{{ workspace.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="status-filter">Status:</label>
+        <select id="status-filter" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+          <option value="">Todos</option>
+          <option value="queued">Na fila</option>
+          <option value="processing">Processando</option>
+          <option value="completed">Concluído</option>
+          <option value="failed">Erro</option>
+          <option value="cancelled">Cancelado</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="start-date-filter">Data inicial:</label>
+        <input
+          type="date"
+          id="start-date-filter"
+          [(ngModel)]="startDateFilter"
+          (change)="onFilterChange()"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="end-date-filter">Data final:</label>
+        <input
+          type="date"
+          id="end-date-filter"
+          [(ngModel)]="endDateFilter"
+          (change)="onFilterChange()"
+        />
+      </div>
+
+      <div class="filter-actions">
+        <button (click)="onRefresh()" class="btn btn-secondary">
+          Atualizar
+        </button>
+        <button (click)="onExportCSV()" class="btn btn-secondary" [disabled]="historyItems().length === 0">
+          Exportar CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="loading-panel">
+        <div class="spinner"></div>
+        <p>Carregando histórico...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error()) {
+      <div class="error-panel">
+        <span class="error-icon">⚠️</span>
+        <div class="error-content">
+          <strong>{{ error()?.summary }}</strong>
+          @if (error()?.description) {
+            <p>{{ error()?.description }}</p>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- History Table -->
+    @if (!loading() && !error() && historyItems().length > 0) {
+      <div class="table-container">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Template</th>
+              <th>Workspace</th>
+              <th>Status</th>
+              <th>Duração</th>
+              <th>Data de Criação</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of historyItems(); track item.id) {
+              <tr>
+                <td class="item-title">{{ item.title }}</td>
+                <td>{{ item.templateName }}</td>
+                <td>{{ item.workspaceName || '-' }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(item.status)">
+                    {{ getStatusLabel(item.status) }}
+                  </span>
+                </td>
+                <td>{{ formatDuration(item.duration) }}</td>
+                <td>{{ formatDate(item.createdAt) }}</td>
+                <td class="actions-cell">
+                  <div class="action-buttons">
+                    <button (click)="onViewDetails(item)" class="btn-link" title="Ver detalhes">
+                      Detalhes
+                    </button>
+                    <button
+                      (click)="onRegenerate(item)"
+                      class="btn-action"
+                      [disabled]="isActionLoading(item.id)"
+                      title="Regenerar documento"
+                    >
+                      {{ isActionLoading(item.id) ? 'Regenerando...' : 'Regenerar' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (pagination().total > pagination().limit) {
+        <div class="pagination">
+          <button
+            (click)="onPreviousPage()"
+            [disabled]="pagination().page === 1"
+            class="btn btn-secondary"
+          >
+            ← Anterior
+          </button>
+          <span class="pagination-info">
+            Página {{ pagination().page }}
+            ({{ pagination().total }} itens)
+          </span>
+          <button
+            (click)="onNextPage()"
+            [disabled]="!pagination().hasMore"
+            class="btn btn-secondary"
+          >
+            Próxima →
+          </button>
+        </div>
+      }
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && !error() && historyItems().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>Nenhuma geração encontrada</h3>
+        <p>Não há gerações no histórico ou nenhuma corresponde aos filtros aplicados</p>
+      </div>
+    }
+  </div>
+</div>

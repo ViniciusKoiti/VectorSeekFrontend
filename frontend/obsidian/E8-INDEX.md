@@ -46,9 +46,9 @@
 
 #### 🟢 SECUNDÁRIAS (P2)
 7. **[E8-T7.md](./E8-T7.md)** — Implementar Histórico de Gerações
-   - **Deadline:** 26 de Novembro
-   - **Estimativa:** 3-5 dias (backend + frontend)
-   - **Status:** ⏳ Não Iniciado
+   - **Deadline:** 20 de Novembro
+   - **Estimativa:** 2-3 dias (frontend)
+   - **Status:** ✅ Concluído (20 de Novembro)
    - **Dependência:** E8-T3
 
 8. **[E8-T8.md](./E8-T8.md)** — Implementar Configurações de Usuário

@@ -13,3 +13,4 @@ export * from './lib/documents/documents.service';
 export * from './lib/generation/generation.api';
 export * from './lib/generation/generation.models';
 export * from './lib/generation/generation.service';
+export * from './lib/generation/generation-history.service';
