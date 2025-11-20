@@ -54,7 +54,7 @@
 8. **[E8-T8.md](./E8-T8.md)** — Implementar Configurações de Usuário
    - **Deadline:** 30 de Novembro
    - **Estimativa:** 4-6 dias (backend + frontend)
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** 🟡 Parcialmente Concluído (Frontend ✅)
    - **Parallelizável:** Sim
 
 9. **[E8-T9.md](./E8-T9.md)** — Implementar Dashboard/Analytics
