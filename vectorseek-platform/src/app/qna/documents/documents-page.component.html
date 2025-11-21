@@ -18,7 +18,7 @@
           id="workspace-filter"
           [(ngModel)]="selectedWorkspaceId"
           (change)="onWorkspaceChange()"
-          [disabled]="workspacesLoading()"
+          [disabled]="isLoadingWorkspaces()"
         >
           <option value="">Todos</option>
           @for (workspace of workspaces(); track workspace.id) {

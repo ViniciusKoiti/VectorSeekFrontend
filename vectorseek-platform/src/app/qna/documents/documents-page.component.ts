@@ -12,6 +12,9 @@ import {
   WorkspacesService,
   Workspace
 } from '@vectorseek/data-access';
+import { DocumentsService, Document, DocumentStatus, DocumentsError, Workspace } from '@vectorseek/data-access';
+import { DeleteConfirmationModalComponent } from './components/delete-confirmation-modal/delete-confirmation-modal.component';
+import { DocumentUploadComponent } from './components/document-upload/document-upload.component';
 import { Subject, takeUntil } from 'rxjs';
 import { DocumentsDialogService } from './services/documents-dialog.service';
 
@@ -49,11 +52,15 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
   });
 
   statusFilter: DocumentStatus | '' = '';
-  selectedWorkspaceId = '';
+  workspaces = signal<Workspace[]>([]);
+  selectedWorkspaceId: string = '';
+  isLoadingWorkspaces = signal(false);
   private actionStatus = signal<Record<string, 'reprocess' | 'delete' | undefined>>({});
 
   ngOnInit(): void {
     this.restoreWorkspacePreference();
+    this.loadWorkspaces();
+    this.loadWorkspacePreference();
     this.loadWorkspaces();
     this.loadDocuments();
   }
@@ -62,7 +69,6 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
   loadDocuments(page: number = 1): void {
     this.loading.set(true);
     this.error.set(null);
@@ -74,7 +80,9 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
         limit,
         offset: (page - 1) * limit,
         status: this.statusFilter || undefined,
-        workspaceId: this.selectedWorkspaceId || undefined
+        workspaceId: this.selectedWorkspaceId || undefined,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -226,6 +234,34 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
     }).format(date);
   }
 
+  loadWorkspaces(): void {
+    this.isLoadingWorkspaces.set(true);
+
+    this.documentsService
+      .listWorkspaces()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (workspaces) => {
+          this.workspaces.set(workspaces);
+          this.isLoadingWorkspaces.set(false);
+        },
+        error: (error) => {
+          console.error('Erro ao carregar workspaces:', error);
+          this.isLoadingWorkspaces.set(false);
+          // Fallback: continuar sem workspaces
+        }
+      });
+  }
+
+
+
+  private loadWorkspacePreference(): void {
+    const saved = localStorage.getItem('selectedWorkspaceId');
+    if (saved !== null) {
+      this.selectedWorkspaceId = saved;
+    }
+  }
+
   private executeReprocess(id: string): void {
     this.setActionStatus(id, 'reprocess');
 
@@ -233,18 +269,18 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
       .reprocessDocument(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-      next: () => {
-        this.snackBar.open('Documento enviado para reprocessamento', 'Fechar', {
-          duration: 3000
-        });
-        this.updateDocumentStatus(id, 'processing');
-        this.setActionStatus(id);
-      },
-      error: (err: DocumentsError) => {
-        this.setActionStatus(id);
-        this.snackBar.open(err.summary, 'Fechar', { duration: 4000 });
-      }
-    });
+        next: () => {
+          this.snackBar.open('Documento enviado para reprocessamento', 'Fechar', {
+            duration: 3000
+          });
+          this.updateDocumentStatus(id, 'processing');
+          this.setActionStatus(id);
+        },
+        error: (err: DocumentsError) => {
+          this.setActionStatus(id);
+          this.snackBar.open(err.summary, 'Fechar', { duration: 4000 });
+        }
+      });
   }
 
   private executeDelete(id: string): void {
@@ -254,18 +290,18 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
       .deleteDocument(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-      next: () => {
-        this.snackBar.open('Documento deletado com sucesso', 'Fechar', {
-          duration: 3000
-        });
-        this.setActionStatus(id);
-        this.loadDocuments(this.pagination().page);
-      },
-      error: (err: DocumentsError) => {
-        this.setActionStatus(id);
-        this.snackBar.open(err.summary, 'Fechar', { duration: 4000 });
-      }
-    });
+        next: () => {
+          this.snackBar.open('Documento deletado com sucesso', 'Fechar', {
+            duration: 3000
+          });
+          this.setActionStatus(id);
+          this.loadDocuments(this.pagination().page);
+        },
+        error: (err: DocumentsError) => {
+          this.setActionStatus(id);
+          this.snackBar.open(err.summary, 'Fechar', { duration: 4000 });
+        }
+      });
   }
 
   private updateDocumentStatus(id: string, status: DocumentStatus): void {

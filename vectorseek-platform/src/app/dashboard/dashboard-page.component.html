@@ -1,0 +1,177 @@
+<div class="dashboard-page">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">{{ 'dashboard.title' | translate }}</h1>
+
+    <!-- Date Range Filter -->
+    <div class="filter-container">
+      <label class="filter-label">{{ 'dashboard.filters.period' | translate }}</label>
+      <div class="filter-buttons">
+        @for (option of dateRangeOptions; track option.value) {
+          <button
+            type="button"
+            class="filter-button"
+            [class.active]="store.dateRange() === option.value"
+            [disabled]="store.loading()"
+            (click)="onDateRangeChange(option.value)"
+          >
+            {{ option.labelKey | translate }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (store.loading()) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p class="loading-text">{{ 'dashboard.loading.message' | translate }}</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (store.hasError() && !store.loading()) {
+    <div class="error-container">
+      <div class="error-icon">⚠️</div>
+      <h2 class="error-title">{{ store.error()?.summary | translate }}</h2>
+      <p class="error-description">{{ store.error()?.description | translate }}</p>
+      <button type="button" class="retry-button" (click)="retry()">
+        {{ 'dashboard.error.retryButton' | translate }}
+      </button>
+    </div>
+  }
+
+  <!-- Dashboard Content -->
+  @if (store.hasData() && !store.loading()) {
+    <!-- Empty State -->
+    @if (store.isEmpty()) {
+      <div class="empty-container">
+        <div class="empty-icon">📊</div>
+        <h2 class="empty-title">{{ 'dashboard.empty.title' | translate }}</h2>
+        <p class="empty-description">
+          {{ 'dashboard.empty.description' | translate }}
+        </p>
+      </div>
+    } @else {
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <!-- Total Documents Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📄</div>
+          <div class="kpi-content">
+            <p class="kpi-label">{{ 'dashboard.kpis.totalDocuments' | translate }}</p>
+            <p class="kpi-value">{{ store.totalDocuments() }}</p>
+          </div>
+        </div>
+
+        <!-- Average Weekly Uploads Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-content">
+            <p class="kpi-label">{{ 'dashboard.kpis.averageUploads' | translate }}</p>
+            <p class="kpi-value">{{ getAverageWeeklyUploads() }}</p>
+          </div>
+        </div>
+
+        <!-- Total Workspaces Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">🗂️</div>
+          <div class="kpi-content">
+            <p class="kpi-label">{{ 'dashboard.kpis.activeWorkspaces' | translate }}</p>
+            <p class="kpi-value">{{ getTotalWorkspaces() }}</p>
+          </div>
+        </div>
+
+        <!-- Top Templates Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon">📋</div>
+          <div class="kpi-content">
+            <p class="kpi-label">{{ 'dashboard.kpis.templatesUsed' | translate }}</p>
+            <p class="kpi-value">{{ store.topTemplates().length }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts and Tables Section -->
+      <div class="charts-grid">
+        <!-- Uploads per Week Chart -->
+        @if (store.uploadsPerWeek().length > 0) {
+          <div class="chart-card">
+            <h3 class="chart-title">{{ 'dashboard.charts.uploadsPerWeek' | translate }}</h3>
+            <div class="chart-content">
+              <div class="bar-chart">
+                @for (week of store.uploadsPerWeek(); track week.week_start) {
+                  <div class="bar-group">
+                    <div class="bar-container">
+                      <div
+                        class="bar"
+                        [style.height.%]="(week.upload_count / getMaxUploads()) * 100"
+                        [title]="week.upload_count + ' uploads'"
+                      >
+                        <span class="bar-value">{{ week.upload_count }}</span>
+                      </div>
+                    </div>
+                    <span class="bar-label">{{ formatWeekDate(week.week_start) }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Top Templates Chart -->
+        @if (getTop5Templates().length > 0) {
+          <div class="chart-card">
+            <h3 class="chart-title">{{ 'dashboard.charts.topTemplates' | translate }}</h3>
+            <div class="chart-content">
+              <div class="template-list">
+                @for (template of getTop5Templates(); track template.template_name) {
+                  <div class="template-item">
+                    <div class="template-info">
+                      <span class="template-name">{{ template.template_name }}</span>
+                      <span class="template-count">{{ template.usage_count }} {{ 'dashboard.units.uses' | translate }}</span>
+                    </div>
+                    <div class="template-bar-container">
+                      <div
+                        class="template-bar"
+                        [style.width.%]="(template.usage_count / getMaxTemplateUsage()) * 100"
+                      ></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Workspace Usage Table -->
+        @if (store.workspaceUsage().length > 0) {
+          <div class="chart-card full-width">
+            <h3 class="chart-title">{{ 'dashboard.charts.workspaceUsage' | translate }}</h3>
+            <div class="chart-content">
+              <table class="workspace-table">
+                <thead>
+                  <tr>
+                    <th>{{ 'dashboard.table.workspace' | translate }}</th>
+                    <th>{{ 'dashboard.table.documents' | translate }}</th>
+                    <th>{{ 'dashboard.table.queries' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (workspace of store.workspaceUsage(); track workspace.workspace_id) {
+                    <tr>
+                      <td class="workspace-name">{{ workspace.workspace_name }}</td>
+                      <td class="workspace-stat">{{ workspace.document_count }}</td>
+                      <td class="workspace-stat">{{ workspace.query_count }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

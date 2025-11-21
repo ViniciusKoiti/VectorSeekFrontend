@@ -1,14 +1,31 @@
 <div class="upload-card" [class.is-dragging]="isDragging()">
   <div
+    #dropzone
     class="dropzone"
+    role="button"
+    tabindex="0"
+    [attr.aria-label]="isDragging()
+      ? 'Solte o arquivo aqui para fazer upload'
+      : 'Área de upload. Arraste e solte um arquivo ou pressione Enter para selecionar'"
+    [attr.aria-busy]="isUploading()"
+    [attr.aria-disabled]="isUploading()"
+    [attr.aria-describedby]="'file-restrictions'"
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
     (drop)="onDrop($event)"
+    (keydown.enter)="onSelectFileClick()"
+    (keydown.space)="onSelectFileClick(); $event.preventDefault()"
   >
-    <div class="dropzone-icon">📄</div>
+    <div class="dropzone-icon" aria-hidden="true">📄</div>
     <p class="dropzone-title">Arraste e solte o arquivo aqui</p>
     <p class="dropzone-subtitle">ou</p>
-    <button type="button" class="btn btn-primary" (click)="onSelectFileClick()" [disabled]="isUploading()">
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="onSelectFileClick()"
+      [disabled]="isUploading()"
+      aria-label="Selecionar arquivo do computador para upload"
+    >
       Selecionar arquivo
     </button>
     <input
@@ -17,8 +34,9 @@
       class="hidden-input"
       accept=".pdf,.docx,.txt,.md"
       (change)="onFileSelected($event)"
+      aria-label="Seletor de arquivo para upload"
     />
-    <p class="dropzone-note">
+    <p class="dropzone-note" id="file-restrictions">
       Tipos aceitos: PDF, DOCX, TXT, MD · Limite: 100MB
     </p>
   </div>
@@ -26,18 +44,58 @@
   <div class="file-info" *ngIf="selectedFileName()">
     <div>
       <strong>{{ selectedFileName() }}</strong>
-      <span>{{ formatFileSize(selectedFileSize()) }}</span>
+      <span class="file-size-badge">{{ formatFileSize(selectedFileSize()) }}</span>
+    </div>
+  </div>
+
+  <!-- Preview e ações antes do upload -->
+  <div class="file-preview-actions" *ngIf="selectedFile() && !isUploading()">
+    <div class="preview-message">
+      <span class="preview-icon" aria-hidden="true">✓</span>
+      <p>Arquivo pronto para envio. Revise as informações abaixo e clique em "Enviar Arquivo".</p>
+    </div>
+    <div class="preview-actions">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="onStartUpload()"
+        aria-label="Iniciar upload do arquivo selecionado"
+      >
+        📤 Enviar Arquivo
+      </button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancelSelection()"
+        aria-label="Cancelar seleção e escolher outro arquivo"
+      >
+        ← Trocar Arquivo
+      </button>
     </div>
   </div>
 
   <div class="form-grid">
-    <label class="form-field">
+    <label class="form-field" for="upload-title">
       <span>Título (opcional)</span>
-      <input type="text" [(ngModel)]="title" [disabled]="isUploading()" placeholder="Usaremos o nome do arquivo se vazio" />
+      <input
+        id="upload-title"
+        type="text"
+        [(ngModel)]="title"
+        [disabled]="isUploading()"
+        placeholder="Usaremos o nome do arquivo se vazio"
+        [attr.aria-label]="'Título personalizado para o documento'"
+      />
     </label>
-    <label class="form-field">
+    <label class="form-field" for="upload-workspace">
       <span>Workspace ID (opcional)</span>
-      <input type="text" [(ngModel)]="workspaceId" [disabled]="isUploading()" placeholder="Informe para associar a um workspace" />
+      <input
+        id="upload-workspace"
+        type="text"
+        [(ngModel)]="workspaceId"
+        [disabled]="isUploading()"
+        placeholder="Informe para associar a um workspace"
+        [attr.aria-label]="'ID do workspace para associar o documento'"
+      />
     </label>
   </div>
 
@@ -45,16 +103,50 @@
     *ngIf="isUploading()"
     [progress]="uploadProgress()"
     [status]="statusMessage()"
+    role="progressbar"
+    [attr.aria-valuenow]="uploadProgress()"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [attr.aria-label]="'Progresso do upload: ' + uploadProgress() + '%'"
   ></app-upload-progress>
 
-  <p class="status-message" *ngIf="!isUploading()">{{ statusMessage() }}</p>
-  <p class="error-message" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+  <p
+    class="status-message"
+    *ngIf="!isUploading()"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    {{ statusMessage() }}
+  </p>
+
+  <p
+    class="error-message"
+    *ngIf="errorMessage()"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    {{ errorMessage() }}
+  </p>
 
   <div class="actions">
-    <button type="button" class="btn btn-secondary" (click)="cancelUpload()" [disabled]="!isUploading()">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="cancelUpload()"
+      [disabled]="!isUploading()"
+      [attr.aria-label]="isUploading() ? 'Cancelar upload em andamento' : 'Nenhum upload em andamento'"
+    >
       Cancelar Upload
     </button>
-    <button type="button" class="btn btn-secondary" (click)="dialogRef?.close()" *ngIf="!isUploading()">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="dialogRef?.close()"
+      *ngIf="!isUploading()"
+      aria-label="Fechar janela de upload"
+    >
       Fechar
     </button>
   </div>

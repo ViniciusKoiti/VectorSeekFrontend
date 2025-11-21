@@ -2,7 +2,7 @@
 import { Router, ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { DocumentsPageComponent } from './documents-page.component';
 import {
   Document,
@@ -52,7 +52,8 @@ describe('DocumentsPageComponent', () => {
     documentsService = jasmine.createSpyObj<DocumentsService>('DocumentsService', [
       'listDocuments',
       'reprocessDocument',
-      'deleteDocument'
+      'deleteDocument',
+      'listWorkspaces'
     ]);
     documentsService.listDocuments.and.returnValue(of(mockListResponse));
 
