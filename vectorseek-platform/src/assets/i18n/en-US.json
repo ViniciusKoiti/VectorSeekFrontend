@@ -1,0 +1,201 @@
+{
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Log in to continue exploring VectorSeek.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMeLabel": "Remember me",
+      "submitButton": "Sign In",
+      "submittingButton": "Signing in...",
+      "registerLink": "Create account",
+      "forgotPasswordLink": "Forgot my password",
+      "errors": {
+        "required": "This field is required",
+        "email": "Enter a valid email",
+        "minLength": "Password must have at least {{min}} characters"
+      }
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join VectorSeek and discover the power of AI.",
+      "fullNameLabel": "Full name",
+      "fullNamePlaceholder": "Your full name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Create a secure password",
+      "acceptTermsLabel": "I accept the terms of use and privacy policy",
+      "submitButton": "Create account",
+      "submittingButton": "Creating account...",
+      "loginLink": "I already have an account",
+      "errors": {
+        "required": "This field is required",
+        "email": "Enter a valid email",
+        "minLength": "Password must have at least {{min}} characters",
+        "fullNameMinLength": "Name must have at least {{min}} characters",
+        "acceptTerms": "You must accept the terms of use",
+        "passwordPattern": "Password must contain uppercase, lowercase, numbers and special characters"
+      }
+    },
+    "forgotPassword": {
+      "title": "Recover Access",
+      "subtitle": "Enter your email and we'll send you a magic link to sign in.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "submitButton": "Send magic link",
+      "submittingButton": "Sending...",
+      "loginLink": "Back to login",
+      "successMessage": "Magic link sent! Check your email.",
+      "errors": {
+        "required": "This field is required",
+        "email": "Enter a valid email"
+      }
+    },
+    "apiErrors": {
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "networkError": "Connection error. Check your internet.",
+      "retryAfter": "Try again in {{seconds}} seconds.",
+      "login": {
+        "default": {
+          "summary": "Unable to sign in now",
+          "description": "Try again in a moment or contact support."
+        },
+        "401": {
+          "summary": "Invalid credentials",
+          "description": "Check your email and password and try again."
+        },
+        "429": {
+          "summary": "Too many login attempts",
+          "description": "Wait a few moments before trying again."
+        }
+      },
+      "register": {
+        "default": {
+          "summary": "Unable to complete registration",
+          "description": "Review the information provided or try again later."
+        },
+        "409": {
+          "summary": "Email already registered",
+          "description": "Use another address or sign in if you already have an account."
+        },
+        "422": {
+          "summary": "Invalid data",
+          "description": "Some information needs attention before continuing."
+        },
+        "user_already_exists": {
+          "summary": "Email already registered",
+          "description": "Use another address or sign in if you already have an account."
+        },
+        "useralreadyexistserror": {
+          "summary": "Email already registered",
+          "description": "Use another address or sign in if you already have an account."
+        },
+        "user_exists": {
+          "summary": "Email already registered",
+          "description": "Use another address or sign in if you already have an account."
+        }
+      },
+      "requestMagicLink": {
+        "default": {
+          "summary": "Unable to send magic link",
+          "description": "Try again in a moment or validate the email address."
+        },
+        "429": {
+          "summary": "Too many requests",
+          "description": "Wait a few moments before trying again."
+        }
+      },
+      "refresh": {
+        "default": {
+          "summary": "Session expired",
+          "description": "Sign in again to continue browsing."
+        },
+        "401": {
+          "summary": "Invalid session",
+          "description": "Sign in again to recover access."
+        }
+      },
+      "me": {
+        "default": {
+          "summary": "Unable to load profile",
+          "description": "Reload the page or try again later."
+        },
+        "401": {
+          "summary": "Invalid session",
+          "description": "Sign in again to recover access."
+        }
+      }
+    }
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full name",
+    "acceptTerms": "Terms of use"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your preferences and platform settings",
+    "loading": "Loading settings...",
+    "sections": {
+      "personal": "Personal Information",
+      "appearance": "Appearance",
+      "notifications": "Notifications"
+    },
+    "fields": {
+      "name": {
+        "label": "Full Name",
+        "placeholder": "Enter your full name",
+        "errors": {
+          "required": "Name is required",
+          "nameRequired": "Name is required",
+          "nameMaxLength": "Name must be at most 200 characters"
+        }
+      },
+      "theme": {
+        "label": "Theme",
+        "options": {
+          "light": "Light",
+          "dark": "Dark"
+        },
+        "descriptions": {
+          "light": "Light theme",
+          "dark": "Dark theme"
+        },
+        "errors": {
+          "invalidTheme": "Invalid theme"
+        }
+      },
+      "language": {
+        "label": "Language",
+        "hint": "Select the interface language",
+        "options": {
+          "ptBR": "Português (Brasil)",
+          "enUS": "English (US)"
+        },
+        "errors": {
+          "invalidLanguage": "Invalid language"
+        }
+      },
+      "notifications": {
+        "title": "Enable notifications",
+        "description": "Receive notifications about updates and important activities"
+      }
+    },
+    "actions": {
+      "save": "Save Settings",
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "retry": "Try again"
+    },
+    "messages": {
+      "saveSuccess": "Settings saved successfully!"
+    },
+    "errors": {
+      "loadTitle": "Error loading settings"
+    }
+  }
+}
