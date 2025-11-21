@@ -1,11 +1,11 @@
 <div class="dashboard-page">
   <!-- Header -->
   <div class="dashboard-header">
-    <h1 class="dashboard-title">Dashboard</h1>
+    <h1 class="dashboard-title">{{ 'dashboard.title' | translate }}</h1>
 
     <!-- Date Range Filter -->
     <div class="filter-container">
-      <label class="filter-label">Período:</label>
+      <label class="filter-label">{{ 'dashboard.filters.period' | translate }}</label>
       <div class="filter-buttons">
         @for (option of dateRangeOptions; track option.value) {
           <button
@@ -15,7 +15,7 @@
             [disabled]="store.loading()"
             (click)="onDateRangeChange(option.value)"
           >
-            {{ option.label }}
+            {{ option.labelKey | translate }}
           </button>
         }
       </div>
@@ -26,7 +26,7 @@
   @if (store.loading()) {
     <div class="loading-container">
       <div class="spinner"></div>
-      <p class="loading-text">Carregando métricas...</p>
+      <p class="loading-text">{{ 'dashboard.loading.message' | translate }}</p>
     </div>
   }
 
@@ -34,10 +34,10 @@
   @if (store.hasError() && !store.loading()) {
     <div class="error-container">
       <div class="error-icon">⚠️</div>
-      <h2 class="error-title">{{ store.error()?.summary }}</h2>
-      <p class="error-description">{{ store.error()?.description }}</p>
+      <h2 class="error-title">{{ store.error()?.summary | translate }}</h2>
+      <p class="error-description">{{ store.error()?.description | translate }}</p>
       <button type="button" class="retry-button" (click)="retry()">
-        Tentar novamente
+        {{ 'dashboard.error.retryButton' | translate }}
       </button>
     </div>
   }
@@ -48,9 +48,9 @@
     @if (store.isEmpty()) {
       <div class="empty-container">
         <div class="empty-icon">📊</div>
-        <h2 class="empty-title">Nenhum dado disponível</h2>
+        <h2 class="empty-title">{{ 'dashboard.empty.title' | translate }}</h2>
         <p class="empty-description">
-          Não há dados de analytics para o período selecionado.
+          {{ 'dashboard.empty.description' | translate }}
         </p>
       </div>
     } @else {
@@ -60,7 +60,7 @@
         <div class="kpi-card">
           <div class="kpi-icon">📄</div>
           <div class="kpi-content">
-            <p class="kpi-label">Total de Documentos</p>
+            <p class="kpi-label">{{ 'dashboard.kpis.totalDocuments' | translate }}</p>
             <p class="kpi-value">{{ store.totalDocuments() }}</p>
           </div>
         </div>
@@ -69,7 +69,7 @@
         <div class="kpi-card">
           <div class="kpi-icon">📈</div>
           <div class="kpi-content">
-            <p class="kpi-label">Uploads por Semana (Média)</p>
+            <p class="kpi-label">{{ 'dashboard.kpis.averageUploads' | translate }}</p>
             <p class="kpi-value">{{ getAverageWeeklyUploads() }}</p>
           </div>
         </div>
@@ -78,7 +78,7 @@
         <div class="kpi-card">
           <div class="kpi-icon">🗂️</div>
           <div class="kpi-content">
-            <p class="kpi-label">Workspaces Ativos</p>
+            <p class="kpi-label">{{ 'dashboard.kpis.activeWorkspaces' | translate }}</p>
             <p class="kpi-value">{{ getTotalWorkspaces() }}</p>
           </div>
         </div>
@@ -87,7 +87,7 @@
         <div class="kpi-card">
           <div class="kpi-icon">📋</div>
           <div class="kpi-content">
-            <p class="kpi-label">Templates Utilizados</p>
+            <p class="kpi-label">{{ 'dashboard.kpis.templatesUsed' | translate }}</p>
             <p class="kpi-value">{{ store.topTemplates().length }}</p>
           </div>
         </div>
@@ -98,7 +98,7 @@
         <!-- Uploads per Week Chart -->
         @if (store.uploadsPerWeek().length > 0) {
           <div class="chart-card">
-            <h3 class="chart-title">Uploads por Semana</h3>
+            <h3 class="chart-title">{{ 'dashboard.charts.uploadsPerWeek' | translate }}</h3>
             <div class="chart-content">
               <div class="bar-chart">
                 @for (week of store.uploadsPerWeek(); track week.week_start) {
@@ -123,14 +123,14 @@
         <!-- Top Templates Chart -->
         @if (getTop5Templates().length > 0) {
           <div class="chart-card">
-            <h3 class="chart-title">Top 5 Templates</h3>
+            <h3 class="chart-title">{{ 'dashboard.charts.topTemplates' | translate }}</h3>
             <div class="chart-content">
               <div class="template-list">
                 @for (template of getTop5Templates(); track template.template_name) {
                   <div class="template-item">
                     <div class="template-info">
                       <span class="template-name">{{ template.template_name }}</span>
-                      <span class="template-count">{{ template.usage_count }} usos</span>
+                      <span class="template-count">{{ template.usage_count }} {{ 'dashboard.units.uses' | translate }}</span>
                     </div>
                     <div class="template-bar-container">
                       <div
@@ -148,14 +148,14 @@
         <!-- Workspace Usage Table -->
         @if (store.workspaceUsage().length > 0) {
           <div class="chart-card full-width">
-            <h3 class="chart-title">Uso por Workspace</h3>
+            <h3 class="chart-title">{{ 'dashboard.charts.workspaceUsage' | translate }}</h3>
             <div class="chart-content">
               <table class="workspace-table">
                 <thead>
                   <tr>
-                    <th>Workspace</th>
-                    <th>Documentos</th>
-                    <th>Consultas</th>
+                    <th>{{ 'dashboard.table.workspace' | translate }}</th>
+                    <th>{{ 'dashboard.table.documents' | translate }}</th>
+                    <th>{{ 'dashboard.table.queries' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { AnalyticsService, DateRangeFilter } from '@vectorseek/data-access';
 import { AnalyticsStore } from '@vectorseek/state';
 
@@ -18,7 +19,7 @@ import { AnalyticsStore } from '@vectorseek/state';
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './dashboard-page.component.html',
   styleUrls: ['./dashboard-page.component.css'],
 })
@@ -27,10 +28,10 @@ export class DashboardPageComponent implements OnInit {
   readonly store = inject(AnalyticsStore);
 
   // Date range filter options
-  readonly dateRangeOptions: { value: DateRangeFilter; label: string }[] = [
-    { value: 7, label: 'Últimos 7 dias' },
-    { value: 30, label: 'Últimos 30 dias' },
-    { value: 90, label: 'Últimos 90 dias' },
+  readonly dateRangeOptions: { value: DateRangeFilter; labelKey: string }[] = [
+    { value: 7, labelKey: 'dashboard.filters.last7Days' },
+    { value: 30, labelKey: 'dashboard.filters.last30Days' },
+    { value: 90, labelKey: 'dashboard.filters.last90Days' },
   ];
 
   constructor() {

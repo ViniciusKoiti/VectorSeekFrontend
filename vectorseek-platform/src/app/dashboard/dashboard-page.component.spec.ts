@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslateModule } from '@ngx-translate/core';
 import { DashboardPageComponent } from './dashboard-page.component';
 import { AnalyticsService, AnalyticsOverview } from '@vectorseek/data-access';
 import { AnalyticsStore } from '@vectorseek/state';
@@ -46,7 +47,7 @@ describe('DashboardPageComponent', () => {
     ]);
 
     await TestBed.configureTestingModule({
-      imports: [DashboardPageComponent],
+      imports: [DashboardPageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: AnalyticsService, useValue: mockAnalyticsService },
         AnalyticsStore,
@@ -335,15 +336,15 @@ describe('DashboardPageComponent', () => {
       const loadingText = compiled.querySelector('.loading-text');
 
       expect(loadingText).toBeTruthy();
-      expect(loadingText?.textContent).toContain('Carregando métricas');
+      expect(loadingText?.textContent).toContain('dashboard.loading.message');
     });
 
     it('should show error state', () => {
       const mockError = {
         status: 500,
         code: 'api_error',
-        summary: 'Erro ao carregar',
-        description: 'Tente novamente',
+        summary: 'analytics.error.generic_summary',
+        description: 'analytics.error.generic_description',
       };
 
       store.setError(mockError);
@@ -353,8 +354,8 @@ describe('DashboardPageComponent', () => {
       const errorTitle = compiled.querySelector('.error-title');
       const errorDescription = compiled.querySelector('.error-description');
 
-      expect(errorTitle?.textContent).toContain('Erro ao carregar');
-      expect(errorDescription?.textContent).toContain('Tente novamente');
+      expect(errorTitle?.textContent).toContain('analytics.error.generic_summary');
+      expect(errorDescription?.textContent).toContain('analytics.error.generic_description');
     });
 
     it('should show empty state when data is empty', () => {
@@ -371,7 +372,7 @@ describe('DashboardPageComponent', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       const emptyTitle = compiled.querySelector('.empty-title');
 
-      expect(emptyTitle?.textContent).toContain('Nenhum dado disponível');
+      expect(emptyTitle?.textContent).toContain('dashboard.empty.title');
     });
 
     it('should show KPI cards with data', () => {
@@ -392,9 +393,10 @@ describe('DashboardPageComponent', () => {
       const filterButtons = compiled.querySelectorAll('.filter-button');
 
       expect(filterButtons.length).toBe(3);
-      expect(filterButtons[0].textContent).toContain('7 dias');
-      expect(filterButtons[1].textContent).toContain('30 dias');
-      expect(filterButtons[2].textContent).toContain('90 dias');
+      // Translation keys will be displayed in tests without actual translation
+      expect(filterButtons[0].textContent).toContain('dashboard.filters.last7Days');
+      expect(filterButtons[1].textContent).toContain('dashboard.filters.last30Days');
+      expect(filterButtons[2].textContent).toContain('dashboard.filters.last90Days');
     });
   });
 });
