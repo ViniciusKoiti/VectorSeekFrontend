@@ -1,8 +1,15 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TaskProgressService } from '@vectorseek/state';
-import { GetProgressResponse, GeneratedDocument, GenerationError } from '@vectorseek/data-access';
+import {
+  GenerationService,
+  GetProgressResponse,
+  GeneratedDocument,
+  GenerationError
+} from '@vectorseek/data-access';
+import { CancelGenerationDialogComponent } from './cancel-generation-dialog.component';
 
 /**
  * Componente para monitorar progresso de tarefas de geração
@@ -17,7 +24,7 @@ import { GetProgressResponse, GeneratedDocument, GenerationError } from '@vector
 @Component({
   selector: 'app-generation-progress',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatDialogModule],
   templateUrl: './generation-progress.component.html',
   styleUrls: ['./generation-progress.component.css']
 })
@@ -28,6 +35,8 @@ export class GenerationProgressComponent implements OnInit, OnDestroy {
   @Output() cancelled = new EventEmitter<void>();
 
   private readonly progressService = inject(TaskProgressService);
+  private readonly generationService = inject(GenerationService);
+  private readonly dialog = inject(MatDialog);
   private readonly destroy$ = new Subject<void>();
 
   // Signals
@@ -37,8 +46,11 @@ export class GenerationProgressComponent implements OnInit, OnDestroy {
   eta = signal<number | null>(null);
   result = signal<GeneratedDocument | null>(null);
   error = signal<GenerationError | null>(null);
+  isCancelling = signal(false);
+  isCancelled = signal(false);
 
   ngOnInit(): void {
+    this.isCancelled.set(false);
     this.startMonitoring();
   }
 
@@ -83,13 +95,32 @@ export class GenerationProgressComponent implements OnInit, OnDestroy {
       });
   }
 
-  onStopMonitoring(): void {
-    this.progressService.stopMonitoring();
-    this.cancelled.emit();
+  onCancelClick(): void {
+    if (this.isCancelling() || this.isCancelled() || this.isCompleted() || this.hasFailed()) {
+      return;
+    }
+
+    this.dialog
+      .open(CancelGenerationDialogComponent, {
+        width: '420px',
+        data: {
+          title: 'Cancelar geração?',
+          message: 'Você tem certeza que deseja cancelar esta geração? O progresso atual será perdido.',
+          confirmLabel: 'Cancelar geração',
+          cancelLabel: 'Continuar'
+        }
+      })
+      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.requestCancellation();
+        }
+      });
   }
 
   onRetry(): void {
-    // Emit cancelled to let parent component restart the process
+    this.isCancelled.set(false);
     this.cancelled.emit();
   }
 
@@ -140,5 +171,29 @@ export class GenerationProgressComponent implements OnInit, OnDestroy {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}m ${remainingSeconds}s`;
+  }
+
+  isCancelDisabled(): boolean {
+    return this.isCancelling() || this.isCancelled();
+  }
+
+  private requestCancellation(): void {
+    this.isCancelling.set(true);
+    this.generationService
+      .cancelGeneration(this.taskId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isCancelling.set(false);
+          this.isCancelled.set(true);
+          this.message.set(response.message || 'Geração cancelada pelo usuário.');
+          this.progressService.stopMonitoring();
+          this.cancelled.emit();
+        },
+        error: (err: GenerationError) => {
+          this.isCancelling.set(false);
+          this.message.set(err.description ?? err.summary ?? 'Erro ao cancelar geração.');
+        }
+      });
   }
 }

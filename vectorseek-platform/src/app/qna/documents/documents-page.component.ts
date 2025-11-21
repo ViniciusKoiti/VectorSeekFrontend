@@ -2,12 +2,18 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { DocumentsService, Document, DocumentStatus, DocumentsError } from '@vectorseek/data-access';
-import { DeleteConfirmationModalComponent } from './components/delete-confirmation-modal/delete-confirmation-modal.component';
-import { DocumentUploadComponent } from './components/document-upload/document-upload.component';
+import {
+  DocumentsService,
+  Document,
+  DocumentStatus,
+  DocumentsError,
+  WorkspacesService,
+  Workspace
+} from '@vectorseek/data-access';
 import { Subject, takeUntil } from 'rxjs';
+import { DocumentsDialogService } from './services/documents-dialog.service';
 
 /**
  * Página de gestão de documentos vetorados
@@ -21,26 +27,34 @@ import { Subject, takeUntil } from 'rxjs';
   styleUrls: ['./documents-page.component.css']
 })
 export class DocumentsPageComponent implements OnInit, OnDestroy {
+  private static readonly WORKSPACE_STORAGE_KEY = 'vectorseek.selectedWorkspaceId';
   private readonly documentsService = inject(DocumentsService);
+  private readonly workspacesService = inject(WorkspacesService);
   private readonly router = inject(Router);
-  private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialogService = inject(DocumentsDialogService);
   private readonly destroy$ = new Subject<void>();
 
   documents = signal<Document[]>([]);
   loading = signal(false);
   error = signal<DocumentsError | null>(null);
+  workspaces = signal<Workspace[]>([]);
+  workspacesLoading = signal(false);
+  workspaceError = signal<string | null>(null);
   pagination = signal({
     total: 0,
     page: 1,
-    pageSize: 20,
-    totalPages: 0
+    limit: 20,
+    totalPages: 1
   });
 
   statusFilter: DocumentStatus | '' = '';
+  selectedWorkspaceId = '';
   private actionStatus = signal<Record<string, 'reprocess' | 'delete' | undefined>>({});
 
   ngOnInit(): void {
+    this.restoreWorkspacePreference();
+    this.loadWorkspaces();
     this.loadDocuments();
   }
 
@@ -53,40 +67,27 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     this.error.set(null);
 
+    const limit = this.pagination().limit;
+
     this.documentsService
       .listDocuments({
-        page,
-        pageSize: 20,
+        limit,
+        offset: (page - 1) * limit,
         status: this.statusFilter || undefined,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
+        workspaceId: this.selectedWorkspaceId || undefined
       })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          // Map API payload to Document format
-          const docs: Document[] = response.documents.map((doc) => ({
-            id: doc.id,
-            title: doc.title ?? undefined,
-            filename: doc.filename,
-            size: doc.size,
-            status: doc.status,
-            workspaceId: doc.workspaceId ?? undefined,
-            workspaceName: doc.workspaceName ?? undefined,
-            createdAt: new Date(doc.createdAt),
-            updatedAt: new Date(doc.updatedAt),
-            processedAt: doc.processedAt ? new Date(doc.processedAt) : undefined,
-            indexedAt: doc.indexedAt ? new Date(doc.indexedAt) : undefined,
-            contentPreview: doc.contentPreview ?? undefined,
-            embeddingCount: doc.embeddingCount ?? 0,
-            chunkCount: doc.chunkCount ?? undefined,
-            processingTimeSeconds: doc.processingTimeSeconds ?? undefined,
-            fingerprint: doc.fingerprint ?? undefined,
-            error: doc.error ?? undefined
-          }));
-
-          this.documents.set(docs);
-          this.pagination.set(response.pagination);
+          const resolvedLimit = response.limit || limit;
+          const totalPages = resolvedLimit > 0 ? Math.ceil(response.total / resolvedLimit) : 1;
+          this.documents.set(response.data);
+          this.pagination.set({
+            total: response.total,
+            page,
+            limit: resolvedLimit,
+            totalPages: Math.max(1, totalPages)
+          });
           this.loading.set(false);
         },
         error: (error) => {
@@ -102,6 +103,11 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
 
   onRefresh(): void {
     this.loadDocuments(this.pagination().page);
+  }
+
+  onWorkspaceChange(): void {
+    this.saveWorkspacePreference();
+    this.loadDocuments(1);
   }
 
   onPreviousPage(): void {
@@ -124,13 +130,8 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
   }
 
   openUploadDialog(): void {
-    const dialogRef = this.dialog.open(DocumentUploadComponent, {
-      width: '520px',
-      disableClose: true
-    });
-
-    dialogRef
-      .afterClosed()
+    this.dialogService
+      .openUploadDialog()
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {
@@ -140,16 +141,9 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
   }
 
   onReprocessDocument(doc: Document): void {
-    this.dialog
-      .open(DeleteConfirmationModalComponent, {
-        width: '420px',
-        data: {
-          title: 'Reprocessar documento',
-          message: `Deseja reprocessar "${doc.title ?? doc.filename}"?`,
-          confirmLabel: 'Reprocessar'
-        }
-      })
-      .afterClosed()
+    this.dialogService
+      .confirmReprocess(doc)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((confirmed: boolean) => {
         if (!confirmed) {
           return;
@@ -159,18 +153,9 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
   }
 
   onDeleteDocument(doc: Document): void {
-    this.dialog
-      .open(DeleteConfirmationModalComponent, {
-        width: '420px',
-        data: {
-          title: 'Deletar documento',
-          message: `Tem certeza que deseja deletar "${doc.title ?? doc.filename}"?`,
-          description: 'Esta ação não pode ser desfeita. Todos os chunks serão removidos.',
-          confirmLabel: 'Deletar',
-          danger: true
-        }
-      })
-      .afterClosed()
+    this.dialogService
+      .confirmDelete(doc)
+      .pipe(takeUntil(this.destroy$))
       .subscribe((confirmed: boolean) => {
         if (!confirmed) {
           return;
@@ -189,12 +174,12 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
 
     const headers = ['Título', 'Status', 'Tamanho (bytes)', 'Workspace', 'Data de Criação', 'Fingerprint'];
     const rows = docs.map((doc) => [
-      doc.title,
+      doc.title ?? doc.filename,
       doc.status,
       doc.size.toString(),
       doc.workspaceName || '',
       doc.createdAt.toISOString(),
-      doc.fingerprint
+      doc.fingerprint ?? ''
     ]);
 
     const csvContent = [
@@ -294,5 +279,55 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
       ...current,
       [id]: status
     }));
+  }
+
+  private loadWorkspaces(): void {
+    this.workspacesLoading.set(true);
+    this.workspaceError.set(null);
+
+    this.workspacesService
+      .listWorkspaces()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (workspaces) => {
+          this.workspaces.set(workspaces);
+          this.workspacesLoading.set(false);
+        },
+        error: () => {
+          this.workspaceError.set('Não foi possível carregar os workspaces.');
+          this.workspacesLoading.set(false);
+        }
+      });
+  }
+
+  private saveWorkspacePreference(): void {
+    const storage = this.getStorage();
+    if (!storage) {
+      return;
+    }
+    if (this.selectedWorkspaceId) {
+      storage.setItem(DocumentsPageComponent.WORKSPACE_STORAGE_KEY, this.selectedWorkspaceId);
+    } else {
+      storage.removeItem(DocumentsPageComponent.WORKSPACE_STORAGE_KEY);
+    }
+  }
+
+  private restoreWorkspacePreference(): void {
+    const storage = this.getStorage();
+    if (!storage) {
+      return;
+    }
+    const saved = storage.getItem(DocumentsPageComponent.WORKSPACE_STORAGE_KEY);
+    if (saved) {
+      this.selectedWorkspaceId = saved;
+    }
+  }
+
+  private getStorage(): Storage | null {
+    try {
+      return typeof window !== 'undefined' ? window.localStorage : null;
+    } catch {
+      return null;
+    }
   }
 }

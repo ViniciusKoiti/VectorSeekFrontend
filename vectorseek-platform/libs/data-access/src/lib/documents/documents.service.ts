@@ -7,6 +7,7 @@ import {
   DocumentApiResponse,
   DocumentDeleteApiResponse,
   DocumentDeleteResult,
+  DocumentMetadata,
   DocumentDetail,
   DocumentDetailApiResponse,
   DocumentReprocessApiResponse,
@@ -23,9 +24,7 @@ import {
   DocumentsListResult,
   LegacyDocumentApiResponse,
   LegacyDocumentDetailResponse,
-  LegacyDocumentsListResponse,
-  Workspace,
-  WorkspacesListResponse
+  LegacyDocumentsListResponse
 } from './documents.models';
 import { DOCUMENTS_API_ENDPOINTS } from './documents.api';
 
@@ -156,15 +155,6 @@ export class DocumentsService {
       );
   }
 
-  listWorkspaces(): Observable<Workspace[]> {
-    return this.http
-      .get<WorkspacesListResponse | DocumentsApiEnvelope<WorkspacesListResponse>>(DOCUMENTS_API_ENDPOINTS.workspaces())
-      .pipe(
-        map((response) => this.unwrapEnvelope(response).workspaces ?? []),
-        catchError((error) => this.handleError('list', error))
-      );
-  }
-
   private buildListParams(request?: DocumentsListRequest): HttpParams {
     let params = new HttpParams();
 
@@ -246,7 +236,7 @@ export class DocumentsService {
       return this.mapLegacyDocument(dto);
     }
 
-    const metadata = dto.metadata ?? undefined;
+    const metadata = this.normalizeMetadata(dto.metadata);
 
     return {
       id: dto.id,
@@ -272,13 +262,14 @@ export class DocumentsService {
   }
 
   private mapLegacyDocument(dto: LegacyDocumentApiResponse): Document {
-    const metadata =
+    const metadataSource =
       dto.metadata || dto.title
         ? {
             title: dto.metadata?.title ?? dto.title ?? undefined,
             description: dto.metadata?.description ?? undefined
           }
         : undefined;
+    const metadata = this.normalizeMetadata(metadataSource);
 
     return {
       id: dto.id,
@@ -301,6 +292,23 @@ export class DocumentsService {
       error: dto.error ?? undefined,
       metadata
     };
+  }
+
+  private normalizeMetadata(
+    metadata?: { title?: string | null; description?: string | null } | DocumentMetadata | null
+  ): DocumentMetadata | undefined {
+    if (!metadata) {
+      return undefined;
+    }
+
+    const title = metadata.title ?? undefined;
+    const description = metadata.description ?? undefined;
+
+    if (title === undefined && description === undefined) {
+      return undefined;
+    }
+
+    return { title, description };
   }
 
   private unwrapEnvelope<T>(response: unknown): T {
@@ -378,7 +386,7 @@ export class DocumentsService {
     return Number.isNaN(parsed.getTime()) ? undefined : parsed;
   }
 
-  private mapUploadResponse(response?: DocumentUploadApiResponse): DocumentUploadResponse {
+  private mapUploadResponse(response: DocumentUploadApiResponse | null | undefined): DocumentUploadResponse {
     return {
       documentId: response?.document_id ?? '',
       filename: response?.filename ?? '',

@@ -97,7 +97,7 @@ describe('ForgotPasswordComponent', () => {
     expect(component.isSubmitting).toBe(false);
   });
 
-  it('should reset form after successful request', () => {
+  it('should reset form after successful request', (done) => {
     const mockResponse = {
       message: 'Link mágico enviado'
     };
@@ -110,7 +110,10 @@ describe('ForgotPasswordComponent', () => {
 
     component.onSubmit();
 
-    expect(component.forgotPasswordForm.value.email).toBe('');
+    setTimeout(() => {
+      expect(component.forgotPasswordForm.value.email).toBeNull();
+      done();
+    }, 100);
   });
 
   it('should handle request magic link errors', () => {

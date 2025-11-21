@@ -11,37 +11,37 @@
 1. **[E8-T1.md](./E8-T1.md)** — Sincronizar Endpoints com Backend Team
    - **Deadline:** 13 de Novembro (24h)
    - **Estimativa:** 1 dia
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** ✅ Concluído (15 Nov)
 
 2. **[E8-T2.md](./E8-T2.md)** — Implementar UI para CRUD de Documentos
    - **Deadline:** 15 de Novembro
    - **Estimativa:** 2-3 dias
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** ✅ Concluído (19 Nov)
    - **Dependência:** E8-T1
 
 3. **[E8-T3.md](./E8-T3.md)** — Implementar Upload de Documentos
    - **Deadline:** 19 de Novembro
    - **Estimativa:** 5-7 dias (backend + frontend)
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** ✅ Concluído (19 Nov)
    - **Prioridade:** 🔴 **CRÍTICA** — Bloqueia fluxo principal
 
 #### 🟡 IMPORTANTES (P1)
 4. **[E8-T4.md](./E8-T4.md)** — Integrar Filtro de Workspace
    - **Deadline:** 16 de Novembro
    - **Estimativa:** 1-2 dias
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** ✅ Concluído (19 Nov)
    - **Dependência:** E8-T2
 
 5. **[E8-T5.md](./E8-T5.md)** — Implementar Botão Cancelar Geração
    - **Deadline:** 16 de Novembro
    - **Estimativa:** 1 dia
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** ✅ Concluído (20 Nov)
    - **Parallelizável:** Sim (independente)
 
 6. **[E8-T6.md](./E8-T6.md)** — Implementar CRUD de Workspaces
    - **Deadline:** 23 de Novembro
    - **Estimativa:** 4-6 dias (backend + frontend)
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** 🟡 Em andamento (frontend pronto; aguardando backend)
    - **Dependência:** E8-T1
 
 #### 🟢 SECUNDÁRIAS (P2)
@@ -131,12 +131,12 @@
 
 ## ✅ Checklist Rápido para Começar
 
-- [ ] Ler E8-README.md
-- [ ] Ler E8-T1.md (sincronizar endpoints)
-- [ ] Sincronizar com backend team
-- [ ] Confirmar endpoints funcionais
-- [ ] Iniciar E8-T2 (CRUD documentos)
-- [ ] Em paralelo: E8-T3 (upload), E8-T5 (cancelar)
+- [x] Ler E8-README.md
+- [x] Ler E8-T1.md (sincronizar endpoints)
+- [x] Sincronizar com backend team
+- [x] Confirmar endpoints funcionais
+- [x] Iniciar E8-T2 (CRUD documentos)
+- [x] Em paralelo: E8-T3 (upload), E8-T5 (cancelar)
 
 ---
 

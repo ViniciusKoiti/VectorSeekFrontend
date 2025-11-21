@@ -3,8 +3,13 @@
   <div class="progress-header">
     <h3>Progresso da Geração</h3>
     @if (!isCompleted() && !hasFailed()) {
-      <button (click)="onStopMonitoring()" class="btn-cancel" title="Parar acompanhamento">
-        Cancelar
+      <button
+        (click)="onCancelClick()"
+        class="btn-cancel"
+        title="Cancelar geração"
+        [disabled]="isCancelDisabled()"
+      >
+        {{ isCancelling() ? 'Cancelando...' : 'Cancelar geração' }}
       </button>
     }
   </div>
@@ -49,6 +54,16 @@
   @if (eta() && !isCompleted() && !hasFailed()) {
     <div class="eta">
       <span>Tempo estimado: {{ formatEta(eta()!) }}</span>
+    </div>
+  }
+
+  <!-- Cancelled Actions -->
+  @if (isCancelled()) {
+    <div class="cancelled-actions">
+      <p class="cancelled-message">Geração cancelada. Você pode iniciar novamente quando quiser.</p>
+      <button (click)="onRetry()" class="btn btn-primary">
+        Reiniciar geração
+      </button>
     </div>
   }
 

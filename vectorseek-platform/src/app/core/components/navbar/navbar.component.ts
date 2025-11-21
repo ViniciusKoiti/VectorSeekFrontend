@@ -59,6 +59,12 @@ export class NavbarComponent {
       description: 'Gerenciar Documentos'
     },
     {
+      label: 'Workspaces',
+      path: '/app/workspaces',
+      icon: 'workspaces',
+      description: 'Gerenciar workspaces'
+    },
+    {
       label: 'Geração',
       path: '/app/generation',
       icon: 'spark',
@@ -91,6 +97,12 @@ export class NavbarComponent {
       close: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                <line x1="18" y1="6" x2="6" y2="18"/>
                <line x1="6" y1="6" x2="18" y2="18"/>
+             </svg>`,
+      workspaces: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+               <rect x="3" y="3" width="7" height="7" rx="1"/>
+               <rect x="14" y="3" width="7" height="7" rx="1"/>
+               <rect x="3" y="14" width="7" height="7" rx="1"/>
+               <rect x="14" y="14" width="7" height="7" rx="1"/>
              </svg>`
     };
     return icons[name] || '';

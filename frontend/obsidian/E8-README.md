@@ -4,7 +4,7 @@
 
 **Épico:** E8 - Frontend Development Sprint
 **Data de Criação:** 12 de Novembro de 2025
-**Status:** 🟡 Em Planejamento (0% completo)
+**Status:** 🟢 Em Progresso (55% completo — 5 de 9 tarefas)
 **Responsável:** Frontend Team + Backend Team (parcial)
 
 Este épico documenta todas as tarefas necessárias para completar o frontend do VectorSeek conforme mapeado em `docs/frontend/agents_vector_dev.md`. As tarefas estão organizadas por prioridade (P0 crítica, P1 importante, P2 secundária) e seguem o padrão de documentação do projeto.
@@ -15,29 +15,27 @@ Este épico documenta todas as tarefas necessárias para completar o frontend do
 
 | Prioridade | Tarefas | Status | Estimativa |
 |------------|---------|--------|-----------|
-| 🔴 P0 (Crítica) | 3 | ⏳ Não Iniciado | 6-8 dias |
-| 🟡 P1 (Importante) | 3 | ⏳ Não Iniciado | 4-6 dias |
+| 🔴 P0 (Crítica) | 3 | ✅ Concluídas (E8-T1, T2, T3) | 6-8 dias |
+| 🟡 P1 (Importante) | 3 | 🟢 2/3 concluídas (E8-T4, T5), pendente E8-T6 | 4-6 dias |
 | 🟢 P2 (Secundária) | 3 | ⏳ Não Iniciado | 5-8 dias |
-| **TOTAL** | **9** | **⏳ 0%** | **15-22 dias** |
+| **TOTAL** | **9** | **🟢 55% completo** | **15-22 dias** |
 
 ---
 
 ## 🔴 TAREFAS CRÍTICAS (P0) — Bloqueiam fluxo principal
 
 ### E8-T1 — Sincronizar Endpoints com Backend Team
-**Status:** ⏳ Não Iniciado
-**Deadline:** 13 de Novembro (próximas 24h)
-**Estimativa:** 1 dia
-**Entregável:** Checklist de endpoints com status (✓/✗/?)
+**Status:** ✅ Concluído (15 Nov 2025)
+**Resultado:** Checklist completo de 18 endpoints confirmados + 11 pendentes, documentação entregue em 10 arquivos (resumo executivo, contratos e templates)
 
 Verificar quais endpoints estão realmente funcionando no backend e quais precisam ser implementados. Criar contrato API alinhado com frontend.
 
 **Endpoints Críticos:**
 - ✓ Auth (login, register, refresh)
 - ✓ Q&A (ask, history, feedback)
-- ? Documentos (list, get, reprocess, delete)
+- ✓ Documentos (list, get, reprocess, delete)
 - ? Workspaces (list)
-- ❌ Upload (POST /api/documents/upload)
+- ✓ Upload (POST /api/documents/upload)
 - ✓ Geração (templates, generate, progress)
 - ? Cancelar geração
 
@@ -46,10 +44,8 @@ Verificar quais endpoints estão realmente funcionando no backend e quais precis
 ---
 
 ### E8-T2 — Implementar UI para CRUD de Documentos
-**Status:** ⏳ Não Iniciado
-**Deadline:** 15 de Novembro
-**Estimativa:** 2-3 dias
-**Dependência:** E8-T1
+**Status:** ✅ Concluído (19 Nov 2025)
+**Resumo:** `DocumentsPageComponent` agora lista, pagina e exporta documentos; `DocumentDetailComponent` exibe metadados e ações; diálogos de confirmação e `DocumentsDialogService` protegem reprocessamentos/deletes; testes cobrindo fluxos críticos.
 
 Implementar interface para gerenciar documentos: ver detalhes, reprocessar e deletar. Os services já estão prontos.
 
@@ -69,10 +65,8 @@ Implementar interface para gerenciar documentos: ver detalhes, reprocessar e del
 ---
 
 ### E8-T3 — Implementar Upload de Documentos
-**Status:** ⏳ Não Iniciado
-**Deadline:** 19 de Novembro (1 semana)
-**Estimativa:** 3-4 dias (backend) + 2-3 dias (frontend)
-**Prioridade:** 🔴 CRÍTICA - Bloqueia fluxo principal
+**Status:** ✅ Concluído (19 Nov 2025)
+**Resumo:** Componentes `DocumentUploadComponent` + `UploadProgressComponent` entregues com drag-and-drop, validação cliente/servidor, cancelamento e emissão de progresso; integrados via botão “+ Upload Documento” na lista e cobertos por specs (`document-upload.component.spec.ts`).
 
 Implementar funcionalidade de upload de documentos (backend + frontend). **Funcionalidade crítica que falta completamente.**
 
@@ -97,62 +91,53 @@ Implementar funcionalidade de upload de documentos (backend + frontend). **Funci
 ## 🟡 TAREFAS IMPORTANTES (P1) — Importante para UX completa
 
 ### E8-T4 — Integrar Filtro de Workspace
-**Status:** ⏳ Não Iniciado
-**Deadline:** 16 de Novembro
-**Estimativa:** 1-2 dias
-**Dependência:** E8-T2
+**Status:** ✅ Concluído (19 Nov 2025)
+**Resumo:** `DocumentsPageComponent` agora carrega os workspaces ao iniciar, exibe o seletor na barra de filtros, persiste a escolha no `localStorage` e passa `workspace_id` para a API. Testes cobrem carregamento, filtragem e restauração da preferência. Pendência aberta: limpeza da preferência no fluxo de logout (documentada).
 
-Integrar filtro de workspace na UI de documentos. O service já existe.
-
-**O que Fazer:**
-- [ ] Dropdown de workspace na barra de filtros
-- [ ] Carregar workspaces ao inicializar
-- [ ] Filtrar documentos por workspace
-- [ ] Persistir preferência no localStorage
-- [ ] Restaurar ao recarregar
+**Checklist:**
+- [x] Dropdown de workspace na barra de filtros
+- [x] Carregamento dos workspaces com feedback visual
+- [x] Filtragem de documentos por workspace selecionado
+- [x] Persistência + restauração via `localStorage`
+- [ ] Limpeza automática da preferência no logout
 
 **Links:** [E8-T4.md](./E8-T4.md)
 
 ---
 
 ### E8-T5 — Implementar Botão Cancelar Geração
-**Status:** ⏳ Não Iniciado
-**Deadline:** 16 de Novembro
-**Estimativa:** 1 dia
+**Status:** ✅ Concluído (20 Nov 2025)
+**Resumo:** `GenerationProgressComponent` agora abre um diálogo de confirmação, chama o endpoint `cancelGeneration`, interrompe o polling do progresso, exibe feedback no painel, emite o evento `cancelled` e apresenta a ação de “Reiniciar geração”. Tests cobrem confirmação e não-confirmação do cancelamento e garantem que o polling seja interrompido.
 
-Adicionar botão para cancelar gerações em progresso. Service já existe.
-
-**O que Fazer:**
-- [ ] Botão "Cancelar" no GenerationProgressComponent
-- [ ] Modal de confirmação
-- [ ] Parar polling após cancelamento
-- [ ] Opção de reiniciar geração
-- [ ] Testes
+**Checklist:**
+- [x] Botão "Cancelar" visível durante o progresso
+- [x] Modal de confirmação (novo `CancelGenerationDialogComponent`)
+- [x] Chamada ao `GenerationService.cancelGeneration()` com feedback
+- [x] Polling interrompido automaticamente após cancelamento
+- [x] Botão “Reiniciar geração” exibido após cancelamento
+- [x] Testes unitários para fluxos de confirmação e recusa
 
 **Links:** [E8-T5.md](./E8-T5.md)
 
 ---
 
 ### E8-T6 — Implementar CRUD de Workspaces
-**Status:** ⏳ Não Iniciado
+**Status:** 🟡 Em andamento — frontend entregue (20 Nov), aguardando validação dos endpoints de criação/edição/delete
 **Deadline:** 23 de Novembro
 **Estimativa:** 2-3 dias (backend) + 2-3 dias (frontend)
 **Dependência:** E8-T1
 
-Implementar endpoints e UI para gerenciar workspaces (criar, editar, deletar). Apenas listagem está funcional.
-
-**Backend:**
+**Backend (pendente):**
 - [ ] POST /api/workspaces
 - [ ] PUT /api/workspaces/:id
 - [ ] DELETE /api/workspaces/:id
 - [ ] Validações e permissões
 
-**Frontend:**
-- [ ] Página `/app/workspaces`
-- [ ] Tabela com workspaces
-- [ ] Modal de criação/edição
-- [ ] Modal de confirmação delete
-- [ ] Testes
+**Frontend (entregue):**
+- [x] Página `/app/workspaces` + link no navbar
+- [x] Formulário modal para criar/editar com validações
+- [x] Modal de confirmação para deletar
+- [x] Feedback visual e testes básicos
 
 **Links:** [E8-T6.md](./E8-T6.md)
 
@@ -244,10 +229,10 @@ Implementar dashboard com métricas de uso. Usuários verão estatísticas de do
 **Marcos:** Endpoints sincronizados, CRUD básico, upload iniciado
 
 ### Semana 2 (19-26 Novembro)
-- [ ] **E8-T2**: Completar CRUD documentos (2-3 dias)
-- [ ] **E8-T3**: Completar upload (frontend)
-- [ ] **E8-T4**: Integrar filtro workspace (1-2 dias)
-- [ ] **E8-T5**: Botão cancelar geração (1 dia)
+- [x] **E8-T2**: Completar CRUD documentos (2-3 dias)
+- [x] **E8-T3**: Completar upload (frontend)
+- [x] **E8-T4**: Integrar filtro workspace (1-2 dias)
+- [x] **E8-T5**: Botão cancelar geração (1 dia)
 
 **Marcos:** Upload funcional, filtros, interface completa
 

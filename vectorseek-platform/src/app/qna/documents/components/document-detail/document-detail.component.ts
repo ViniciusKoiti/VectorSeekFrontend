@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import {
   Document,
   DocumentStatus,
-  DocumentDetailResponse,
   DocumentsError,
   DocumentsService
 } from '@vectorseek/data-access';
 import { Subject, takeUntil } from 'rxjs';
-import { DeleteConfirmationModalComponent } from '../delete-confirmation-modal/delete-confirmation-modal.component';
+import { DocumentsDialogService } from '../../services/documents-dialog.service';
 
 type DocumentDetailViewModel = Document;
 
@@ -26,8 +25,8 @@ export class DocumentDetailComponent implements OnInit, OnDestroy {
   private readonly documentsService = inject(DocumentsService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialogService = inject(DocumentsDialogService);
   private readonly destroy$ = new Subject<void>();
 
   readonly document = signal<DocumentDetailViewModel | null>(null);
@@ -68,16 +67,11 @@ export class DocumentDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.dialog
-      .open(DeleteConfirmationModalComponent, {
-        width: '420px',
-        data: {
-          title: 'Reprocessar documento',
-          message: `Deseja reprocessar "${this.getDocumentTitle(doc)}"?`,
-          confirmLabel: 'Reprocessar'
-        }
+    this.dialogService
+      .confirmReprocess(doc, {
+        message: `Deseja reprocessar "${this.getDocumentTitle(doc)}"?`
       })
-      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((confirmed: boolean) => {
         if (!confirmed) return;
         this.executeReprocess(doc.id);
@@ -88,18 +82,12 @@ export class DocumentDetailComponent implements OnInit, OnDestroy {
     const doc = this.document();
     if (!doc) return;
 
-    this.dialog
-      .open(DeleteConfirmationModalComponent, {
-        width: '420px',
-        data: {
-          title: 'Deletar documento',
-          message: `Tem certeza que deseja deletar "${this.getDocumentTitle(doc)}"?`,
-          description: 'Esta ação é irreversível e removerá todos os dados processados.',
-          confirmLabel: 'Deletar',
-          danger: true
-        }
+    this.dialogService
+      .confirmDelete(doc, {
+        message: `Tem certeza que deseja deletar "${this.getDocumentTitle(doc)}"?`,
+        description: 'Esta ação é irreversível e removerá todos os dados processados.'
       })
-      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
       .subscribe((confirmed: boolean) => {
         if (!confirmed) return;
         this.executeDelete(doc.id);
@@ -163,8 +151,7 @@ export class DocumentDetailComponent implements OnInit, OnDestroy {
       .getDocumentDetail(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          const detail = this.normalizeDocument(response);
+        next: (detail) => {
           this.document.set(detail);
           this.loading.set(false);
         },
@@ -227,46 +214,6 @@ export class DocumentDetailComponent implements OnInit, OnDestroy {
         status
       };
     });
-  }
-
-  private normalizeDocument(response: DocumentDetailResponse): DocumentDetailViewModel {
-    const detail = response.document ?? {};
-
-    const createdAt = this.toDate(detail.createdAt);
-    const updatedAt = this.toDate(detail.updatedAt);
-    const processedAt = this.toDate(detail.processedAt);
-
-    const chunkCount =
-      (detail.chunkCount ?? detail.embeddingCount ?? (detail as { totalChunks?: number }).totalChunks) ??
-      undefined;
-
-    return {
-      id: detail.id ?? '',
-      filename: detail.filename ?? detail.title ?? 'Documento',
-      title: detail.title ?? undefined,
-      size: detail.size ?? 0,
-      status: (detail.status as DocumentStatus) ?? 'pending',
-      workspaceId: detail.workspaceId ?? undefined,
-      workspaceName:
-        detail.workspaceName ??
-        (detail as { workspace?: { name?: string | null } }).workspace?.name ??
-        undefined,
-      createdAt: createdAt ?? new Date(),
-      updatedAt: updatedAt ?? new Date(),
-      processedAt: processedAt,
-      indexedAt: this.toDate(detail.indexedAt),
-      contentPreview: detail.contentPreview ?? undefined,
-      embeddingCount: detail.embeddingCount ?? chunkCount ?? 0,
-      chunkCount: chunkCount,
-      processingTimeSeconds: detail.processingTimeSeconds ?? undefined,
-      error: detail.error ?? undefined,
-      fingerprint: (detail as { fingerprint?: string | null }).fingerprint ?? undefined
-    } as DocumentDetailViewModel;
-  }
-
-  private toDate(value?: string | Date | null): Date | undefined {
-    if (!value) return undefined;
-    return value instanceof Date ? value : new Date(value);
   }
 
   private getDocumentTitle(doc: DocumentDetailViewModel): string {

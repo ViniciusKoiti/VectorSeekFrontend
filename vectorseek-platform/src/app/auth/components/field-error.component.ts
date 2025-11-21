@@ -63,6 +63,10 @@ export class FieldErrorComponent {
       });
     }
 
+    if (errors['pattern']) {
+      return this.translate.instant('auth.register.errors.passwordPattern');
+    }
+
 
 
     // Erro genérico

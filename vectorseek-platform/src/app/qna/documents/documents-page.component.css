@@ -66,6 +66,15 @@
   color: var(--text-primary);
 }
 
+.filter-hint {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.filter-hint.error {
+  color: var(--error-primary);
+}
+
 .filter-actions {
   display: flex;
   gap: 0.75rem;

@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DocumentsService, DocumentUploadResponse } from '@vectorseek/data-access';
+import { DocumentsService, DocumentUploadResponse, DocumentsError } from '@vectorseek/data-access';
 import { UploadProgressComponent } from '../upload-progress/upload-progress.component';
 import { Subscription } from 'rxjs';
 
@@ -159,7 +159,7 @@ export class DocumentUploadComponent implements OnDestroy {
             this.uploadProgress.set(percent);
             this.statusMessage.set('Upload em andamento...');
           } else if (event instanceof HttpResponse) {
-            const body = event.body?.data;
+            const body = event.body;
             if (body) {
               this.handleUploadSuccess(body);
             } else {
@@ -167,12 +167,8 @@ export class DocumentUploadComponent implements OnDestroy {
             }
           }
         },
-        error: (error) => {
-          const serverMessage =
-            error?.error?.error ??
-            error?.error?.message ??
-            error?.message ??
-            'Erro ao enviar arquivo.';
+        error: (error: DocumentsError) => {
+          const serverMessage = error.description ?? error.summary ?? 'Erro ao enviar arquivo.';
           this.handleUploadError(serverMessage);
         }
       });

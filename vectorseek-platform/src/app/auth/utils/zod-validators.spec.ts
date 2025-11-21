@@ -144,7 +144,8 @@ describe('Zod Validators', () => {
       const validator = zodValidator(emailSchema);
       const control = new FormControl('invalid');
 
-      validator(control);
+      const errors = validator(control);
+      control.setErrors(errors);
 
       const message = getZodErrorMessage(control);
 

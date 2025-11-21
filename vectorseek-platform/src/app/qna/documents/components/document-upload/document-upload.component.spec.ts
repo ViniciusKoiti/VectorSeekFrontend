@@ -1,9 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
-import { DocumentsService, DocumentUploadResponse } from '@vectorseek/data-access';
-import { DocumentUploadComponent } from './document-upload.component';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { Subject } from 'rxjs';
+import { DocumentsService, DocumentUploadResponse, DocumentsError } from '@vectorseek/data-access';
+import { DocumentUploadComponent } from './document-upload.component';
 
 describe('DocumentUploadComponent', () => {
   let component: DocumentUploadComponent;
@@ -64,11 +64,12 @@ describe('DocumentUploadComponent', () => {
 
     const apiResponse: DocumentUploadResponse = {
       documentId: '123',
-      title: 'doc.pdf',
-      status: 'pending',
-      message: 'ok'
+      filename: 'doc.pdf',
+      size: 10,
+      status: 'processing',
+      createdAt: new Date()
     };
-    subject.next(new HttpResponse({ body: { data: apiResponse } }));
+    subject.next(new HttpResponse({ body: apiResponse }));
 
     expect(uploadSpy).toHaveBeenCalledWith(apiResponse);
     expect(component.isUploading()).toBeFalse();
@@ -81,9 +82,15 @@ describe('DocumentUploadComponent', () => {
 
     (component as any).processFile(validFile);
 
-    subject.error({ error: { error: 'File too large' } });
+    const apiError: DocumentsError = {
+      status: 400,
+      code: 'invalid_request',
+      summary: 'File too large',
+      description: 'Arquivo excede o limite'
+    };
+    subject.error(apiError);
 
-    expect(component.errorMessage()).toBe('File too large');
+    expect(component.errorMessage()).toBe(apiError.description ?? null);
     expect(component.isUploading()).toBeFalse();
   });
 });

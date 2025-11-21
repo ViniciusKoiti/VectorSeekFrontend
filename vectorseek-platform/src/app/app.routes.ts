@@ -34,6 +34,10 @@ export const routes: Routes = [
       {
         path: 'generation',
         loadChildren: () => import('./generation/generation.routes').then((m) => m.generationRoutes)
+      },
+      {
+        path: 'workspaces',
+        loadChildren: () => import('./workspaces/workspaces.routes').then((m) => m.workspacesRoutes)
       }
     ]
   },

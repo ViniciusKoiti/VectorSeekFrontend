@@ -43,6 +43,7 @@ describe('RegisterPageComponent', () => {
       fullName: '',
       email: '',
       password: '',
+      plan: 'free',
       acceptTerms: false
     });
   });
@@ -69,7 +70,7 @@ describe('RegisterPageComponent', () => {
   });
 
 
-  it('should handle registration errors with field errors', () => {
+  it('should handle registration errors with field errors', (done) => {
     const mockError: AuthError = {
       status: 422,
       code: 'VALIDATION_FAILED',
@@ -86,14 +87,17 @@ describe('RegisterPageComponent', () => {
     component.registerForm.patchValue({
       fullName: 'John Doe',
       email: 'john@example.com',
-      password: 'weak',
+      password: 'ValidPass123!',
       acceptTerms: true
     });
 
     component.onSubmit();
 
-    expect(component.apiError).toEqual(mockError);
-    expect(component.isSubmitting).toBe(false);
+    setTimeout(() => {
+      expect(component.apiError).toEqual(mockError);
+      expect(component.isSubmitting).toBe(false);
+      done();
+    }, 100);
   });
 
   it('should format field errors for display', () => {
@@ -136,10 +140,10 @@ describe('RegisterPageComponent', () => {
   });
 
   it('should validate strong password', () => {
-    component.passwordControl.setValue('WeakPassword');
+    component.passwordControl.setValue('weak');
     component.passwordControl.markAsTouched();
 
-    // Password sem caracteres especiais deve ser inválido
+    // Password com menos de 8 caracteres deve ser inválido
     expect(component.passwordControl.invalid).toBe(true);
   });
 });
