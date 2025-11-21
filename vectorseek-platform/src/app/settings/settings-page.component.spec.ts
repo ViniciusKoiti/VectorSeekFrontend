@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { SettingsPageComponent } from './settings-page.component';
@@ -30,7 +31,7 @@ describe('SettingsPageComponent', () => {
     ]);
 
     await TestBed.configureTestingModule({
-      imports: [SettingsPageComponent, ReactiveFormsModule],
+      imports: [SettingsPageComponent, ReactiveFormsModule, TranslateModule.forRoot()],
       providers: [
         { provide: SettingsService, useValue: settingsServiceSpy },
         { provide: ThemeService, useValue: themeServiceSpy },
