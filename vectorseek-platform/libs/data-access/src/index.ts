@@ -14,3 +14,10 @@ export * from './lib/generation/generation.api';
 export * from './lib/generation/generation.models';
 export * from './lib/generation/generation.service';
 export * from './lib/generation/generation-history.service';
+
+export * from './lib/settings/settings.api';
+export * from './lib/settings/settings.models';
+export * from './lib/settings/settings.service';
+export * from './lib/analytics/analytics.api';
+export * from './lib/analytics/analytics.models';
+export * from './lib/analytics/analytics.service';

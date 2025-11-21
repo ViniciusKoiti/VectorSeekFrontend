@@ -136,60 +136,119 @@
     "fullName": "Nome completo",
     "acceptTerms": "Termos de uso"
   },
-  "generation": {
-    "history": {
-      "title": "Histórico de Gerações",
-      "description": "Visualize e gerencie o histórico de gerações de documentos",
-      "filters": {
-        "workspaceLabel": "Workspace:",
-        "workspaceAll": "Todos",
-        "statusLabel": "Status:",
-        "statusAll": "Todos",
-        "statusQueued": "Na fila",
-        "statusProcessing": "Processando",
-        "statusCompleted": "Concluído",
-        "statusFailed": "Erro",
-        "statusCancelled": "Cancelado",
-        "startDateLabel": "Data inicial:",
-        "endDateLabel": "Data final:",
-        "refreshButton": "Atualizar",
-        "exportButton": "Exportar CSV"
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Personalize suas preferências e configurações da plataforma",
+    "loading": "Carregando configurações...",
+    "sections": {
+      "personal": "Informações Pessoais",
+      "appearance": "Aparência",
+      "notifications": "Notificações"
+    },
+    "fields": {
+      "name": {
+        "label": "Nome Completo",
+        "placeholder": "Digite seu nome completo",
+        "errors": {
+          "required": "Nome é obrigatório",
+          "nameRequired": "Nome é obrigatório",
+          "nameMaxLength": "Nome deve ter no máximo 200 caracteres"
+        }
       },
-      "table": {
-        "columns": {
-          "title": "Título",
-          "template": "Template",
-          "workspace": "Workspace",
-          "status": "Status",
-          "duration": "Duração",
-          "createdAt": "Data de Criação",
-          "actions": "Ações"
+      "theme": {
+        "label": "Tema",
+        "options": {
+          "light": "Claro",
+          "dark": "Escuro"
         },
-        "actions": {
-          "details": "Detalhes",
-          "regenerate": "Regenerar",
-          "regenerating": "Regenerando..."
+        "descriptions": {
+          "light": "Tema claro",
+          "dark": "Tema escuro"
         },
-        "emptyWorkspace": "-"
+        "errors": {
+          "invalidTheme": "Tema inválido"
+        }
       },
-      "pagination": {
-        "previous": "← Anterior",
-        "next": "Próxima →",
-        "info": "Página {{page}} ({{total}} itens)"
+      "language": {
+        "label": "Idioma",
+        "hint": "Selecione o idioma da interface",
+        "options": {
+          "ptBR": "Português (Brasil)",
+          "enUS": "English (US)"
+        },
+        "errors": {
+          "invalidLanguage": "Idioma inválido"
+        }
       },
-      "states": {
-        "loading": "Carregando histórico...",
-        "errorTitle": "⚠️",
-        "emptyIcon": "📋",
-        "emptyTitle": "Nenhuma geração encontrada",
-        "emptyDescription": "Não há gerações no histórico ou nenhuma corresponde aos filtros aplicados"
-      },
-      "messages": {
-        "regenerateSuccess": "Regeneração iniciada com sucesso",
-        "regenerateError": "Erro ao regenerar",
-        "detailsMessage": "Detalhes da geração: {{title}}",
-        "close": "Fechar"
+      "notifications": {
+        "title": "Habilitar notificações",
+        "description": "Receba notificações sobre atualizações e atividades importantes"
       }
+    },
+    "actions": {
+      "save": "Salvar Configurações",
+      "saving": "Salvando...",
+      "cancel": "Cancelar",
+      "retry": "Tentar novamente"
+    },
+    "messages": {
+      "saveSuccess": "Configurações salvas com sucesso!"
+    },
+    "errors": {
+      "loadTitle": "Erro ao carregar configurações"
+  "dashboard": {
+    "title": "Dashboard",
+    "filters": {
+      "period": "Período:",
+      "last7Days": "Últimos 7 dias",
+      "last30Days": "Últimos 30 dias",
+      "last90Days": "Últimos 90 dias"
+    },
+    "loading": {
+      "message": "Carregando métricas..."
+    },
+    "error": {
+      "title": "Erro ao carregar dashboard",
+      "retryButton": "Tentar novamente"
+    },
+    "empty": {
+      "title": "Nenhum dado disponível",
+      "description": "Não há dados de analytics para o período selecionado."
+    },
+    "kpis": {
+      "totalDocuments": "Total de Documentos",
+      "averageUploads": "Uploads por Semana (Média)",
+      "activeWorkspaces": "Workspaces Ativos",
+      "templatesUsed": "Templates Utilizados"
+    },
+    "charts": {
+      "uploadsPerWeek": "Uploads por Semana",
+      "topTemplates": "Top 5 Templates",
+      "workspaceUsage": "Uso por Workspace"
+    },
+    "table": {
+      "workspace": "Workspace",
+      "documents": "Documentos",
+      "queries": "Consultas"
+    },
+    "units": {
+      "uses": "usos"
+    }
+  },
+  "analytics": {
+    "error": {
+      "unauthorized_summary": "Não autorizado",
+      "unauthorized_description": "Você não tem permissão para acessar os dados de analytics.",
+      "forbidden_summary": "Acesso negado",
+      "forbidden_description": "Você não possui permissão para visualizar este recurso.",
+      "rate_limit_summary": "Muitas requisições",
+      "rate_limit_description": "Aguarde alguns instantes antes de tentar novamente.",
+      "service_unavailable_summary": "Serviço temporariamente indisponível",
+      "service_unavailable_description": "Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns instantes.",
+      "generic_summary": "Erro ao carregar dados",
+      "generic_description": "Ocorreu um erro ao carregar os dados de analytics. Tente novamente.",
+      "unexpected_summary": "Erro inesperado",
+      "unexpected_description": "Ocorreu um erro inesperado. Tente novamente mais tarde."
     }
   }
 }

@@ -160,7 +160,7 @@ export class DocumentsService {
     return this.http
       .get<WorkspacesListResponse | DocumentsApiEnvelope<WorkspacesListResponse>>(DOCUMENTS_API_ENDPOINTS.workspaces())
       .pipe(
-        map((response) => this.unwrapEnvelope(response).workspaces ?? []),
+        map((response) => this.unwrapEnvelope<WorkspacesListResponse>(response).workspaces ?? []),
         catchError((error) => this.handleError('list', error))
       );
   }
@@ -236,7 +236,7 @@ export class DocumentsService {
 
   private mapUploadEvent(event: HttpEvent<DocumentUploadApiResponse>): HttpEvent<DocumentUploadResponse> {
     if (event instanceof HttpResponse) {
-      return event.clone({ body: this.mapUploadResponse(event.body) });
+      return event.clone({ body: this.mapUploadResponse(event.body ?? undefined) });
     }
     return event as HttpEvent<DocumentUploadResponse>;
   }
@@ -246,7 +246,10 @@ export class DocumentsService {
       return this.mapLegacyDocument(dto);
     }
 
-    const metadata = dto.metadata ?? undefined;
+    const metadata = dto.metadata ? {
+      title: dto.metadata.title ?? undefined,
+      description: dto.metadata.description ?? undefined
+    } : undefined;
 
     return {
       id: dto.id,
