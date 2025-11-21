@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   GenerationHistoryService,
   GenerationHistoryItem,
@@ -21,7 +22,7 @@ import { Subject, takeUntil } from 'rxjs';
 @Component({
   selector: 'app-generation-history-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatDialogModule, MatSnackBarModule],
+  imports: [CommonModule, FormsModule, RouterModule, MatDialogModule, MatSnackBarModule, TranslateModule],
   templateUrl: './generation-history-page.component.html',
   styleUrls: ['./generation-history-page.component.css']
 })
@@ -31,6 +32,7 @@ export class GenerationHistoryPageComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   private readonly destroy$ = new Subject<void>();
 
   historyItems = signal<GenerationHistoryItem[]>([]);
@@ -122,7 +124,9 @@ export class GenerationHistoryPageComponent implements OnInit, OnDestroy {
 
   onViewDetails(item: GenerationHistoryItem): void {
     // TODO: Implementar visualização de detalhes em um dialog ou página separada
-    this.snackBar.open(`Detalhes da geração: ${item.title}`, 'Fechar', {
+    const message = this.translate.instant('generation.history.messages.detailsMessage', { title: item.title });
+    const closeLabel = this.translate.instant('generation.history.messages.close');
+    this.snackBar.open(message, closeLabel, {
       duration: 3000
     });
   }
@@ -139,7 +143,9 @@ export class GenerationHistoryPageComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.snackBar.open('Regeneração iniciada com sucesso', 'Fechar', {
+          const message = this.translate.instant('generation.history.messages.regenerateSuccess');
+          const closeLabel = this.translate.instant('generation.history.messages.close');
+          this.snackBar.open(message, closeLabel, {
             duration: 3000
           });
           this.setActionStatus(item.id, false);
@@ -148,7 +154,9 @@ export class GenerationHistoryPageComponent implements OnInit, OnDestroy {
         },
         error: (err: GenerationHistoryError) => {
           this.setActionStatus(item.id, false);
-          this.snackBar.open(err.summary || 'Erro ao regenerar', 'Fechar', {
+          const errorMessage = err.summary || this.translate.instant('generation.history.messages.regenerateError');
+          const closeLabel = this.translate.instant('generation.history.messages.close');
+          this.snackBar.open(errorMessage, closeLabel, {
             duration: 4000
           });
         }
@@ -160,14 +168,14 @@ export class GenerationHistoryPageComponent implements OnInit, OnDestroy {
   }
 
   getStatusLabel(status: GenerationStatus): string {
-    const labels: Record<GenerationStatus, string> = {
-      queued: 'Na fila',
-      processing: 'Processando',
-      completed: 'Concluído',
-      failed: 'Erro',
-      cancelled: 'Cancelado'
+    const translationKeys: Record<GenerationStatus, string> = {
+      queued: 'generation.history.filters.statusQueued',
+      processing: 'generation.history.filters.statusProcessing',
+      completed: 'generation.history.filters.statusCompleted',
+      failed: 'generation.history.filters.statusFailed',
+      cancelled: 'generation.history.filters.statusCancelled'
     };
-    return labels[status] || status;
+    return this.translate.instant(translationKeys[status] || status);
   }
 
   getStatusClass(status: GenerationStatus): string {

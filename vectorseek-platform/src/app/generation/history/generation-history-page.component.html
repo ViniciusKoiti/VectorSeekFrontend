@@ -2,22 +2,22 @@
   <div class="page-header">
     <div class="history-header">
       <div>
-        <h1 class="page-title">Histórico de Gerações</h1>
-        <p class="page-description">Visualize e gerencie o histórico de gerações de documentos</p>
+        <h1 class="page-title">{{ 'generation.history.title' | translate }}</h1>
+        <p class="page-description">{{ 'generation.history.description' | translate }}</p>
       </div>
     </div>
 
     <!-- Filters -->
     <div class="filters-section">
       <div class="filter-group">
-        <label for="workspace-filter">Workspace:</label>
+        <label for="workspace-filter">{{ 'generation.history.filters.workspaceLabel' | translate }}</label>
         <select
           id="workspace-filter"
           [(ngModel)]="selectedWorkspaceId"
           (change)="onWorkspaceChange()"
           [disabled]="isLoadingWorkspaces()"
         >
-          <option value="">Todos</option>
+          <option value="">{{ 'generation.history.filters.workspaceAll' | translate }}</option>
           @for (workspace of workspaces(); track workspace.id) {
             <option [value]="workspace.id">{{ workspace.name }}</option>
           }
@@ -25,19 +25,19 @@
       </div>
 
       <div class="filter-group">
-        <label for="status-filter">Status:</label>
+        <label for="status-filter">{{ 'generation.history.filters.statusLabel' | translate }}</label>
         <select id="status-filter" [(ngModel)]="statusFilter" (change)="onFilterChange()">
-          <option value="">Todos</option>
-          <option value="queued">Na fila</option>
-          <option value="processing">Processando</option>
-          <option value="completed">Concluído</option>
-          <option value="failed">Erro</option>
-          <option value="cancelled">Cancelado</option>
+          <option value="">{{ 'generation.history.filters.statusAll' | translate }}</option>
+          <option value="queued">{{ 'generation.history.filters.statusQueued' | translate }}</option>
+          <option value="processing">{{ 'generation.history.filters.statusProcessing' | translate }}</option>
+          <option value="completed">{{ 'generation.history.filters.statusCompleted' | translate }}</option>
+          <option value="failed">{{ 'generation.history.filters.statusFailed' | translate }}</option>
+          <option value="cancelled">{{ 'generation.history.filters.statusCancelled' | translate }}</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label for="start-date-filter">Data inicial:</label>
+        <label for="start-date-filter">{{ 'generation.history.filters.startDateLabel' | translate }}</label>
         <input
           type="date"
           id="start-date-filter"
@@ -47,7 +47,7 @@
       </div>
 
       <div class="filter-group">
-        <label for="end-date-filter">Data final:</label>
+        <label for="end-date-filter">{{ 'generation.history.filters.endDateLabel' | translate }}</label>
         <input
           type="date"
           id="end-date-filter"
@@ -58,10 +58,10 @@
 
       <div class="filter-actions">
         <button (click)="onRefresh()" class="btn btn-secondary">
-          Atualizar
+          {{ 'generation.history.filters.refreshButton' | translate }}
         </button>
         <button (click)="onExportCSV()" class="btn btn-secondary" [disabled]="historyItems().length === 0">
-          Exportar CSV
+          {{ 'generation.history.filters.exportButton' | translate }}
         </button>
       </div>
     </div>
@@ -70,14 +70,14 @@
     @if (loading()) {
       <div class="loading-panel">
         <div class="spinner"></div>
-        <p>Carregando histórico...</p>
+        <p>{{ 'generation.history.states.loading' | translate }}</p>
       </div>
     }
 
     <!-- Error State -->
     @if (error()) {
       <div class="error-panel">
-        <span class="error-icon">⚠️</span>
+        <span class="error-icon">{{ 'generation.history.states.errorTitle' | translate }}</span>
         <div class="error-content">
           <strong>{{ error()?.summary }}</strong>
           @if (error()?.description) {
@@ -93,13 +93,13 @@
         <table class="history-table">
           <thead>
             <tr>
-              <th>Título</th>
-              <th>Template</th>
-              <th>Workspace</th>
-              <th>Status</th>
-              <th>Duração</th>
-              <th>Data de Criação</th>
-              <th>Ações</th>
+              <th>{{ 'generation.history.table.columns.title' | translate }}</th>
+              <th>{{ 'generation.history.table.columns.template' | translate }}</th>
+              <th>{{ 'generation.history.table.columns.workspace' | translate }}</th>
+              <th>{{ 'generation.history.table.columns.status' | translate }}</th>
+              <th>{{ 'generation.history.table.columns.duration' | translate }}</th>
+              <th>{{ 'generation.history.table.columns.createdAt' | translate }}</th>
+              <th>{{ 'generation.history.table.columns.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -107,7 +107,7 @@
               <tr>
                 <td class="item-title">{{ item.title }}</td>
                 <td>{{ item.templateName }}</td>
-                <td>{{ item.workspaceName || '-' }}</td>
+                <td>{{ item.workspaceName || ('generation.history.table.emptyWorkspace' | translate) }}</td>
                 <td>
                   <span class="status-badge" [ngClass]="getStatusClass(item.status)">
                     {{ getStatusLabel(item.status) }}
@@ -117,16 +117,16 @@
                 <td>{{ formatDate(item.createdAt) }}</td>
                 <td class="actions-cell">
                   <div class="action-buttons">
-                    <button (click)="onViewDetails(item)" class="btn-link" title="Ver detalhes">
-                      Detalhes
+                    <button (click)="onViewDetails(item)" class="btn-link" [title]="'generation.history.table.actions.details' | translate">
+                      {{ 'generation.history.table.actions.details' | translate }}
                     </button>
                     <button
                       (click)="onRegenerate(item)"
                       class="btn-action"
                       [disabled]="isActionLoading(item.id)"
-                      title="Regenerar documento"
+                      [title]="'generation.history.table.actions.regenerate' | translate"
                     >
-                      {{ isActionLoading(item.id) ? 'Regenerando...' : 'Regenerar' }}
+                      {{ isActionLoading(item.id) ? ('generation.history.table.actions.regenerating' | translate) : ('generation.history.table.actions.regenerate' | translate) }}
                     </button>
                   </div>
                 </td>
@@ -144,18 +144,17 @@
             [disabled]="pagination().page === 1"
             class="btn btn-secondary"
           >
-            ← Anterior
+            {{ 'generation.history.pagination.previous' | translate }}
           </button>
           <span class="pagination-info">
-            Página {{ pagination().page }}
-            ({{ pagination().total }} itens)
+            {{ 'generation.history.pagination.info' | translate: { page: pagination().page, total: pagination().total } }}
           </span>
           <button
             (click)="onNextPage()"
             [disabled]="!pagination().hasMore"
             class="btn btn-secondary"
           >
-            Próxima →
+            {{ 'generation.history.pagination.next' | translate }}
           </button>
         </div>
       }
@@ -164,9 +163,9 @@
     <!-- Empty State -->
     @if (!loading() && !error() && historyItems().length === 0) {
       <div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <h3>Nenhuma geração encontrada</h3>
-        <p>Não há gerações no histórico ou nenhuma corresponde aos filtros aplicados</p>
+        <div class="empty-icon">{{ 'generation.history.states.emptyIcon' | translate }}</div>
+        <h3>{{ 'generation.history.states.emptyTitle' | translate }}</h3>
+        <p>{{ 'generation.history.states.emptyDescription' | translate }}</p>
       </div>
     }
   </div>

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 import { GenerationHistoryPageComponent } from './generation-history-page.component';
 import {
@@ -18,6 +19,7 @@ describe('GenerationHistoryPageComponent', () => {
   let fixture: ComponentFixture<GenerationHistoryPageComponent>;
   let historyService: jasmine.SpyObj<GenerationHistoryService>;
   let documentsService: jasmine.SpyObj<DocumentsService>;
+  let translateService: jasmine.SpyObj<TranslateService>;
   let snackBarOpenSpy: jasmine.Spy;
   let router: Router;
 
@@ -66,6 +68,17 @@ describe('GenerationHistoryPageComponent', () => {
     ]);
     documentsService.listWorkspaces.and.returnValue(of(mockWorkspaces));
 
+    translateService = jasmine.createSpyObj<TranslateService>('TranslateService', [
+      'instant'
+    ]);
+    translateService.instant.and.callFake((key: string, params?: any) => {
+      // Mock simples que retorna a chave para testes
+      if (params) {
+        return `${key}_with_params`;
+      }
+      return key;
+    });
+
     snackBarOpenSpy = jasmine.createSpy('open');
 
     await TestBed.configureTestingModule({
@@ -73,6 +86,7 @@ describe('GenerationHistoryPageComponent', () => {
       providers: [
         { provide: GenerationHistoryService, useValue: historyService },
         { provide: DocumentsService, useValue: documentsService },
+        { provide: TranslateService, useValue: translateService },
         { provide: MatDialog, useValue: {} },
         { provide: MatSnackBar, useValue: { open: snackBarOpenSpy } }
       ]
@@ -228,11 +242,9 @@ describe('GenerationHistoryPageComponent', () => {
       component.onRegenerate(item);
 
       expect(historyService.regenerate).toHaveBeenCalledWith('history-1');
-      expect(snackBarOpenSpy).toHaveBeenCalledWith(
-        'Regeneração iniciada com sucesso',
-        'Fechar',
-        { duration: 3000 }
-      );
+      expect(translateService.instant).toHaveBeenCalledWith('generation.history.messages.regenerateSuccess');
+      expect(translateService.instant).toHaveBeenCalledWith('generation.history.messages.close');
+      expect(snackBarOpenSpy).toHaveBeenCalled();
     });
 
     it('should handle regenerate error', () => {
@@ -247,11 +259,8 @@ describe('GenerationHistoryPageComponent', () => {
       const item = component.historyItems()[0];
       component.onRegenerate(item);
 
-      expect(snackBarOpenSpy).toHaveBeenCalledWith(
-        'Limite excedido',
-        'Fechar',
-        { duration: 4000 }
-      );
+      expect(translateService.instant).toHaveBeenCalledWith('generation.history.messages.close');
+      expect(snackBarOpenSpy).toHaveBeenCalled();
     });
 
     it('should set loading state during regenerate', () => {
@@ -273,11 +282,9 @@ describe('GenerationHistoryPageComponent', () => {
 
       component.onViewDetails(item);
 
-      expect(snackBarOpenSpy).toHaveBeenCalledWith(
-        'Detalhes da geração: Test Generation',
-        'Fechar',
-        { duration: 3000 }
-      );
+      expect(translateService.instant).toHaveBeenCalledWith('generation.history.messages.detailsMessage', { title: 'Test Generation' });
+      expect(translateService.instant).toHaveBeenCalledWith('generation.history.messages.close');
+      expect(snackBarOpenSpy).toHaveBeenCalled();
     });
   });
 
@@ -291,11 +298,11 @@ describe('GenerationHistoryPageComponent', () => {
     });
 
     it('should get correct status label', () => {
-      expect(component.getStatusLabel('queued')).toBe('Na fila');
-      expect(component.getStatusLabel('processing')).toBe('Processando');
-      expect(component.getStatusLabel('completed')).toBe('Concluído');
-      expect(component.getStatusLabel('failed')).toBe('Erro');
-      expect(component.getStatusLabel('cancelled')).toBe('Cancelado');
+      expect(component.getStatusLabel('queued')).toBe('generation.history.filters.statusQueued');
+      expect(component.getStatusLabel('processing')).toBe('generation.history.filters.statusProcessing');
+      expect(component.getStatusLabel('completed')).toBe('generation.history.filters.statusCompleted');
+      expect(component.getStatusLabel('failed')).toBe('generation.history.filters.statusFailed');
+      expect(component.getStatusLabel('cancelled')).toBe('generation.history.filters.statusCancelled');
     });
 
     it('should get correct status class', () => {

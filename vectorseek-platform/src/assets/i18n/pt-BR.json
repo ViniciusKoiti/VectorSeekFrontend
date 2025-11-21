@@ -135,5 +135,61 @@
     "password": "Senha",
     "fullName": "Nome completo",
     "acceptTerms": "Termos de uso"
+  },
+  "generation": {
+    "history": {
+      "title": "Histórico de Gerações",
+      "description": "Visualize e gerencie o histórico de gerações de documentos",
+      "filters": {
+        "workspaceLabel": "Workspace:",
+        "workspaceAll": "Todos",
+        "statusLabel": "Status:",
+        "statusAll": "Todos",
+        "statusQueued": "Na fila",
+        "statusProcessing": "Processando",
+        "statusCompleted": "Concluído",
+        "statusFailed": "Erro",
+        "statusCancelled": "Cancelado",
+        "startDateLabel": "Data inicial:",
+        "endDateLabel": "Data final:",
+        "refreshButton": "Atualizar",
+        "exportButton": "Exportar CSV"
+      },
+      "table": {
+        "columns": {
+          "title": "Título",
+          "template": "Template",
+          "workspace": "Workspace",
+          "status": "Status",
+          "duration": "Duração",
+          "createdAt": "Data de Criação",
+          "actions": "Ações"
+        },
+        "actions": {
+          "details": "Detalhes",
+          "regenerate": "Regenerar",
+          "regenerating": "Regenerando..."
+        },
+        "emptyWorkspace": "-"
+      },
+      "pagination": {
+        "previous": "← Anterior",
+        "next": "Próxima →",
+        "info": "Página {{page}} ({{total}} itens)"
+      },
+      "states": {
+        "loading": "Carregando histórico...",
+        "errorTitle": "⚠️",
+        "emptyIcon": "📋",
+        "emptyTitle": "Nenhuma geração encontrada",
+        "emptyDescription": "Não há gerações no histórico ou nenhuma corresponde aos filtros aplicados"
+      },
+      "messages": {
+        "regenerateSuccess": "Regeneração iniciada com sucesso",
+        "regenerateError": "Erro ao regenerar",
+        "detailsMessage": "Detalhes da geração: {{title}}",
+        "close": "Fechar"
+      }
+    }
   }
 }
