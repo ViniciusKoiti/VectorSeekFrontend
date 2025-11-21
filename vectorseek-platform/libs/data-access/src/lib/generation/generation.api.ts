@@ -24,5 +24,20 @@ export const GENERATION_API_ENDPOINTS = {
   /**
    * POST /api/generate/cancel/{taskId} - Cancelar geração em andamento
    */
-  cancelGeneration: (taskId: string) => `${GENERATION_BASE_PATH}/cancel/${taskId}`
+  cancelGeneration: (taskId: string) => `${GENERATION_BASE_PATH}/cancel/${taskId}`,
+
+  /**
+   * GET /api/generate/history - Listar histórico de gerações (E8-T7)
+   */
+  listHistory: () => `${GENERATION_BASE_PATH}/history`,
+
+  /**
+   * GET /api/generate/history/{id} - Obter detalhes de uma geração do histórico (E8-T7)
+   */
+  getHistoryDetail: (id: string) => `${GENERATION_BASE_PATH}/history/${id}`,
+
+  /**
+   * POST /api/generate/history/{id}/regenerate - Regenerar a partir de um item do histórico (E8-T7)
+   */
+  regenerate: (id: string) => `${GENERATION_BASE_PATH}/history/${id}/regenerate`
 } as const;

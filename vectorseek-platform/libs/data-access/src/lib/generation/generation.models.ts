@@ -160,3 +160,93 @@ export interface GenerationApiErrorPayload {
 export interface GenerationApiEnvelope<T> {
   data: T;
 }
+
+// === Tipos para Histórico de Gerações (E8-T7) ===
+
+export type GenerationStatus = 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';
+
+export interface GenerationHistoryItem {
+  id: string;
+  taskId: string;
+  templateId: string;
+  templateName: string;
+  workspaceId: string;
+  workspaceName: string;
+  title: string;
+  status: GenerationStatus;
+  duration?: number; // em segundos
+  createdAt: string;
+  completedAt?: string;
+  error?: string;
+}
+
+export interface GenerationHistoryDetail extends GenerationHistoryItem {
+  briefing: string;
+  customVariables: Record<string, string | number>;
+  modelOverride?: string;
+  result?: GeneratedDocument;
+  metadata?: {
+    modelUsed?: string;
+    provider?: string;
+    tokensUsed?: {
+      input: number;
+      output: number;
+    };
+    stages?: Array<{
+      name: string;
+      startedAt: string;
+      completedAt?: string;
+      duration?: number;
+    }>;
+  };
+}
+
+export interface ListHistoryRequest {
+  workspaceId?: string;
+  status?: GenerationStatus;
+  startDate?: string; // ISO 8601
+  endDate?: string; // ISO 8601
+  page?: number;
+  limit?: number;
+  sortBy?: 'createdAt' | 'completedAt' | 'duration';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface ListHistoryResponse {
+  items: GenerationHistoryItem[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+}
+
+export interface GetHistoryDetailRequest {
+  id: string;
+}
+
+export interface GetHistoryDetailResponse {
+  item: GenerationHistoryDetail;
+}
+
+export interface RegenerateRequest {
+  historyId: string;
+}
+
+export interface RegenerateResponse {
+  taskId: string;
+  status: 'queued' | 'processing';
+  message: string;
+}
+
+// Atualizar tipo de ação para incluir operações de histórico
+export type GenerationHistoryAction =
+  | 'listHistory'
+  | 'getHistoryDetail'
+  | 'regenerate';
+
+export interface GenerationHistoryError {
+  status: number;
+  code: string;
+  summary: string;
+  description?: string;
+}
