@@ -188,20 +188,6 @@
     "actions": {
       "save": "Salvar Configurações",
       "saving": "Salvando...",
-      "cancel": "Cancelar",
-      "retry": "Tentar novamente"
-    },
-    "messages": {
-      "saveSuccess": "Configurações salvas com sucesso!"
-    },
-    "errors": {
-      "loadTitle": "Erro ao carregar configurações"
-  "dashboard": {
-    "title": "Dashboard",
-    "filters": {
-      "period": "Período:",
-      "last7Days": "Últimos 7 dias",
-      "last30Days": "Últimos 30 dias",
       "last90Days": "Últimos 90 dias"
     },
     "loading": {

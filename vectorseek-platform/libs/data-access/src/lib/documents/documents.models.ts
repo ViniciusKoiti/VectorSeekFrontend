@@ -70,6 +70,15 @@ export interface DocumentUploadResponse {
   createdAt: Date;
 }
 
+export interface Workspace {
+  id: string;
+  name: string;
+}
+
+export interface WorkspacesListResponse {
+  workspaces: Workspace[];
+}
+
 // === Tipos de erro ===
 
 export type DocumentsAction = 'list' | 'detail' | 'reprocess' | 'delete' | 'upload';
@@ -160,8 +169,8 @@ export type DocumentDetailApiResponse = DocumentApiResponse;
 export type LegacyDocumentDetailResponse =
   | LegacyDocumentApiResponse
   | {
-      document?: LegacyDocumentApiResponse;
-    };
+    document?: LegacyDocumentApiResponse;
+  };
 
 export interface DocumentReprocessApiResponse {
   document_id: string;

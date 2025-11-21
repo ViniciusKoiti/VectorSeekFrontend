@@ -43,6 +43,7 @@ export const routes: Routes = [
         path: 'settings',
         loadChildren: () => import('./settings/settings.routes').then((m) => m.settingsRoutes)
       },
+      {
         path: 'dashboard',
         loadChildren: () => import('./dashboard/dashboard.routes').then((m) => m.dashboardRoutes)
       }
