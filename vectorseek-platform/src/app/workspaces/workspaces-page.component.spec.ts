@@ -1,8 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
-import { Workspace, WorkspacesService } from '@vectorseek/data-access';
+import { WorkspacesService } from '@vectorseek/data-access';
+import { Workspace } from '@vectorseek/data-access/lib/workspaces/workspaces.models';
 import { WorkspacesPageComponent } from './workspaces-page.component';
 
 describe('WorkspacesPageComponent', () => {
@@ -46,6 +47,9 @@ describe('WorkspacesPageComponent', () => {
 
     fixture = TestBed.createComponent(WorkspacesPageComponent);
     component = fixture.componentInstance;
+    // Force component to use mocked dialog/snackbar
+    (component as any).dialog = dialog;
+    (component as any).snackBar = snackBar;
     fixture.detectChanges();
   });
 
@@ -54,12 +58,13 @@ describe('WorkspacesPageComponent', () => {
     expect(component.workspaces().length).toBe(1);
   });
 
-  it('should create workspace when dialog returns data', () => {
+  it('should create workspace when dialog returns data', fakeAsync(() => {
     dialog.open.and.returnValue({ afterClosed: () => of({ name: 'Novo' }) } as any);
 
     component.openCreateDialog();
+    flush();
 
     expect(workspacesService.createWorkspace).toHaveBeenCalledWith({ name: 'Novo' });
     expect(snackBar.open).toHaveBeenCalled();
-  });
+  }));
 });

@@ -130,13 +130,13 @@ export class DashboardPageComponent implements OnInit {
    * @returns Formatted date string (DD/MM)
    */
   formatWeekDate(dateString: string): string {
-    try {
-      const date = new Date(dateString);
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      return `${day}/${month}`;
-    } catch {
+    const [year, month, day] = dateString.split('-').map(Number);
+    if (!year || !month || !day) {
       return dateString;
     }
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const dd = date.getUTCDate().toString().padStart(2, '0');
+    const mm = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    return `${dd}/${mm}`;
   }
 }

@@ -1,26 +1,19 @@
-﻿import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { of, throwError } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { of } from 'rxjs';
 import { DocumentsPageComponent } from './documents-page.component';
-import {
-  Document,
-  DocumentsListResult,
-  DocumentsService,
-  Workspace,
-  WorkspacesService
-} from '@vectorseek/data-access';
-import { DocumentsDialogService } from './services/documents-dialog.service';
+import { Document, DocumentsListResult, DocumentsService, Workspace } from '@vectorseek/data-access';
 
 describe('DocumentsPageComponent', () => {
   let component: DocumentsPageComponent;
   let fixture: ComponentFixture<DocumentsPageComponent>;
   let documentsService: jasmine.SpyObj<DocumentsService>;
-  let workspacesService: jasmine.SpyObj<WorkspacesService>;
+  let dialog: jasmine.SpyObj<MatDialog>;
   let snackBarOpenSpy: jasmine.Spy;
   let router: Router;
-  let dialogServiceMock: jasmine.SpyObj<DocumentsDialogService>;
 
   const makeDocument = (): Document => ({
     id: 'doc-1',
@@ -56,9 +49,7 @@ describe('DocumentsPageComponent', () => {
       'listWorkspaces'
     ]);
     documentsService.listDocuments.and.returnValue(of(mockListResponse));
-
-    workspacesService = jasmine.createSpyObj<WorkspacesService>('WorkspacesService', ['listWorkspaces']);
-    workspacesService.listWorkspaces.and.returnValue(
+    documentsService.listWorkspaces.and.returnValue(
       of([
         {
           id: 'ws-1',
@@ -71,14 +62,8 @@ describe('DocumentsPageComponent', () => {
     );
     documentsService.deleteDocument.and.returnValue(of({ id: 'doc-1', deletedAt: new Date() }));
 
-    dialogServiceMock = jasmine.createSpyObj<DocumentsDialogService>('DocumentsDialogService', [
-      'openUploadDialog',
-      'confirmReprocess',
-      'confirmDelete'
-    ]);
-    dialogServiceMock.openUploadDialog.and.returnValue(of({ documentId: 'doc-1' }));
-    dialogServiceMock.confirmReprocess.and.returnValue(of(true));
-    dialogServiceMock.confirmDelete.and.returnValue(of(true));
+    dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
+    dialog.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
     snackBarOpenSpy = jasmine.createSpy('open');
 
@@ -86,10 +71,8 @@ describe('DocumentsPageComponent', () => {
       imports: [DocumentsPageComponent, RouterTestingModule],
       providers: [
         { provide: DocumentsService, useValue: documentsService },
-        { provide: WorkspacesService, useValue: workspacesService },
-        { provide: DocumentsDialogService, useValue: dialogServiceMock },
-        { provide: MatSnackBar, useValue: { open: snackBarOpenSpy } },
-        { provide: ActivatedRoute, useValue: { queryParams: of({}), params: of({}) } }
+        { provide: MatDialog, useValue: dialog },
+        { provide: MatSnackBar, useValue: { open: snackBarOpenSpy } }
       ]
     }).compileComponents();
 
@@ -98,6 +81,9 @@ describe('DocumentsPageComponent', () => {
 
     fixture = TestBed.createComponent(DocumentsPageComponent);
     component = fixture.componentInstance;
+    // Ensure we always use the mocked dialog/snackbar instances
+    (component as any).dialog = dialog;
+    (component as any).snackBar = { open: snackBarOpenSpy } as any;
     fixture.detectChanges();
   });
 
@@ -118,7 +104,7 @@ describe('DocumentsPageComponent', () => {
   });
 
   it('should load workspaces on init', () => {
-    expect(workspacesService.listWorkspaces).toHaveBeenCalled();
+    expect(documentsService.listWorkspaces).toHaveBeenCalled();
     expect(component.workspaces().length).toBeGreaterThan(0);
   });
 
@@ -128,22 +114,31 @@ describe('DocumentsPageComponent', () => {
   });
 
   it('should trigger reprocess flow when confirmed', () => {
+    dialog.open.and.returnValue({ afterClosed: () => of(true) } as any);
+
     component.onReprocessDocument(component.documents()[0]);
-    expect(dialogServiceMock.confirmReprocess).toHaveBeenCalled();
+
+    expect(dialog.open).toHaveBeenCalled();
     expect(documentsService.reprocessDocument).toHaveBeenCalledWith('doc-1');
   });
 
   it('should delete document and reload list after confirmation', () => {
+    dialog.open.and.returnValue({ afterClosed: () => of(true) } as any);
+
     component.onDeleteDocument(component.documents()[0]);
-    expect(dialogServiceMock.confirmDelete).toHaveBeenCalled();
+
+    expect(dialog.open).toHaveBeenCalled();
     expect(documentsService.deleteDocument).toHaveBeenCalledWith('doc-1');
     expect(documentsService.listDocuments).toHaveBeenCalledTimes(2);
   });
 
   it('should reload documents when upload dialog closes successfully', () => {
+    dialog.open.and.returnValue({ afterClosed: () => of({ documentId: 'doc-1' }) } as any);
     const loadSpy = spyOn(component, 'loadDocuments').and.callThrough();
     loadSpy.calls.reset();
+
     component.openUploadDialog();
+
     expect(loadSpy).toHaveBeenCalledWith(1);
   });
 
@@ -153,7 +148,7 @@ describe('DocumentsPageComponent', () => {
 
     component.onWorkspaceChange();
 
-    expect(localStorage.getItem('vectorseek.selectedWorkspaceId')).toBe('ws-1');
+    expect(localStorage.getItem('selectedWorkspaceId')).toBe('ws-1');
     expect(documentsService.listDocuments).toHaveBeenCalledWith(
       jasmine.objectContaining({
         workspaceId: 'ws-1'
@@ -163,7 +158,7 @@ describe('DocumentsPageComponent', () => {
 
   it('should restore workspace preference on init', () => {
     fixture.destroy();
-    localStorage.setItem('vectorseek.selectedWorkspaceId', 'ws-1');
+    localStorage.setItem('selectedWorkspaceId', 'ws-1');
 
     const newFixture = TestBed.createComponent(DocumentsPageComponent);
     const newComponent = newFixture.componentInstance;

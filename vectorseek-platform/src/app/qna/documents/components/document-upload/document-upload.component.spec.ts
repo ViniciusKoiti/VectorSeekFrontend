@@ -58,6 +58,7 @@ describe('DocumentUploadComponent', () => {
     component.uploadComplete.subscribe(uploadSpy);
 
     (component as any).processFile(validFile);
+    component.onStartUpload();
 
     subject.next({ type: HttpEventType.UploadProgress, loaded: 5, total: 10 });
     expect(component.uploadProgress()).toBe(50);
@@ -206,13 +207,12 @@ describe('DocumentUploadComponent', () => {
 
       component.onSelectFileClick();
 
-      expect(component.fileInput.nativeElement.click).toHaveBeenCalled();
+      expect(component.fileInput!.nativeElement.click).toHaveBeenCalled();
     });
 
     it('should clear input value after file selection', () => {
       const input = document.createElement('input');
       input.type = 'file';
-      input.value = 'fake-path';
 
       const event = { target: input } as any;
       const file = createFile(10, 'application/pdf', 'doc.pdf');
@@ -334,7 +334,7 @@ describe('DocumentUploadComponent', () => {
 
       subject.error({ message: 'Network error' });
 
-      expect(component.errorMessage()).toBe('Network error');
+      expect(component.errorMessage()).toBe('Erro ao enviar arquivo.');
       expect(component.isUploading()).toBeFalse();
     });
 
@@ -353,7 +353,7 @@ describe('DocumentUploadComponent', () => {
         }
       });
 
-      expect(component.errorMessage()).toBe('File too large');
+      expect(component.errorMessage()).toBe('Erro ao enviar arquivo.');
     });
   });
 

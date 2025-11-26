@@ -64,7 +64,7 @@ export class SettingsPageComponent implements OnInit, OnDestroy {
   /**
    * Load current settings from server
    */
-  private loadSettings(): void {
+  loadSettings(): void {
     this.isLoading.set(true);
     this.loadError.set(null);
 

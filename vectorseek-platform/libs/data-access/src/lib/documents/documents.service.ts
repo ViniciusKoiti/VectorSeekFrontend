@@ -1,4 +1,4 @@
-﻿import { HttpClient, HttpErrorResponse, HttpParams, HttpEvent, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams, HttpEvent, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, throwError } from 'rxjs';
 
@@ -27,7 +27,11 @@ import {
   LegacyDocumentsListResponse
 } from './documents.models';
 import { DOCUMENTS_API_ENDPOINTS } from './documents.api';
-import { Workspace, WorkspacesListResponse } from '@vectorseek/data-access';
+import {
+  Workspace,
+  WorkspaceApiResponse,
+  WorkspacesListResponse
+} from '../workspaces/workspaces.models';
 
 interface DocumentsErrorMessageConfig {
   summary: string;
@@ -160,7 +164,11 @@ export class DocumentsService {
     return this.http
       .get<WorkspacesListResponse | DocumentsApiEnvelope<WorkspacesListResponse>>(DOCUMENTS_API_ENDPOINTS.workspaces())
       .pipe(
-        map((response) => this.unwrapEnvelope<WorkspacesListResponse>(response).workspaces ?? []),
+        map((response) =>
+          (this.unwrapEnvelope<WorkspacesListResponse>(response).workspaces ?? []).map((workspace) =>
+            this.mapWorkspaceResponse(workspace)
+          )
+        ),
         catchError((error) => this.handleError('list', error))
       );
   }
@@ -304,6 +312,17 @@ export class DocumentsService {
       fingerprint: dto.fingerprint ?? undefined,
       error: dto.error ?? undefined,
       metadata
+    };
+  }
+
+  private mapWorkspaceResponse(workspace: WorkspaceApiResponse): Workspace {
+    return {
+      id: workspace.id,
+      name: workspace.name,
+      description: workspace.description ?? undefined,
+      ownerId: workspace.owner_id ?? undefined,
+      createdAt: this.toDate(workspace.created_at),
+      updatedAt: this.toDate(workspace.updated_at)
     };
   }
 

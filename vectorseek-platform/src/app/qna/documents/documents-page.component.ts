@@ -41,6 +41,7 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
   workspaces = signal<Workspace[]>([]);
   selectedWorkspaceId: string = '';
   isLoadingWorkspaces = signal(false);
+  workspaceError = signal<string | null>(null);
   private actionStatus = signal<Record<string, 'reprocess' | 'delete' | undefined>>({});
 
   ngOnInit(): void {
@@ -256,6 +257,7 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
 
   loadWorkspaces(): void {
     this.isLoadingWorkspaces.set(true);
+    this.workspaceError.set(null);
 
     this.documentsService
       .listWorkspaces()
@@ -267,6 +269,7 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Erro ao carregar workspaces:', error);
+          this.workspaceError.set(error.summary ?? 'Não foi possível carregar workspaces.');
           this.isLoadingWorkspaces.set(false);
           // Fallback: continuar sem workspaces
         }

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Subject } from 'rxjs';
 
 import { SettingsPageComponent } from './settings-page.component';
 import { SettingsService, UserSettings, SettingsError } from '@vectorseek/data-access';
@@ -189,12 +189,16 @@ describe('SettingsPageComponent', () => {
     });
 
     it('should set isSaving during save operation', () => {
-      settingsService.updateSettings.and.returnValue(of(mockSettings));
+      const subject = new Subject<UserSettings>();
+      settingsService.updateSettings.and.returnValue(subject.asObservable());
 
       component.onSubmit();
 
       // Should be saving immediately after submit
       expect(component.isSaving()).toBe(true);
+
+      subject.next(mockSettings);
+      subject.complete();
     });
   });
 
@@ -251,12 +255,10 @@ describe('SettingsPageComponent', () => {
     });
 
     it('should return correct form controls', () => {
-      expect(component.nameControl).toBe(component.settingsForm.get('name'));
-      expect(component.themeControl).toBe(component.settingsForm.get('theme'));
-      expect(component.languageControl).toBe(component.settingsForm.get('language'));
-      expect(component.notificationsControl).toBe(
-        component.settingsForm.get('notificationsEnabled')
-      );
+      expect(component.nameControl).toBe(component.settingsForm.get('name')!);
+      expect(component.themeControl).toBe(component.settingsForm.get('theme')!);
+      expect(component.languageControl).toBe(component.settingsForm.get('language')!);
+      expect(component.notificationsControl).toBe(component.settingsForm.get('notificationsEnabled')!);
     });
   });
 

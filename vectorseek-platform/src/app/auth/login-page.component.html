@@ -8,6 +8,19 @@
       </p>
     </header>
 
+    <!-- Google OAuth Button -->
+    <div class="oauth-section">
+      <app-google-oauth-button
+        (authStarted)="onOAuthStarted()"
+        (authError)="onOAuthError($event)"
+        [class.disabled]="isSubmitting || isOAuthInProgress">
+      </app-google-oauth-button>
+
+      <div class="divider">
+        <span>{{ 'auth.login.or_continue_with' | translate }}</span>
+      </div>
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
       <!-- Mensagem de erro geral da API -->
       <div class="api-error" *ngIf="apiError">
@@ -55,7 +68,7 @@
       </div>
 
       <!-- Botão Submit -->
-      <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isSubmitting">
+      <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isSubmitting || isOAuthInProgress">
         {{ isSubmitting ? ('auth.login.submittingButton' | translate) : ('auth.login.submitButton' | translate) }}
       </button>
     </form>

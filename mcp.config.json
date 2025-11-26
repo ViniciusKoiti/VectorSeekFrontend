@@ -1,0 +1,56 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/mnt/d/Cursos/VectorSeek",
+        "/mnt/d/Cursos/VectorSeekFrontend"
+      ],
+      "env": {}
+    },
+    "docs-mcp-server": {
+      "type": "sse",
+      "url": "http://localhost:6280/sse",
+      "disabled": false,
+      "autoApprove": []
+    },
+    "git": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git",
+        "/mnt/d/Cursos/VectorSeek",
+        "/mnt/d/Cursos/VectorSeekFrontend"
+      ],
+      "env": {}
+    },
+    "lsp": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "docker.io/jonrad/lsp-mcp:0.3.1"
+      ],
+      "env": {}
+    },
+    "serena": {
+      "command": "serena-mcp-server",
+      "args": [],
+      "env": {}
+    },
+    "grafana": {
+      "command": "mcp-grafana",
+      "args": [],
+      "env": {
+        "GRAFANA_URL": "http://localhost:3000",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "<your service account token>",
+        "GRAFANA_USERNAME": "<your username>",
+        "GRAFANA_PASSWORD": "<your password>",
+        "GRAFANA_ORG_ID": "1"
+      }
+    }
+  }
+}

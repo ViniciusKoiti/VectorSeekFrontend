@@ -41,7 +41,13 @@ This will compile your project and store the build artifacts in the `dist/` dire
 To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
 
 ```bash
-ng test
+npm test -- --watch=false --browsers=ChromeHeadless
+```
+
+If your environment blocks the default Karma port, set `KARMA_PORT=0` (random ephemeral) or another free port before running the tests:
+
+```bash
+KARMA_PORT=0 npm test -- --watch=false --browsers=ChromeHeadless
 ```
 
 ## Running end-to-end tests

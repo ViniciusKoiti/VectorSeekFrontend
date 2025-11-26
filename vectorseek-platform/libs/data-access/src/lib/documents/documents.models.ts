@@ -70,15 +70,6 @@ export interface DocumentUploadResponse {
   createdAt: Date;
 }
 
-export interface Workspace {
-  id: string;
-  name: string;
-}
-
-export interface WorkspacesListResponse {
-  workspaces: Workspace[];
-}
-
 // === Tipos de erro ===
 
 export type DocumentsAction = 'list' | 'detail' | 'reprocess' | 'delete' | 'upload';

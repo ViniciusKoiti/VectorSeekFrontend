@@ -38,6 +38,8 @@ describe('GenerationProgressComponent', () => {
 
     fixture = TestBed.createComponent(GenerationProgressComponent);
     component = fixture.componentInstance;
+    // Ensure the component uses the mocked dialog instead of Material's implementation
+    (component as any).dialog = dialog;
     component.taskId = 'task-1';
     fixture.detectChanges();
   });

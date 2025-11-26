@@ -45,6 +45,7 @@ describe('DashboardPageComponent', () => {
     mockAnalyticsService = jasmine.createSpyObj('AnalyticsService', [
       'getOverview',
     ]);
+    mockAnalyticsService.getOverview.and.returnValue(of(mockOverview));
 
     await TestBed.configureTestingModule({
       imports: [DashboardPageComponent, TranslateModule.forRoot()],
@@ -329,6 +330,9 @@ describe('DashboardPageComponent', () => {
 
   describe('template rendering', () => {
     it('should show loading state', () => {
+      spyOn(component, 'loadAnalytics').and.stub();
+      fixture.detectChanges();
+
       store.setLoading(true);
       fixture.detectChanges();
 
@@ -340,6 +344,7 @@ describe('DashboardPageComponent', () => {
     });
 
     it('should show error state', () => {
+      spyOn(component, 'loadAnalytics').and.stub();
       const mockError = {
         status: 500,
         code: 'api_error',
@@ -347,6 +352,7 @@ describe('DashboardPageComponent', () => {
         description: 'analytics.error.generic_description',
       };
 
+      fixture.detectChanges();
       store.setError(mockError);
       fixture.detectChanges();
 
@@ -359,6 +365,7 @@ describe('DashboardPageComponent', () => {
     });
 
     it('should show empty state when data is empty', () => {
+      spyOn(component, 'loadAnalytics').and.stub();
       const emptyOverview: AnalyticsOverview = {
         totalDocuments: 0,
         uploadsPerWeek: [],
@@ -366,6 +373,7 @@ describe('DashboardPageComponent', () => {
         topTemplates: [],
       };
 
+      fixture.detectChanges();
       store.setOverview(emptyOverview);
       fixture.detectChanges();
 

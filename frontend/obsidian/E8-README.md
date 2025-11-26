@@ -4,7 +4,7 @@
 
 **Épico:** E8 - Frontend Development Sprint
 **Data de Criação:** 12 de Novembro de 2025
-**Status:** 🟢 Em Progresso (55% completo — 5 de 9 tarefas)
+**Status:** ✅ Concluído (100% completo — 9 de 9 tarefas)
 **Responsável:** Frontend Team + Backend Team (parcial)
 
 Este épico documenta todas as tarefas necessárias para completar o frontend do VectorSeek conforme mapeado em `docs/frontend/agents_vector_dev.md`. As tarefas estão organizadas por prioridade (P0 crítica, P1 importante, P2 secundária) e seguem o padrão de documentação do projeto.
@@ -16,9 +16,9 @@ Este épico documenta todas as tarefas necessárias para completar o frontend do
 | Prioridade | Tarefas | Status | Estimativa |
 |------------|---------|--------|-----------|
 | 🔴 P0 (Crítica) | 3 | ✅ Concluídas (E8-T1, T2, T3) | 6-8 dias |
-| 🟡 P1 (Importante) | 3 | 🟢 2/3 concluídas (E8-T4, T5), pendente E8-T6 | 4-6 dias |
-| 🟢 P2 (Secundária) | 3 | ⏳ Não Iniciado | 5-8 dias |
-| **TOTAL** | **9** | **🟢 55% completo** | **15-22 dias** |
+| 🟡 P1 (Importante) | 3 | ✅ Concluídas (E8-T4, T5, T6) | 4-6 dias |
+| 🟢 P2 (Secundária) | 3 | ✅ Concluídas (E8-T7, T8, T9) | 5-8 dias |
+| **TOTAL** | **9** | **✅ 100% completo** | **15-22 dias** |
 
 ---
 
@@ -122,18 +122,18 @@ Implementar funcionalidade de upload de documentos (backend + frontend). **Funci
 ---
 
 ### E8-T6 — Implementar CRUD de Workspaces
-**Status:** 🟡 Em andamento — frontend entregue (20 Nov), aguardando validação dos endpoints de criação/edição/delete
+**Status:** ✅ Concluído (22 Nov 2025)
 **Deadline:** 23 de Novembro
 **Estimativa:** 2-3 dias (backend) + 2-3 dias (frontend)
 **Dependência:** E8-T1
 
-**Backend (pendente):**
-- [ ] POST /api/workspaces
-- [ ] PUT /api/workspaces/:id
-- [ ] DELETE /api/workspaces/:id
-- [ ] Validações e permissões
+**Backend:**
+- [x] POST /api/workspaces
+- [x] PUT /api/workspaces/:id
+- [x] DELETE /api/workspaces/:id
+- [x] Validações e permissões
 
-**Frontend (entregue):**
+**Frontend:**
 - [x] Página `/app/workspaces` + link no navbar
 - [x] Formulário modal para criar/editar com validações
 - [x] Modal de confirmação para deletar
@@ -146,54 +146,54 @@ Implementar funcionalidade de upload de documentos (backend + frontend). **Funci
 ## 🟢 TAREFAS SECUNDÁRIAS (P2) — Melhorias que agregam valor
 
 ### E8-T7 — Implementar Histórico de Gerações
-**Status:** ⏳ Não Iniciado
+**Status:** ✅ Concluído (22 Nov 2025)
 **Deadline:** 26 de Novembro
 **Estimativa:** 1-2 dias (backend) + 2-3 dias (frontend)
 **Dependência:** E8-T3
 
-Implementar página de histórico mostrando gerações anteriores. Usuários poderão ver, filtrar e regenerar documentos.
+Página `/app/generation/history` entregue com filtros, paginação, exportação CSV, regeneração e snackbar de detalhes; serviços e specs cobrindo fluxos de sucesso/erro.
 
 **Backend:**
-- [ ] GET /api/generate/history (com paginação e filtros)
+- [x] GET /api/generate/history (com paginação e filtros)
 
 **Frontend:**
-- [ ] Página `/app/generation/history`
-- [ ] Tabela com histórico
-- [ ] Filtros (data, template, status)
-- [ ] Botão "Regenerar"
-- [ ] Modal de preview
-- [ ] Testes
+- [x] Página `/app/generation/history`
+- [x] Tabela com histórico
+- [x] Filtros (data, template, status)
+- [x] Botão "Regenerar"
+- [x] Modal de preview
+- [x] Testes
 
 **Links:** [E8-T7.md](./E8-T7.md)
 
 ---
 
 ### E8-T8 — Implementar Configurações de Usuário
-**Status:** ⏳ Não Iniciado
+**Status:** ✅ Concluído (22 Nov 2025)
 **Deadline:** 30 de Novembro
 **Estimativa:** 2-3 dias (backend) + 2-3 dias (frontend)
 
 Implementar endpoints e UI para gerenciar perfil, senha e preferências (tema, idioma, notificações).
 
 **Backend:**
-- [ ] PUT /api/auth/profile
-- [ ] PUT /api/auth/password
-- [ ] GET/PUT /api/auth/preferences
+- [x] PUT /api/auth/profile
+- [x] PUT /api/auth/password
+- [x] GET/PUT /api/auth/preferences
 
 **Frontend:**
-- [ ] Página `/app/settings` com abas
-- [ ] Aba "Perfil" (nome, avatar)
-- [ ] Aba "Segurança" (alterar senha)
-- [ ] Aba "Preferências" (tema, idioma, notificações)
-- [ ] Validações e indicador de força de senha
-- [ ] Testes
+- [x] Página `/app/settings` com abas
+- [x] Aba "Perfil" (nome, avatar)
+- [x] Aba "Segurança" (alterar senha)
+- [x] Aba "Preferências" (tema, idioma, notificações)
+- [x] Validações e indicador de força de senha
+- [x] Testes
 
 **Links:** [E8-T8.md](./E8-T8.md)
 
 ---
 
 ### E8-T9 — Implementar Dashboard/Analytics
-**Status:** ⏳ Não Iniciado
+**Status:** ✅ Concluído (22 Nov 2025)
 **Deadline:** 7 de Dezembro
 **Estimativa:** 1-2 dias (backend) + 3-4 dias (frontend)
 **Dependência:** E8-T2, E8-T3
@@ -201,19 +201,19 @@ Implementar endpoints e UI para gerenciar perfil, senha e preferências (tema, i
 Implementar dashboard com métricas de uso. Usuários verão estatísticas de documentos, perguntas, gerações e storage.
 
 **Backend:**
-- [ ] GET /api/analytics/usage
-- [ ] GET /api/analytics/timeline
-- [ ] GET /api/analytics/documents
-- [ ] GET /api/analytics/storage
+- [x] GET /api/analytics/usage
+- [x] GET /api/analytics/timeline
+- [x] GET /api/analytics/documents
+- [x] GET /api/analytics/storage
 
 **Frontend:**
-- [ ] Página `/app/dashboard`
-- [ ] Cards com KPIs (Perguntas, Documentos, Gerações, Storage)
-- [ ] Gráfico de timeline (linha)
-- [ ] Gráfico de distribuição (pizza)
-- [ ] Storage breakdown
-- [ ] Alertas de limite próximo
-- [ ] Testes
+- [x] Página `/app/dashboard`
+- [x] Cards com KPIs (Perguntas, Documentos, Gerações, Storage)
+- [x] Gráfico de timeline (linha)
+- [x] Gráfico de distribuição (pizza)
+- [x] Storage breakdown
+- [x] Alertas de limite próximo
+- [x] Testes
 
 **Links:** [E8-T9.md](./E8-T9.md)
 
@@ -222,9 +222,9 @@ Implementar dashboard com métricas de uso. Usuários verão estatísticas de do
 ## 📅 Cronograma Proposto
 
 ### Semana 1 (12-19 Novembro)
-- [ ] **E8-T1**: Sincronizar endpoints com backend (24h)
-- [ ] **E8-T2**: Iniciar CRUD documentos (2-3 dias)
-- [ ] **E8-T3**: Planejar e iniciar upload (backend 3-4 dias)
+- [x] **E8-T1**: Sincronizar endpoints com backend (24h)
+- [x] **E8-T2**: Iniciar CRUD documentos (2-3 dias)
+- [x] **E8-T3**: Planejar e iniciar upload (backend 3-4 dias)
 
 **Marcos:** Endpoints sincronizados, CRUD básico, upload iniciado
 
@@ -237,16 +237,16 @@ Implementar dashboard com métricas de uso. Usuários verão estatísticas de do
 **Marcos:** Upload funcional, filtros, interface completa
 
 ### Semana 3 (26-3 Dezembro)
-- [ ] **E8-T6**: CRUD workspaces (3-4 dias)
-- [ ] **E8-T7**: Histórico de gerações (2-3 dias)
-- [ ] Testes e ajustes
+- [x] **E8-T6**: CRUD workspaces (3-4 dias)
+- [x] **E8-T7**: Histórico de gerações (2-3 dias)
+- [x] Testes e ajustes
 
 **Marcos:** Gestão completa de workspaces, histórico
 
 ### Semana 4+ (3+ Dezembro)
-- [ ] **E8-T8**: Configurações de usuário (3-4 dias)
-- [ ] **E8-T9**: Dashboard/Analytics (3-4 dias)
-- [ ] Features secundárias e polishing
+- [x] **E8-T8**: Configurações de usuário (3-4 dias)
+- [x] **E8-T9**: Dashboard/Analytics (3-4 dias)
+- [x] Features secundárias e polishing
 
 **Marcos:** Sistema completo, analytics, user preferences
 
@@ -300,20 +300,20 @@ Parallelizáveis: E8-T5, E8-T8
 ## 🎯 Critério de Sucesso
 
 ### Funcionalidades Críticas (DEVE TER)
-- [ ] Upload de documentos funcional
-- [ ] CRUD completo de documentos
-- [ ] Endpoints sincronizados com backend
-- [ ] Autenticação e autorização
+- [x] Upload de documentos funcional
+- [x] CRUD completo de documentos
+- [x] Endpoints sincronizados com backend
+- [x] Autenticação e autorização
 
 ### Funcionalidades Importantes (DEVERIA TER)
-- [ ] Filtro de workspace
-- [ ] Cancelar geração
-- [ ] CRUD de workspaces
-- [ ] Histórico de gerações
+- [x] Filtro de workspace
+- [x] Cancelar geração
+- [x] CRUD de workspaces
+- [x] Histórico de gerações
 
 ### Funcionalidades Desejáveis (PODERIA TER)
-- [ ] Configurações de usuário
-- [ ] Dashboard/Analytics
+- [x] Configurações de usuário
+- [x] Dashboard/Analytics
 
 ---
 
@@ -381,6 +381,6 @@ docs/TASKS/
 ---
 
 **Criado em:** 12 de Novembro de 2025
-**Última Atualização:** 12 de Novembro de 2025
-**Status:** 🟡 Em Planejamento
-**Próxima Ação:** Iniciar E8-T1 — Sincronizar Endpoints
+**Última Atualização:** 22 de Novembro de 2025
+**Status:** ✅ Concluído
+**Próxima Ação:** Encerrar épico e arquivar documentação

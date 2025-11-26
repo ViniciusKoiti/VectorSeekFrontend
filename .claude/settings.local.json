@@ -3,9 +3,20 @@
     "allow": [
       "Bash(npm test:*)",
       "Bash(pkill:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(if [ -d \"node_modules\" ])",
+      "Bash(then echo \"✓ node_modules existe\")",
+      "Bash(else echo \"✗ node_modules NÃO existe - precisa instalar\")",
+      "Bash(fi)",
+      "Bash(KARMA_PORT=0 npm test:*)",
+      "Bash(curl:*)",
+      "Bash(/dev/null)",
+      "Bash(npm start)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "D:\\Cursos\\VectorSeek\\docs\\"
+    ]
   }
 }

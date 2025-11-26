@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { Workspace, WorkspacesService } from '@vectorseek/data-access';
+import { WorkspacesService } from '@vectorseek/data-access';
+import { Workspace } from '@vectorseek/data-access/lib/workspaces/workspaces.models';
 import { WorkspaceFormDialogComponent, WorkspaceFormDialogResult } from './workspace-form-dialog.component';
 import { WorkspaceDeleteDialogComponent } from './workspace-delete-dialog.component';
 

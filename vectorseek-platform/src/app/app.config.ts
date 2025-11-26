@@ -38,7 +38,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideMarkdown(),
     provideTranslateService({
-      defaultLanguage: 'pt-BR',
+      fallbackLang: 'pt-BR',
       loader: {
         provide: TranslateLoader,
         useClass: CustomTranslateLoader

@@ -1,18 +1,17 @@
 import { Component, OnDestroy, OnInit, ElementRef, ViewChild, Renderer2, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { ThemeToggleComponent } from '../../core/components/theme-toggle/theme-toggle.component';
 
 /**
  * AuthLayoutComponent - Layout placeholder para páginas de autenticação
- * 
+ *
  * Compatível com SSR conforme definido no ADR-001 e E1-A1-1.
  * Este componente serve como container para as rotas filhas de autenticação.
  */
 @Component({
   selector: 'app-auth-layout',
   standalone: true,
-  imports: [RouterOutlet, ThemeToggleComponent],
+  imports: [RouterOutlet],
   templateUrl: './auth-layout.component.html',
   styleUrls: ['./auth-layout.component.scss']
 })

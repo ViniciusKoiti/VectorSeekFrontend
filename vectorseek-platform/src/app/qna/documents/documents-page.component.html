@@ -25,7 +25,7 @@
             <option [value]="workspace.id">{{ workspace.name }}</option>
           }
         </select>
-        @if (workspacesLoading()) {
+        @if (isLoadingWorkspaces()) {
           <span class="filter-hint">Carregando...</span>
         } @else if (workspaceError()) {
           <span class="filter-hint error">{{ workspaceError() }}</span>

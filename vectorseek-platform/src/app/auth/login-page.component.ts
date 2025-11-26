@@ -8,6 +8,7 @@ import { AuthService } from '../../../libs/data-access/src/lib/auth/auth.service
 import { AuthError } from '../../../libs/data-access/src/lib/auth/auth.models';
 import { AuthStore } from '../../../libs/state/src/lib/auth/auth.store';
 import { FieldErrorComponent } from './components/field-error.component';
+import { GoogleOAuthButtonComponent } from './components/google-oauth-button.component';
 import { loginSchema, LoginFormData } from './schemas/auth.schemas';
 import { zodValidator } from './utils/zod-validators';
 import { AuthErrorPipe } from '@vectorseek/data-access/lib/auth/auth-error.pipe';
@@ -16,7 +17,7 @@ import { TypewriterComponent } from './components/typewriter/typewriter.componen
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent, AuthErrorPipe, TypewriterComponent],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, TranslateModule, FieldErrorComponent, GoogleOAuthButtonComponent, AuthErrorPipe, TypewriterComponent],
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.css']
 })
@@ -31,6 +32,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   apiError: AuthError | null = null;
   animationsDisabled = false;
+  isOAuthInProgress = false;
 
   @HostBinding('class.animations-disabled') get animationsDisabledClass() {
     return this.animationsDisabled;
@@ -103,6 +105,21 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         this.isSubmitting = false;
       }
     });
+  }
+
+  onOAuthStarted(): void {
+    this.isOAuthInProgress = true;
+    this.apiError = null;
+  }
+
+  onOAuthError(error: any): void {
+    this.isOAuthInProgress = false;
+    this.apiError = {
+      status: error.status || 401,
+      code: error.code || 'OAUTH_ERROR',
+      summary: error.message || 'auth.google.error.unknown',
+      description: undefined
+    };
   }
 }
 

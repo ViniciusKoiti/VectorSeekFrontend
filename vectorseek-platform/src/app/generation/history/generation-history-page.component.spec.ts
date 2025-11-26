@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Subject } from 'rxjs';
 import { GenerationHistoryPageComponent } from './generation-history-page.component';
 import {
   GenerationHistoryService,
@@ -14,12 +14,20 @@ import {
   GenerationHistoryError
 } from '@vectorseek/data-access';
 
+type TranslateServiceMock = Pick<TranslateService, 'instant' | 'get'> & {
+  onLangChange: Subject<unknown>;
+  onTranslationChange: Subject<unknown>;
+  onFallbackLangChange: Subject<unknown>;
+  instant: jasmine.Spy;
+  get: jasmine.Spy;
+};
+
 describe('GenerationHistoryPageComponent', () => {
   let component: GenerationHistoryPageComponent;
   let fixture: ComponentFixture<GenerationHistoryPageComponent>;
   let historyService: jasmine.SpyObj<GenerationHistoryService>;
   let documentsService: jasmine.SpyObj<DocumentsService>;
-  let translateService: jasmine.SpyObj<TranslateService>;
+  let translateService: TranslateServiceMock;
   let snackBarOpenSpy: jasmine.Spy;
   let router: Router;
 
@@ -51,6 +59,8 @@ describe('GenerationHistoryPageComponent', () => {
   };
 
   beforeEach(async () => {
+    localStorage.clear();
+
     historyService = jasmine.createSpyObj<GenerationHistoryService>('GenerationHistoryService', [
       'listHistory',
       'getHistoryDetail',
@@ -68,16 +78,19 @@ describe('GenerationHistoryPageComponent', () => {
     ]);
     documentsService.listWorkspaces.and.returnValue(of(mockWorkspaces));
 
-    translateService = jasmine.createSpyObj<TranslateService>('TranslateService', [
-      'instant'
-    ]);
-    translateService.instant.and.callFake((key: string, params?: any) => {
-      // Mock simples que retorna a chave para testes
-      if (params) {
-        return `${key}_with_params`;
-      }
-      return key;
-    });
+    translateService = {
+      onLangChange: new Subject(),
+      onTranslationChange: new Subject(),
+      onFallbackLangChange: new Subject(),
+      instant: jasmine.createSpy('instant').and.callFake((key: string, params?: any) => {
+        // Mock simples que retorna a chave para testes
+        if (params) {
+          return `${key}_with_params`;
+        }
+        return key;
+      }),
+      get: jasmine.createSpy('get').and.returnValue(of(''))
+    };
 
     snackBarOpenSpy = jasmine.createSpy('open');
 
@@ -97,6 +110,8 @@ describe('GenerationHistoryPageComponent', () => {
 
     fixture = TestBed.createComponent(GenerationHistoryPageComponent);
     component = fixture.componentInstance;
+    // Guarantee the component uses the mocked snackbar
+    (component as any).snackBar = { open: snackBarOpenSpy } as any;
     fixture.detectChanges();
   });
 
@@ -387,5 +402,9 @@ describe('GenerationHistoryPageComponent', () => {
 
       expect(component.selectedWorkspaceId).toBe('ws-2');
     });
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 });

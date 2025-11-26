@@ -5,6 +5,7 @@ if (!process.env.CHROME_BIN && process.platform !== 'win32') {
 }
 
 const isCI = process.env.CI === 'true';
+const karmaPort = Number(process.env.KARMA_PORT ?? 0);
 
 module.exports = function (config) {
   config.set({
@@ -29,13 +30,13 @@ module.exports = function (config) {
       reporters: [{ type: 'html' }, { type: 'text-summary' }]
     },
     reporters: ['progress', 'kjhtml'],
-    port: 0,
+    port: Number.isFinite(karmaPort) && karmaPort > 0 ? karmaPort : 0,
     listenAddress: '127.0.0.1',
     hostname: 'localhost',
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: isCI ? ['ChromiumHeadlessNoSandbox'] : ['Chrome'],
+    browsers: isCI ? ['ChromiumHeadlessNoSandbox'] : ['ChromeHeadless'],
     customLaunchers: {
       ChromiumHeadlessNoSandbox: {
         base: 'ChromeHeadless',

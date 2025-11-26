@@ -41,7 +41,7 @@
 6. **[E8-T6.md](./E8-T6.md)** — Implementar CRUD de Workspaces
    - **Deadline:** 23 de Novembro
    - **Estimativa:** 4-6 dias (backend + frontend)
-   - **Status:** 🟡 Em andamento (frontend pronto; aguardando backend)
+   - **Status:** ✅ Concluído (22 Nov)
    - **Dependência:** E8-T1
 
 #### 🟢 SECUNDÁRIAS (P2)
@@ -54,13 +54,13 @@
 8. **[E8-T8.md](./E8-T8.md)** — Implementar Configurações de Usuário
    - **Deadline:** 30 de Novembro
    - **Estimativa:** 4-6 dias (backend + frontend)
-   - **Status:** 🟡 Parcialmente Concluído (Frontend ✅)
+   - **Status:** ✅ Concluído (22 Nov)
    - **Parallelizável:** Sim
 
 9. **[E8-T9.md](./E8-T9.md)** — Implementar Dashboard/Analytics
    - **Deadline:** 7 de Dezembro
    - **Estimativa:** 4-6 dias (backend + frontend)
-   - **Status:** ⏳ Não Iniciado
+   - **Status:** ✅ Concluído (22 Nov)
    - **Dependência:** E8-T2, E8-T3
 
 ---
@@ -97,6 +97,7 @@
 | **Estimativa Total** | **28-40 dias** |
 | Prazo | 4-6 semanas |
 | Timeline com 2 devs | 28-40 dias |
+| Status Atual | ✅ 100% concluído |
 
 ---
 
@@ -142,4 +143,4 @@
 
 **Criado:** 12 de Novembro de 2025
 **Tipo:** Índice de Navegação
-**Próximo Passo:** [Ler E8-README.md →](./E8-README.md)
+**Próximo Passo:** Encerrar épico (documentação concluída)
