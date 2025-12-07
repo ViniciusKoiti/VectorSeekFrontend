@@ -16,6 +16,8 @@
         [class.disabled]="isSubmitting || isOAuthInProgress">
       </app-google-oauth-button>
 
+      <p class="oauth-hint">Callback local: http://localhost:4200/auth/oauth/google/callback</p>
+
       <div class="divider">
         <span>{{ 'auth.login.or_continue_with' | translate }}</span>
       </div>

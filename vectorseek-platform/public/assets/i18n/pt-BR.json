@@ -3,6 +3,7 @@
     "login": {
       "title": "Entrar",
       "subtitle": "Faça login para continuar explorando a VectorSeek.",
+      "or_continue_with": "ou continue com e-mail",
       "emailLabel": "E-mail",
       "emailPlaceholder": "seu@email.com",
       "passwordLabel": "Senha",
@@ -53,6 +54,43 @@
       "errors": {
         "required": "Este campo é obrigatório",
         "email": "Digite um e-mail válido"
+      }
+    },
+    "google": {
+      "sign_in": "Continuar com Google",
+      "signing_in": "Entrando...",
+      "aria_label": "Entrar com Google",
+      "error": {
+        "invalid_url": "URL de autorização inválida",
+        "redirect_failed": "Falha no redirecionamento",
+        "request_invalid": "Solicitação inválida",
+        "unauthorized": "Não autorizado",
+        "forbidden": "Acesso negado",
+        "rate_limited": "Muitas tentativas. Aguarde alguns instantes",
+        "server_error": "Erro no servidor. Tente novamente",
+        "network_error": "Erro de conexão",
+        "unknown": "Erro desconhecido. Tente novamente"
+      }
+    },
+    "oauth": {
+      "processing_title": "Finalizando login...",
+      "processing_message": "Aguarde enquanto validamos suas credenciais.",
+      "success_title": "Login realizado com sucesso!",
+      "success_message": "Você será redirecionado em instantes.",
+      "error_title": "Falha no login",
+      "retry_button": "Tentar novamente",
+      "back_to_login": "Voltar ao login",
+      "error": {
+        "access_denied": "Acesso negado pelo provedor",
+        "invalid_request": "Solicitação inválida",
+        "missing_code": "Código de autorização ausente",
+        "missing_state": "Parâmetro de estado ausente",
+        "profile_error": "Erro ao carregar perfil do usuário",
+        "invalid_credentials": "Credenciais inválidas",
+        "rate_limited": "Muitas tentativas. Aguarde alguns instantes",
+        "server_error": "Erro no servidor. Tente novamente",
+        "network_error": "Erro de conexão",
+        "unknown": "Erro desconhecido. Tente novamente"
       }
     },
     "apiErrors": {

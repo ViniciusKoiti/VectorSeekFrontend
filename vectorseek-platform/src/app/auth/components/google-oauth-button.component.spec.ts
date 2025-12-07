@@ -8,17 +8,20 @@ import { GoogleOAuthButtonComponent } from './google-oauth-button.component';
 import { AuthService } from '../../../../libs/data-access/src/lib/auth/auth.service';
 import { AuthStore } from '../../../../libs/state/src/lib/auth/auth.store';
 import { environment } from '../../../environments/environment';
+import {
+  GoogleOAuthAuthorizeResponse,
+  AuthError
+} from '../../../../libs/data-access/src/lib/auth/auth.models';
 
 describe('GoogleOAuthButtonComponent', () => {
   let component: GoogleOAuthButtonComponent;
   let fixture: ComponentFixture<GoogleOAuthButtonComponent>;
-  let httpMock: HttpTestingController;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
   let authStoreSpy: jasmine.SpyObj<AuthStore>;
   let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-    const authServiceSpyObj = jasmine.createSpyObj('AuthService', ['login']);
+    const authServiceSpyObj = jasmine.createSpyObj('AuthService', ['googleOAuthAuthorize']);
     const authStoreSpyObj = jasmine.createSpyObj('AuthStore', ['setSession', 'setUser']);
     const routerSpyObj = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -37,16 +40,11 @@ describe('GoogleOAuthButtonComponent', () => {
 
     fixture = TestBed.createComponent(GoogleOAuthButtonComponent);
     component = fixture.componentInstance;
-    httpMock = TestBed.inject(HttpTestingController);
     authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     authStoreSpy = TestBed.inject(AuthStore) as jasmine.SpyObj<AuthStore>;
     routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    httpMock.verify();
   });
 
   it('should create', () => {
@@ -74,31 +72,37 @@ describe('GoogleOAuthButtonComponent', () => {
   it('should emit authStarted event when sign-in process begins', () => {
     spyOn(component.authStarted, 'emit');
     
-    // Mock a successful OAuth URL response
-    const mockResponse = {
+    const mockResponse: GoogleOAuthAuthorizeResponse = {
       authorization_url: 'https://accounts.google.com/oauth/authorize?client_id=test',
       state: 'test-state'
     };
 
-    // Spy on window.location.assign to prevent actual redirect
-    spyOn(window.location, 'assign');
+    authServiceSpy.googleOAuthAuthorize.and.returnValue(of(mockResponse));
+    
+    // Mock window.location.assign
+    const originalAssign = window.location.assign;
+    window.location.assign = jasmine.createSpy('assign');
 
     component.signInWithGoogle();
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/api/auth/oauth/google/authorize`);
-    expect(req.request.method).toBe('POST');
-    req.flush(mockResponse);
-
     expect(component.authStarted.emit).toHaveBeenCalled();
+    expect(authServiceSpy.googleOAuthAuthorize).toHaveBeenCalled();
+    
+    // Restore original assign function
+    window.location.assign = originalAssign;
   });
 
   it('should handle OAuth URL request failure gracefully', () => {
     spyOn(component.authError, 'emit');
 
-    component.signInWithGoogle();
+    const mockError = {
+      status: 500,
+      error: { code: 'SERVER_ERROR', message: 'Server error' }
+    };
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/api/auth/oauth/google/authorize`);
-    req.flush('Server error', { status: 500, statusText: 'Internal Server Error' });
+    authServiceSpy.googleOAuthAuthorize.and.returnValue(throwError(() => mockError));
+
+    component.signInWithGoogle();
 
     expect(component.isLoading).toBeFalsy();
     expect(component.error).toBeTruthy();
@@ -119,7 +123,12 @@ describe('GoogleOAuthButtonComponent', () => {
   });
 
   it('should display error message when authentication fails', () => {
-    component.error = { message: 'OAUTH_SERVER_ERROR', code: 'SERVER_ERROR' };
+    component.error = {
+      status: 500,
+      code: 'SERVER_ERROR',
+      summary: 'OAUTH_SERVER_ERROR',
+      description: 'Server error'
+    };
     fixture.detectChanges();
 
     const errorMessage = fixture.nativeElement.querySelector('.error-message');
@@ -128,7 +137,6 @@ describe('GoogleOAuthButtonComponent', () => {
   });
 
   it('should map HTTP error codes correctly', () => {
-    // Test various HTTP error codes
     const testCases = [
       { status: 400, expected: 'OAUTH_REQUEST_INVALID' },
       { status: 401, expected: 'OAUTH_UNAUTHORIZED' },
@@ -139,12 +147,15 @@ describe('GoogleOAuthButtonComponent', () => {
     ];
 
     testCases.forEach(({ status, expected }) => {
+      const mockError = {
+        status,
+        error: { code: 'TEST_ERROR', message: 'Test error' }
+      };
+      
+      authServiceSpy.googleOAuthAuthorize.and.returnValue(throwError(() => mockError));
       component.signInWithGoogle();
       
-      const req = httpMock.expectOne(`${environment.apiUrl}/api/auth/oauth/google/authorize`);
-      req.flush('Error', { status, statusText: 'Error' });
-      
-      expect(component.error?.message).toBe(expected);
+      expect(component.error?.summary).toBe(expected);
     });
   });
 

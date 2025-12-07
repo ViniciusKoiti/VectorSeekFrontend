@@ -1,0 +1,131 @@
+<div class="pricing-page">
+  <div class="pricing-header">
+    <h1 class="pricing-title">{{ 'BILLING.PRICING.TITLE' | translate }}</h1>
+    <p class="pricing-subtitle">{{ 'BILLING.PRICING.SUBTITLE' | translate }}</p>
+
+    <!-- Billing Interval Toggle -->
+    <div class="interval-toggle">
+      <button
+        class="interval-button"
+        [class.active]="selectedInterval() === BillingInterval.MONTHLY"
+        (click)="toggleInterval()"
+      >
+        {{ 'BILLING.INTERVAL.MONTHLY' | translate }}
+      </button>
+      <button
+        class="interval-button"
+        [class.active]="selectedInterval() === BillingInterval.YEARLY"
+        (click)="toggleInterval()"
+      >
+        {{ 'BILLING.INTERVAL.YEARLY' | translate }}
+        <span class="save-badge">{{ 'BILLING.SAVE_UP_TO' | translate }} 17%</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="error-banner" role="alert">
+      <span class="error-icon">⚠</span>
+      <span>{{ error() | translate }}</span>
+    </div>
+  }
+
+  <!-- Pricing Cards -->
+  <div class="pricing-grid">
+    @for (plan of plans(); track plan.id) {
+      <div
+        class="pricing-card"
+        [class.popular]="plan.popular"
+        [class.current]="isCurrentPlan(plan)"
+      >
+        @if (plan.popular) {
+          <div class="popular-badge">{{ 'BILLING.MOST_POPULAR' | translate }}</div>
+        }
+
+        @if (isCurrentPlan(plan)) {
+          <div class="current-badge">{{ 'BILLING.CURRENT_PLAN' | translate }}</div>
+        }
+
+        <div class="card-header">
+          <h2 class="plan-name">{{ plan.name | translate }}</h2>
+          <p class="plan-description">{{ plan.description | translate }}</p>
+
+          <div class="plan-price">
+            @if (getPrice(plan) === 0) {
+              <span class="price-amount">{{ 'BILLING.FREE' | translate }}</span>
+            } @else {
+              <span class="price-currency">$</span>
+              <span class="price-amount">{{ getPrice(plan) }}</span>
+              <span class="price-period">/{{ selectedInterval() === BillingInterval.MONTHLY ? ('BILLING.MONTH' | translate) : ('BILLING.YEAR' | translate) }}</span>
+            }
+          </div>
+
+          @if (selectedInterval() === BillingInterval.YEARLY && getYearlySavings(plan) > 0) {
+            <p class="savings-text">
+              {{ 'BILLING.SAVE' | translate }} ${{ getYearlySavings(plan) }}/{{ 'BILLING.YEAR' | translate }}
+            </p>
+          }
+        </div>
+
+        <div class="card-body">
+          <ul class="features-list">
+            @for (feature of plan.features; track feature.name) {
+              <li class="feature-item" [class.included]="feature.included">
+                <span class="feature-icon">{{ feature.included ? '✓' : '✕' }}</span>
+                <span class="feature-text">
+                  {{ feature.name | translate }}
+                  @if (feature.limit) {
+                    <span class="feature-limit">({{ feature.limit }})</span>
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="card-footer">
+          <button
+            class="cta-button"
+            [class.primary]="plan.popular"
+            [class.current]="isCurrentPlan(plan)"
+            [disabled]="isLoading() || isCurrentPlan(plan)"
+            (click)="onSelectPlan(plan)"
+          >
+            @if (isLoading()) {
+              <span class="spinner"></span>
+              {{ 'BILLING.LOADING' | translate }}
+            } @else if (isCurrentPlan(plan)) {
+              {{ 'BILLING.CURRENT_PLAN' | translate }}
+            } @else {
+              {{ plan.cta | translate }}
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="faq-section">
+    <h2 class="faq-title">{{ 'BILLING.FAQ.TITLE' | translate }}</h2>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h3>{{ 'BILLING.FAQ.CHANGE_PLAN.Q' | translate }}</h3>
+        <p>{{ 'BILLING.FAQ.CHANGE_PLAN.A' | translate }}</p>
+      </div>
+      <div class="faq-item">
+        <h3>{{ 'BILLING.FAQ.CANCEL.Q' | translate }}</h3>
+        <p>{{ 'BILLING.FAQ.CANCEL.A' | translate }}</p>
+      </div>
+      <div class="faq-item">
+        <h3>{{ 'BILLING.FAQ.REFUND.Q' | translate }}</h3>
+        <p>{{ 'BILLING.FAQ.REFUND.A' | translate }}</p>
+      </div>
+      <div class="faq-item">
+        <h3>{{ 'BILLING.FAQ.PAYMENT.Q' | translate }}</h3>
+        <p>{{ 'BILLING.FAQ.PAYMENT.A' | translate }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -26,3 +26,22 @@ export * from './lib/settings/settings.service';
 export * from './lib/analytics/analytics.api';
 export * from './lib/analytics/analytics.models';
 export * from './lib/analytics/analytics.service';
+
+export * from './lib/billing/billing.api';
+export { BillingInterval, SubscriptionStatus } from './lib/billing/billing.models';
+export type {
+  PlanFeature,
+  PricingPlan,
+  Subscription,
+  Invoice,
+  CheckoutSessionRequest,
+  CheckoutSessionResponse,
+  CustomerPortalRequest,
+  CustomerPortalResponse,
+  CancelSubscriptionRequest,
+  BillingDashboardData,
+  BillingApiSubscriptionDto,
+  BillingApiInvoiceDto
+} from './lib/billing/billing.models';
+export { PlanType as BillingPlanType } from './lib/billing/billing.models';
+export * from './lib/billing/billing.service';

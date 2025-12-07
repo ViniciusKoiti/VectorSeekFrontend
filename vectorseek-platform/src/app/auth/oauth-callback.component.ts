@@ -1,32 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { TranslateModule } from '@ngx-translate/core';
-import { catchError, throwError } from 'rxjs';
 
 import { AuthStore } from '../../../libs/state/src/lib/auth/auth.store';
 import { AuthService } from '../../../libs/data-access/src/lib/auth/auth.service';
-import { environment } from '../../environments/environment';
-
-interface OAuthCallbackRequest {
-  code: string;
-  state: string;
-  provider: 'google';
-}
-
-interface OAuthCallbackResponse {
-  access_token: string;
-  refresh_token?: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    avatar_url?: string;
-    provider: string;
-    provider_id: string;
-  };
-}
+import {
+  GoogleOAuthCallbackRequest,
+  GoogleOAuthCallbackResponse,
+  AuthError
+} from '../../../libs/data-access/src/lib/auth/auth.models';
 
 @Component({
   selector: 'app-oauth-callback',
@@ -215,7 +198,6 @@ interface OAuthCallbackResponse {
 export class OAuthCallbackComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private http = inject(HttpClient);
   private authStore = inject(AuthStore);
   private authService = inject(AuthService);
 
@@ -227,94 +209,59 @@ export class OAuthCallbackComponent implements OnInit {
     this.handleOAuthCallback();
   }
 
-  private async handleOAuthCallback(): Promise<void> {
-    try {
-      this.isProcessing = true;
+  private handleOAuthCallback(): void {
+    this.isProcessing = true;
 
-      // Extrair parâmetros da URL
-      const urlParams = this.route.snapshot.queryParams;
-      const { code, state, error: oauthError } = urlParams;
+    const urlParams = this.route.snapshot.queryParams;
+    const { code, state, error: oauthError } = urlParams;
 
-      // Verificar se houve erro no OAuth
-      if (oauthError) {
-        throw new Error(`OAUTH_PROVIDER_ERROR_${oauthError.toUpperCase()}`);
-      }
-
-      // Validar parâmetros obrigatórios
-      if (!code) {
-        throw new Error('OAUTH_MISSING_CODE');
-      }
-
-      if (!state) {
-        throw new Error('OAUTH_MISSING_STATE');
-      }
-
-      // Processar callback com backend
-      const authData = await this.processCallback({
-        code,
-        state,
-        provider: 'google'
-      });
-
-      // Atualizar estado da aplicação
-      this.authStore.setSession({
-        raw: {
-          access_token: authData.access_token,
-          refresh_token: authData.refresh_token
-        }
-      });
-
-      this.authStore.setUser({
-        id: authData.user.id,
-        email: authData.user.email,
-        fullName: authData.user.name,
-        avatarUrl: authData.user.avatar_url
-      });
-
-      // Marcar como sucesso
-      this.isProcessing = false;
-      this.isSuccess = true;
-
-      // Redirecionar após 2 segundos
-      setTimeout(() => {
-        this.router.navigate(['/app/qna']);
-      }, 2000);
-
-    } catch (err: any) {
-      this.isProcessing = false;
-      this.error = err?.message || 'OAUTH_UNKNOWN_ERROR';
-      console.error('OAuth callback error:', err);
+    if (oauthError) {
+      this.handleError(`OAUTH_PROVIDER_ERROR_${oauthError.toUpperCase()}`);
+      return;
     }
+
+    if (!code) {
+      this.handleError('OAUTH_MISSING_CODE');
+      return;
+    }
+
+    if (!state) {
+      this.handleError('OAUTH_MISSING_STATE');
+      return;
+    }
+
+    const request: GoogleOAuthCallbackRequest = { code, state };
+
+    this.authService.googleOAuthCallback(request).subscribe({
+      next: (authData: GoogleOAuthCallbackResponse) => {
+        this.authStore.setSession({ raw: authData });
+        
+        this.authService.me().subscribe({
+          next: (user) => {
+            this.authStore.setUser(user);
+            this.isProcessing = false;
+            this.isSuccess = true;
+            
+            setTimeout(() => {
+              this.router.navigate(['/app/qna']);
+            }, 2000);
+          },
+          error: (error: AuthError) => {
+            console.error('Failed to fetch user profile:', error);
+            this.handleError('OAUTH_PROFILE_ERROR');
+          }
+        });
+      },
+      error: (error: AuthError) => {
+        console.error('OAuth callback error:', error);
+        this.handleError(error.code || 'OAUTH_UNKNOWN_ERROR');
+      }
+    });
   }
 
-  private processCallback(request: OAuthCallbackRequest): Promise<OAuthCallbackResponse> {
-    const endpoint = `${environment.apiUrl}/api/auth/oauth/google/callback`;
-    
-    return this.http.post<OAuthCallbackResponse>(endpoint, request).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.error('OAuth callback request failed:', error);
-        return throwError(() => this.mapCallbackError(error));
-      })
-    ).toPromise() as Promise<OAuthCallbackResponse>;
-  }
-
-  private mapCallbackError(error: HttpErrorResponse): Error {
-    switch (error.status) {
-      case 400:
-        return new Error('OAUTH_INVALID_REQUEST');
-      case 401:
-        return new Error('OAUTH_INVALID_CREDENTIALS');
-      case 403:
-        return new Error('OAUTH_ACCESS_DENIED');
-      case 429:
-        return new Error('OAUTH_RATE_LIMITED');
-      case 500:
-      case 502:
-      case 503:
-        return new Error('OAUTH_SERVER_ERROR');
-      default:
-        return new Error('OAUTH_NETWORK_ERROR');
-    }
+  private handleError(errorCode: string): void {
+    this.isProcessing = false;
+    this.error = errorCode;
   }
 
   getErrorMessage(): string {
@@ -325,6 +272,7 @@ export class OAuthCallbackComponent implements OnInit {
       'OAUTH_PROVIDER_ERROR_INVALID_REQUEST': 'auth.oauth.error.invalid_request',
       'OAUTH_MISSING_CODE': 'auth.oauth.error.missing_code',
       'OAUTH_MISSING_STATE': 'auth.oauth.error.missing_state',
+      'OAUTH_PROFILE_ERROR': 'auth.oauth.error.profile_error',
       'OAUTH_INVALID_REQUEST': 'auth.oauth.error.invalid_request',
       'OAUTH_INVALID_CREDENTIALS': 'auth.oauth.error.invalid_credentials',
       'OAUTH_ACCESS_DENIED': 'auth.oauth.error.access_denied',

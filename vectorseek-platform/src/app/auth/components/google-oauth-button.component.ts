@@ -1,22 +1,16 @@
 import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError } from 'rxjs';
 
 import { AuthService } from '../../../../libs/data-access/src/lib/auth/auth.service';
 import { AuthStore } from '../../../../libs/state/src/lib/auth/auth.store';
-
-interface GoogleAuthUrlResponse {
-  authorization_url: string;
-  state: string;
-}
-
-interface AuthError {
-  message: string;
-  code?: string;
-}
+import {
+  GoogleOAuthAuthorizeResponse,
+  AuthError
+} from '../../../../libs/data-access/src/lib/auth/auth.models';
 
 @Component({
   selector: 'app-google-oauth-button',
@@ -203,7 +197,6 @@ interface AuthError {
   `]
 })
 export class GoogleOAuthButtonComponent {
-  private http = inject(HttpClient);
   private authService = inject(AuthService);
   private authStore = inject(AuthStore);
   private router = inject(Router);
@@ -214,49 +207,34 @@ export class GoogleOAuthButtonComponent {
   isLoading = false;
   error: AuthError | null = null;
 
-  async signInWithGoogle(): Promise<void> {
-    try {
-      this.isLoading = true;
-      this.error = null;
-      this.authStarted.emit();
+  signInWithGoogle(): void {
+    this.isLoading = true;
+    this.error = null;
+    this.authStarted.emit();
 
-      // Solicitar URL de autorização do backend de forma segura
-      const authData = await this.getGoogleAuthUrl();
-      
-      // Validar resposta do backend
-      if (!authData?.authorization_url) {
-        throw new Error('OAUTH_URL_INVALID');
-      }
-
-      // Redirecionar para Google OAuth de forma segura
-      this.redirectToGoogle(authData.authorization_url);
-
-    } catch (err: any) {
-      this.handleAuthError(err);
-    }
-  }
-
-  private getGoogleAuthUrl(): Promise<GoogleAuthUrlResponse> {
-    // Use relative path - apiUrlInterceptor will prepend the base URL
-    const endpoint = '/oauth/google/authorize';
-
-    return this.http.post<GoogleAuthUrlResponse>(endpoint, {
-      // Incluir informações do client para o backend processar
-      redirect_uri: this.buildRedirectUri(),
+    const redirectUri = this.buildRedirectUri();
+    const request = {
+      redirect_uri: redirectUri,
       scope: 'openid email profile'
-    }).pipe(
-      catchError((error: HttpErrorResponse) => {
-        console.error('OAuth URL request failed:', error);
-        return throwError(() => this.mapHttpError(error));
-      })
-    ).toPromise() as Promise<GoogleAuthUrlResponse>;
+    };
+
+    this.authService.googleOAuthAuthorize(request).subscribe({
+      next: (authData: GoogleOAuthAuthorizeResponse) => {
+        if (!authData?.authorization_url) {
+          throw new Error('OAUTH_URL_INVALID');
+        }
+        this.redirectToGoogle(authData.authorization_url);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.handleAuthError(this.mapHttpError(error));
+      }
+    });
   }
+
 
   private buildRedirectUri(): string {
-    // Construir URL de callback de forma segura
-    const protocol = window.location.protocol;
-    const host = window.location.host;
-    return `${protocol}//${host}/auth/oauth/google/callback`;
+    // URL dinâmica baseada na origem atual (browser)
+    return `${window.location.origin}/auth/oauth/google/callback`;
   }
 
   private redirectToGoogle(authUrl: string): void {
@@ -265,65 +243,58 @@ export class GoogleOAuthButtonComponent {
       const url = new URL(authUrl);
 
       console.log('Redirecting to Google OAuth URL:', url.toString());
-      
+
       if (!url.hostname.includes('accounts.google.com')) {
         throw new Error('OAUTH_URL_INVALID');
       }
 
       // Redirecionar de forma segura
       window.location.assign(authUrl);
-      
+
     } catch (err) {
       throw new Error('OAUTH_REDIRECT_FAILED');
     }
   }
 
   private mapHttpError(error: HttpErrorResponse): AuthError {
-    switch (error.status) {
+    return {
+      status: error.status,
+      code: error.error?.code || `http_${error.status}`,
+      summary: this.getErrorMessageForStatus(error.status),
+      description: error.error?.message
+    };
+  }
+
+  private getErrorMessageForStatus(status: number): string {
+    switch (status) {
       case 400:
-        return { message: 'OAUTH_REQUEST_INVALID', code: 'BAD_REQUEST' };
+        return 'OAUTH_REQUEST_INVALID';
       case 401:
-        return { message: 'OAUTH_UNAUTHORIZED', code: 'UNAUTHORIZED' };
+        return 'OAUTH_UNAUTHORIZED';
       case 403:
-        return { message: 'OAUTH_FORBIDDEN', code: 'FORBIDDEN' };
+        return 'OAUTH_FORBIDDEN';
       case 429:
-        return { message: 'OAUTH_RATE_LIMITED', code: 'RATE_LIMITED' };
+        return 'OAUTH_RATE_LIMITED';
       case 500:
       case 502:
       case 503:
-        return { message: 'OAUTH_SERVER_ERROR', code: 'SERVER_ERROR' };
+        return 'OAUTH_SERVER_ERROR';
       default:
-        return { message: 'OAUTH_NETWORK_ERROR', code: 'NETWORK_ERROR' };
+        return 'OAUTH_NETWORK_ERROR';
     }
   }
 
-  private handleAuthError(err: any): void {
-    let authError: AuthError;
-
-    if (err?.message) {
-      authError = {
-        message: err.message,
-        code: err.code || 'UNKNOWN_ERROR'
-      };
-    } else {
-      authError = {
-        message: 'OAUTH_UNKNOWN_ERROR',
-        code: 'UNKNOWN_ERROR'
-      };
-    }
-
+  private handleAuthError(authError: AuthError): void {
     this.error = authError;
     this.isLoading = false;
     this.authError.emit(authError);
 
-    // Log error for monitoring (production)
     console.error('Google OAuth error:', authError);
   }
 
   getErrorMessage(): string {
     if (!this.error) return '';
 
-    // Mapear códigos de erro para chaves de tradução
     const errorMap: Record<string, string> = {
       'OAUTH_URL_INVALID': 'auth.google.error.invalid_url',
       'OAUTH_REDIRECT_FAILED': 'auth.google.error.redirect_failed',
@@ -336,6 +307,6 @@ export class GoogleOAuthButtonComponent {
       'OAUTH_UNKNOWN_ERROR': 'auth.google.error.unknown'
     };
 
-    return errorMap[this.error.message] || 'auth.google.error.unknown';
+    return errorMap[this.error.summary] || 'auth.google.error.unknown';
   }
 }

@@ -14,6 +14,17 @@
   pointer-events: none;
 }
 
+.oauth-hint {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #6b7280);
+  word-break: break-all;
+}
+
+[data-theme="dark"] .oauth-hint {
+  color: var(--text-secondary-dark, #9ca3af);
+}
+
 .divider {
   display: flex;
   align-items: center;

@@ -20,7 +20,13 @@ import {
   RegisterRequest,
   RegisterResponse,
   RequestMagicLinkRequest,
-  RequestMagicLinkResponse
+  RequestMagicLinkResponse,
+  GoogleOAuthAuthorizeRequest,
+  GoogleOAuthAuthorizeResponse,
+  GoogleOAuthCallbackRequest,
+  GoogleOAuthCallbackResponse,
+  GoogleOAuthLinkRequest,
+  GoogleOAuthLinkResponse
 } from './auth.models';
 import { AUTH_API_ENDPOINTS } from './auth.api';
 
@@ -92,6 +98,24 @@ const ACTION_ERROR_MESSAGES: Record<
       summary: 'Sessão inválida',
       description: 'Faça login novamente para recuperar o acesso.'
     }
+  },
+  googleOAuth: {
+    default: {
+      summary: 'Não foi possível entrar com o Google',
+      description: 'Tente novamente em instantes ou entre em contato com o suporte.'
+    },
+    400: {
+      summary: 'Solicitação inválida',
+      description: 'Verifique os dados e tente novamente.'
+    },
+    401: {
+      summary: 'Autorização negada',
+      description: 'Acesso negado pelo Google ou credenciais inválidas.'
+    },
+    429: {
+      summary: 'Muitas tentativas',
+      description: 'Aguarde alguns instantes antes de tentar novamente.'
+    }
   }
 };
 
@@ -152,6 +176,44 @@ export class AuthService {
       .pipe(
         map((response) => this.mapProfile(response)),
         catchError((error) => this.handleError('me', error))
+      );
+  }
+
+  googleOAuthAuthorize(payload: GoogleOAuthAuthorizeRequest): Observable<GoogleOAuthAuthorizeResponse> {
+    return this.http
+      .get<GoogleOAuthAuthorizeResponse>(AUTH_API_ENDPOINTS.googleOAuthAuthorize(), {
+        params: {
+          ...(payload.redirect_uri && { redirect_uri: payload.redirect_uri }),
+          ...(payload.scope && { scope: payload.scope })
+        }
+      })
+      .pipe(
+        catchError((error) => this.handleError('googleOAuth', error))
+      );
+  }
+
+  googleOAuthCallback(payload: GoogleOAuthCallbackRequest): Observable<GoogleOAuthCallbackResponse> {
+    return this.http
+      .get<GoogleOAuthCallbackResponse>(AUTH_API_ENDPOINTS.googleOAuthCallback(), {
+        params: {
+          code: payload.code,
+          state: payload.state
+        }
+      })
+      .pipe(
+        map((response) => response),
+        catchError((error) => this.handleError('googleOAuth', error))
+      );
+  }
+
+  googleOAuthLink(payload: GoogleOAuthLinkRequest): Observable<GoogleOAuthLinkResponse> {
+    return this.http
+      .post<GoogleOAuthLinkResponse>(AUTH_API_ENDPOINTS.googleOAuthLink(), {
+        code: payload.code,
+        state: payload.state
+      })
+      .pipe(
+        catchError((error) => this.handleError('googleOAuth', error))
       );
   }
 

@@ -63,7 +63,8 @@ export type AuthAction =
   | 'register'
   | 'requestMagicLink'
   | 'refresh'
-  | 'me';
+  | 'me'
+  | 'googleOAuth';
 
 export interface AuthError {
   status: number;
@@ -105,4 +106,31 @@ export interface AuthApiSessionDto {
   scopes?: string[];
   issued_at?: string;
   plan?: string | null;
+}
+
+export interface GoogleOAuthAuthorizeRequest {
+  redirect_uri?: string;
+  scope?: string;
+}
+
+export interface GoogleOAuthAuthorizeResponse {
+  authorization_url: string;
+  state: string;
+}
+
+export interface GoogleOAuthCallbackRequest {
+  code: string;
+  state: string;
+}
+
+export type GoogleOAuthCallbackResponse = AuthApiSessionDto;
+
+export interface GoogleOAuthLinkRequest {
+  code: string;
+  state: string;
+}
+
+export interface GoogleOAuthLinkResponse {
+  message: string;
+  linked: boolean;
 }
