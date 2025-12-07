@@ -67,27 +67,43 @@ export interface WorkspaceFormDialogResult {
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        /* Fix overflow/scrollbar issue */
+        overflow-x: hidden;
       }
       .field-label {
         font-weight: 600;
+        color: var(--text-secondary); /* Fixed label color */
         margin-bottom: 0.25rem;
       }
       input,
       textarea {
         width: 100%;
+        box-sizing: border-box; /* Fix scrollbar caused by width + padding */
         border: 1px solid var(--accent-primary-border);
-        border-radius: 4px;
-        padding: 0.5rem 0.75rem;
-        font-size: 1rem;
+        border-radius: 8px; /* consistent radius */
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
         background: var(--background-elevated);
         color: var(--text-primary);
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
       }
+      input:focus, textarea:focus {
+        border-color: var(--accent-primary);
+      }
+      /* Boxed error message like Document Upload */
       .field-hint {
+        margin: 0;
+        padding: 0.5rem 0.75rem;
+        background: var(--error-surface);
+        border: 1px solid var(--error-border);
+        border-radius: 6px;
+        color: var(--error-text);
         font-size: 0.85rem;
-        color: var(--error-primary);
+        font-weight: 500;
       }
       [mat-dialog-actions] {
-        margin-top: 1rem;
+        margin-top: 1.5rem;
       }
     `
   ]
