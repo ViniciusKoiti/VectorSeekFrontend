@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
-  background: var(--background-surface);
+  background: var(--background-base);
   border: 1px solid var(--accent-primary-border);
   border-radius: 16px;
   min-width: 360px;
@@ -14,13 +14,13 @@
   border-radius: 12px;
   text-align: center;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(12, 10, 29, 0.3);
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .upload-card.is-dragging .dropzone {
   border-color: var(--accent-primary);
-  background: rgba(0, 246, 255, 0.05);
+  background: rgba(0, 246, 255, 0.1);
 }
 
 .dropzone-icon {
@@ -55,7 +55,7 @@
   font-size: 0.95rem;
 }
 
-.file-info > div {
+.file-info>div {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -98,8 +98,16 @@
 
 .error-message {
   margin: 0;
-  color: var(--error-primary);
-  font-weight: 600;
+  padding: 0.75rem 1rem;
+  background: var(--error-surface);
+  border: 1px solid var(--error-border);
+  border-radius: 8px;
+  color: var(--error-text);
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .actions {
@@ -117,7 +125,7 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  background: rgba(0, 246, 255, 0.05);
+  background: rgba(0, 246, 255, 0.1);
   border: 1px solid var(--accent-primary-border);
   border-radius: 8px;
 }

@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpParams, HttpEvent, HttpResponse } from '@angular/common/http';
+﻿import { HttpClient, HttpErrorResponse, HttpParams, HttpEvent, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, throwError } from 'rxjs';
 
@@ -148,6 +148,13 @@ export class DocumentsService {
       formData.append('title', payload.title);
     }
 
+    // Additional fields required by backend
+    formData.append('filename', payload.file.name);
+
+    const extension = payload.file.name.split('.').pop()?.toLowerCase();
+    const documentType = extension === 'md' ? 'txt' : (extension || 'pdf');
+    formData.append('document_type', documentType);
+
     return this.http
       .post<DocumentUploadApiResponse>(DOCUMENTS_API_ENDPOINTS.upload(), formData, {
         reportProgress: true,
@@ -286,9 +293,9 @@ export class DocumentsService {
     const metadataSource =
       dto.metadata || dto.title
         ? {
-            title: dto.metadata?.title ?? dto.title ?? undefined,
-            description: dto.metadata?.description ?? undefined
-          }
+          title: dto.metadata?.title ?? dto.title ?? undefined,
+          description: dto.metadata?.description ?? undefined
+        }
         : undefined;
     const metadata = this.normalizeMetadata(metadataSource);
 
