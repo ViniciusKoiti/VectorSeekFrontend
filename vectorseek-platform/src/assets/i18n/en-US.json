@@ -12,10 +12,47 @@
       "submittingButton": "Signing in...",
       "registerLink": "Create account",
       "forgotPasswordLink": "Forgot my password",
+      "or_continue_with": "or continue with email",
       "errors": {
         "required": "This field is required",
         "email": "Enter a valid email",
         "minLength": "Password must have at least {{min}} characters"
+      }
+    },
+    "google": {
+      "sign_in": "Continue with Google",
+      "signing_in": "Signing in...",
+      "aria_label": "Sign in with Google",
+      "error": {
+        "invalid_url": "Invalid authorization URL",
+        "redirect_failed": "Redirect failed",
+        "request_invalid": "Invalid request",
+        "unauthorized": "Unauthorized access",
+        "forbidden": "Access denied",
+        "rate_limited": "Too many attempts. Try again later",
+        "server_error": "Server error. Try again",
+        "network_error": "Connection error. Check your internet",
+        "unknown": "Unexpected error. Try again"
+      }
+    },
+    "oauth": {
+      "processing_title": "Finishing sign in...",
+      "processing_message": "Please wait while we verify your credentials...",
+      "success_title": "Successfully signed in!",
+      "success_message": "Redirecting you to the platform...",
+      "error_title": "Sign in failed",
+      "retry_button": "Try again",
+      "back_to_login": "Back to login",
+      "error": {
+        "access_denied": "Access denied by user",
+        "invalid_request": "Invalid request",
+        "missing_code": "Authorization code missing",
+        "missing_state": "Security state missing",
+        "invalid_credentials": "Invalid credentials",
+        "rate_limited": "Too many attempts. Wait a moment",
+        "server_error": "Server error. Try again",
+        "network_error": "Connection error",
+        "unknown": "Unexpected error during sign in"
       }
     },
     "register": {
@@ -53,80 +90,81 @@
         "required": "This field is required",
         "email": "Enter a valid email"
       }
+    }
+  },
+  "apiErrors": {
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "networkError": "Connection error. Check your internet.",
+    "retryAfter": "Try again in {{seconds}} seconds.",
+    "DOC_MISSING_FIELDS": "Missing required fields: {{fields}}",
+    "login": {
+      "default": {
+        "summary": "Unable to sign in now",
+        "description": "Try again in a moment or contact support."
+      },
+      "401": {
+        "summary": "Invalid credentials",
+        "description": "Check your email and password and try again."
+      },
+      "429": {
+        "summary": "Too many login attempts",
+        "description": "Wait a few moments before trying again."
+      }
     },
-    "apiErrors": {
-      "unexpectedError": "An unexpected error occurred. Please try again.",
-      "networkError": "Connection error. Check your internet.",
-      "retryAfter": "Try again in {{seconds}} seconds.",
-      "login": {
-        "default": {
-          "summary": "Unable to sign in now",
-          "description": "Try again in a moment or contact support."
-        },
-        "401": {
-          "summary": "Invalid credentials",
-          "description": "Check your email and password and try again."
-        },
-        "429": {
-          "summary": "Too many login attempts",
-          "description": "Wait a few moments before trying again."
-        }
+    "register": {
+      "default": {
+        "summary": "Unable to complete registration",
+        "description": "Review the information provided or try again later."
       },
-      "register": {
-        "default": {
-          "summary": "Unable to complete registration",
-          "description": "Review the information provided or try again later."
-        },
-        "409": {
-          "summary": "Email already registered",
-          "description": "Use another address or sign in if you already have an account."
-        },
-        "422": {
-          "summary": "Invalid data",
-          "description": "Some information needs attention before continuing."
-        },
-        "user_already_exists": {
-          "summary": "Email already registered",
-          "description": "Use another address or sign in if you already have an account."
-        },
-        "useralreadyexistserror": {
-          "summary": "Email already registered",
-          "description": "Use another address or sign in if you already have an account."
-        },
-        "user_exists": {
-          "summary": "Email already registered",
-          "description": "Use another address or sign in if you already have an account."
-        }
+      "409": {
+        "summary": "Email already registered",
+        "description": "Use another address or sign in if you already have an account."
       },
-      "requestMagicLink": {
-        "default": {
-          "summary": "Unable to send magic link",
-          "description": "Try again in a moment or validate the email address."
-        },
-        "429": {
-          "summary": "Too many requests",
-          "description": "Wait a few moments before trying again."
-        }
+      "422": {
+        "summary": "Invalid data",
+        "description": "Some information needs attention before continuing."
       },
-      "refresh": {
-        "default": {
-          "summary": "Session expired",
-          "description": "Sign in again to continue browsing."
-        },
-        "401": {
-          "summary": "Invalid session",
-          "description": "Sign in again to recover access."
-        }
+      "user_already_exists": {
+        "summary": "Email already registered",
+        "description": "Use another address or sign in if you already have an account."
       },
-      "me": {
-        "default": {
-          "summary": "Unable to load profile",
-          "description": "Reload the page or try again later."
-        },
-        "401": {
-          "summary": "Invalid session",
-          "description": "Sign in again to recover access."
-        }
+      "useralreadyexistserror": {
+        "summary": "Email already registered",
+        "description": "Use another address or sign in if you already have an account."
+      },
+      "user_exists": {
+        "summary": "Email already registered",
+        "description": "Use another address or sign in if you already have an account."
+      }
+    },
+    "requestMagicLink": {
+      "default": {
+        "summary": "Unable to send magic link",
+        "description": "Try again in a moment or validate the email address."
+      },
+      "429": {
+        "summary": "Too many requests",
+        "description": "Wait a few moments before trying again."
+      }
+    },
+    "refresh": {
+      "default": {
+        "summary": "Session expired",
+        "description": "Sign in again to continue browsing."
+      },
+      "401": {
+        "summary": "Invalid session",
+        "description": "Sign in again to recover access."
+      }
+    },
+    "me": {
+      "default": {
+        "summary": "Unable to load profile",
+        "description": "Reload the page or try again later."
+      },
+      "401": {
+        "summary": "Invalid session",
+        "description": "Sign in again to recover access."
       }
     }
   },

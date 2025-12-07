@@ -17,42 +17,6 @@
         "required": "Este campo é obrigatório",
         "email": "Digite um e-mail válido",
         "minLength": "Senha deve ter no mínimo {{min}} caracteres"
-      },
-      "google": {
-        "sign_in": "Continuar com Google",
-        "signing_in": "Conectando...",
-        "aria_label": "Entrar com conta Google",
-        "error": {
-          "invalid_url": "URL de autenticação inválida",
-          "redirect_failed": "Falha no redirecionamento",
-          "request_invalid": "Solicitação inválida",
-          "unauthorized": "Acesso não autorizado",
-          "forbidden": "Operação não permitida",
-          "rate_limited": "Muitas tentativas. Tente novamente em alguns minutos",
-          "server_error": "Erro no servidor. Tente novamente",
-          "network_error": "Erro de conexão. Verifique sua internet",
-          "unknown": "Erro inesperado. Tente novamente"
-        }
-      },
-      "oauth": {
-        "processing_title": "Finalizando autenticação",
-        "processing_message": "Aguarde enquanto confirmamos seus dados com o Google...",
-        "success_title": "Login realizado com sucesso!",
-        "success_message": "Redirecionando você para a plataforma...",
-        "error_title": "Falha na autenticação",
-        "retry_button": "Tentar novamente",
-        "back_to_login": "Voltar para login",
-        "error": {
-          "access_denied": "Acesso negado pelo usuário",
-          "invalid_request": "Solicitação inválida",
-          "missing_code": "Código de autorização não encontrado",
-          "missing_state": "Estado de segurança ausente",
-          "invalid_credentials": "Credenciais inválidas",
-          "rate_limited": "Muitas tentativas. Aguarde alguns minutos",
-          "server_error": "Erro no servidor. Tente novamente",
-          "network_error": "Erro de conexão. Verifique sua internet",
-          "unknown": "Erro inesperado durante autenticação"
-        }
       }
     },
     "register": {
@@ -91,79 +55,129 @@
         "email": "Digite um e-mail válido"
       }
     },
-    "apiErrors": {
-      "unexpectedError": "Ocorreu um erro inesperado. Tente novamente.",
-      "networkError": "Erro de conexão. Verifique sua internet.",
-      "retryAfter": "Tente novamente em {{seconds}} segundos.",
-      "login": {
-        "default": {
-          "summary": "Não foi possível entrar agora",
-          "description": "Tente novamente em instantes ou entre em contato com o suporte."
-        },
-        "401": {
-          "summary": "Credenciais inválidas",
-          "description": "Verifique e-mail e senha informados e tente novamente."
-        },
-        "429": {
-          "summary": "Muitas tentativas de login",
-          "description": "Aguarde alguns instantes antes de tentar novamente."
-        }
+    "google": {
+      "sign_in": "Continuar com Google",
+      "signing_in": "Conectando...",
+      "aria_label": "Entrar com conta Google",
+      "error": {
+        "invalid_url": "URL de autenticação inválida",
+        "redirect_failed": "Falha no redirecionamento",
+        "request_invalid": "Solicitação inválida",
+        "unauthorized": "Acesso não autorizado",
+        "forbidden": "Operação não permitida",
+        "rate_limited": "Muitas tentativas. Tente novamente em alguns minutos",
+        "server_error": "Erro no servidor. Tente novamente",
+        "network_error": "Erro de conexão. Verifique sua internet",
+        "unknown": "Erro inesperado. Tente novamente"
+      }
+    },
+    "oauth": {
+      "processing_title": "Finalizando autenticação",
+      "processing_message": "Aguarde enquanto confirmamos seus dados com o Google...",
+      "success_title": "Login realizado com sucesso!",
+      "success_message": "Redirecionando você para a plataforma...",
+      "error_title": "Falha na autenticação",
+      "retry_button": "Tentar novamente",
+      "back_to_login": "Voltar para login",
+      "error": {
+        "access_denied": "Acesso negado pelo usuário",
+        "invalid_request": "Solicitação inválida",
+        "missing_code": "Código de autorização não encontrado",
+        "missing_state": "Estado de segurança ausente",
+        "invalid_credentials": "Credenciais inválidas",
+        "rate_limited": "Muitas tentativas. Aguarde alguns minutos",
+        "server_error": "Erro no servidor. Tente novamente",
+        "network_error": "Erro de conexão. Verifique sua internet",
+        "unknown": "Erro inesperado durante autenticação"
+      }
+    }
+  },
+  "apiErrors": {
+    "unexpectedError": "Ocorreu um erro inesperado. Tente novamente.",
+    "networkError": "Erro de conexão. Verifique sua internet.",
+    "retryAfter": "Tente novamente em {{seconds}} segundos.",
+    "AUTH_INVALID_CREDENTIALS": "Email ou senha incorretos",
+    "AUTH_USER_INACTIVE": "Sua conta está desativada",
+    "AUTH_USER_ALREADY_EXISTS": "Este email já está cadastrado",
+    "AUTH_TOKEN_EXPIRED": "Sua sessão expirou. Faça login novamente.",
+    "DOC_FILE_TOO_LARGE": "Arquivo muito grande",
+    "DOC_UNSUPPORTED_TYPE": "Formato de arquivo não suportado",
+    "DOC_DUPLICATE": "Este documento já foi enviado",
+    "DOC_MISSING_FIELDS": "Campos obrigatórios faltando: {{fields}}",
+    "INTERNAL_SERVER_ERROR": "Erro interno. Tente novamente mais tarde.",
+    "NOT_FOUND": "Recurso não encontrado",
+    "BAD_REQUEST": "Requisição inválida",
+    "WS_QUOTA_EXCEEDED": "Você atingiu o limite do seu plano.",
+    "WS_ACCESS_DENIED": "Você não tem permissão para acessar este workspace.",
+    "TASK_FAILED": "Falha na execução da tarefa. Tente novamente.",
+    "login": {
+      "default": {
+        "summary": "Não foi possível entrar agora",
+        "description": "Tente novamente em instantes ou entre em contato com o suporte."
       },
-      "register": {
-        "default": {
-          "summary": "Não foi possível concluir o cadastro",
-          "description": "Revise os dados informados ou tente mais tarde."
-        },
-        "409": {
-          "summary": "E-mail já cadastrado",
-          "description": "Use outro endereço ou faça login caso já possua uma conta."
-        },
-        "422": {
-          "summary": "Dados inválidos",
-          "description": "Algumas informações precisam de atenção antes de continuar."
-        },
-        "user_already_exists": {
-          "summary": "E-mail já cadastrado",
-          "description": "Use outro endereço ou faça login caso já possua uma conta."
-        },
-        "useralreadyexistserror": {
-          "summary": "E-mail já cadastrado",
-          "description": "Use outro endereço ou faça login caso já possua uma conta."
-        },
-        "user_exists": {
-          "summary": "E-mail já cadastrado",
-          "description": "Use outro endereço ou faça login caso já possua uma conta."
-        }
+      "401": {
+        "summary": "Credenciais inválidas",
+        "description": "Verifique e-mail e senha informados e tente novamente."
       },
-      "requestMagicLink": {
-        "default": {
-          "summary": "Não foi possível enviar o link mágico",
-          "description": "Tente novamente em instantes ou valide o endereço de e-mail."
-        },
-        "429": {
-          "summary": "Muitas solicitações",
-          "description": "Aguarde alguns instantes antes de tentar novamente."
-        }
+      "429": {
+        "summary": "Muitas tentativas de login",
+        "description": "Aguarde alguns instantes antes de tentar novamente."
+      }
+    },
+    "register": {
+      "default": {
+        "summary": "Não foi possível concluir o cadastro",
+        "description": "Revise os dados informados ou tente mais tarde."
       },
-      "refresh": {
-        "default": {
-          "summary": "Sessão expirada",
-          "description": "Faça login novamente para continuar navegando."
-        },
-        "401": {
-          "summary": "Sessão inválida",
-          "description": "Faça login novamente para recuperar o acesso."
-        }
+      "409": {
+        "summary": "E-mail já cadastrado",
+        "description": "Use outro endereço ou faça login caso já possua uma conta."
       },
-      "me": {
-        "default": {
-          "summary": "Não foi possível carregar o perfil",
-          "description": "Recarregue a página ou tente novamente mais tarde."
-        },
-        "401": {
-          "summary": "Sessão inválida",
-          "description": "Faça login novamente para recuperar o acesso."
-        }
+      "422": {
+        "summary": "Dados inválidos",
+        "description": "Algumas informações precisam de atenção antes de continuar."
+      },
+      "user_already_exists": {
+        "summary": "E-mail já cadastrado",
+        "description": "Use outro endereço ou faça login caso já possua uma conta."
+      },
+      "useralreadyexistserror": {
+        "summary": "E-mail já cadastrado",
+        "description": "Use outro endereço ou faça login caso já possua uma conta."
+      },
+      "user_exists": {
+        "summary": "E-mail já cadastrado",
+        "description": "Use outro endereço ou faça login caso já possua uma conta."
+      }
+    },
+    "requestMagicLink": {
+      "default": {
+        "summary": "Não foi possível enviar o link mágico",
+        "description": "Tente novamente em instantes ou valide o endereço de e-mail."
+      },
+      "429": {
+        "summary": "Muitas solicitações",
+        "description": "Aguarde alguns instantes antes de tentar novamente."
+      }
+    },
+    "refresh": {
+      "default": {
+        "summary": "Sessão expirada",
+        "description": "Faça login novamente para continuar navegando."
+      },
+      "401": {
+        "summary": "Sessão inválida",
+        "description": "Faça login novamente para recuperar o acesso."
+      }
+    },
+    "me": {
+      "default": {
+        "summary": "Não foi possível carregar o perfil",
+        "description": "Recarregue a página ou tente novamente mais tarde."
+      },
+      "401": {
+        "summary": "Sessão inválida",
+        "description": "Faça login novamente para recuperar o acesso."
       }
     }
   },
