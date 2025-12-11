@@ -96,7 +96,20 @@
     "apiErrors": {
       "unexpectedError": "Ocorreu um erro inesperado. Tente novamente.",
       "networkError": "Erro de conexão. Verifique sua internet.",
-      "retryAfter": "Tente novamente em {{seconds}} segundos."
+      "rateLimited": "Muitas tentativas. Tente novamente em {{seconds}} segundos.",
+      "AUTH_INVALID_CREDENTIALS": "Email ou senha incorretos",
+      "AUTH_USER_INACTIVE": "Sua conta está desativada",
+      "AUTH_USER_ALREADY_EXISTS": "Este email já está cadastrado",
+      "AUTH_TOKEN_EXPIRED": "Sua sessão expirou. Faça login novamente.",
+      "DOC_FILE_TOO_LARGE": "Arquivo muito grande",
+      "DOC_UNSUPPORTED_TYPE": "Formato de arquivo não suportado",
+      "DOC_DUPLICATE": "Este documento já foi enviado",
+      "INTERNAL_SERVER_ERROR": "Erro interno. Tente novamente mais tarde.",
+      "NOT_FOUND": "Recurso não encontrado",
+      "BAD_REQUEST": "Requisição inválida",
+      "WS_QUOTA_EXCEEDED": "Você atingiu o limite do seu plano.",
+      "WS_ACCESS_DENIED": "Você não tem permissão para acessar este workspace.",
+      "TASK_FAILED": "Falha na execução da tarefa. Tente novamente."
     }
   }
 }

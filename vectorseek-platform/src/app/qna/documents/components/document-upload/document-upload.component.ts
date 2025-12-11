@@ -12,10 +12,10 @@ import {
   signal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DocumentsService, DocumentUploadResponse, DocumentsError } from '@vectorseek/data-access';
+import { DocumentsService, DocumentUploadResponse, DocumentsError, Workspace } from '@vectorseek/data-access';
 import { UploadProgressComponent } from '../upload-progress/upload-progress.component';
 import { Subscription } from 'rxjs';
 
@@ -30,6 +30,10 @@ export class DocumentUploadComponent implements OnDestroy, AfterViewInit {
   private readonly documentsService = inject(DocumentsService);
   protected readonly dialogRef = inject<MatDialogRef<DocumentUploadComponent> | null>(
     MatDialogRef,
+    { optional: true }
+  );
+  protected readonly data = inject<{ workspaceId?: string; workspaces?: Workspace[] } | null>(
+    MAT_DIALOG_DATA,
     { optional: true }
   );
   private readonly destroyRef = inject(DestroyRef);
@@ -48,7 +52,8 @@ export class DocumentUploadComponent implements OnDestroy, AfterViewInit {
   readonly selectedFile = signal<File | null>(null);
 
   title = '';
-  workspaceId = '';
+  workspaceId = this.data?.workspaceId ?? '';
+  workspaces = signal<Workspace[]>(this.data?.workspaces ?? []);
 
   protected maxFileSizeBytes = 100 * 1024 * 1024; // 100MB
   private readonly allowedMimeTypes = [

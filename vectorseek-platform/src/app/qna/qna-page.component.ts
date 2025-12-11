@@ -58,6 +58,7 @@ export class QnaPageComponent implements OnInit {
 
     this.qnaService.ask({ question }).subscribe({
       next: (response) => {
+        console.log(response);
         this.store.setCurrentAnswer(response.answer);
         this.store.setLoading(false);
         this.currentQuestionId.set(response.questionId);
@@ -150,6 +151,8 @@ export class QnaPageComponent implements OnInit {
   private loadHistory(page: number = 1, pageSize: number = 10): void {
     this.qnaService.getHistory({ page, pageSize, sortBy: 'timestamp', sortOrder: 'desc' }).subscribe({
       next: (response) => {
+
+        console.log(response);
         // Map response to QnaHistoryEntry format
         const entries: QnaHistoryEntry[] = response.entries.map((entry) => ({
           id: entry.id,
@@ -159,15 +162,15 @@ export class QnaPageComponent implements OnInit {
             timestamp: new Date(entry.question.timestamp),
             filters: entry.question.filters
               ? {
-                  workspaceId: entry.question.filters.workspaceId,
-                  documentIds: entry.question.filters.documentIds,
-                  dateRange: entry.question.filters.dateRange
-                    ? {
-                        start: new Date(entry.question.filters.dateRange.start),
-                        end: new Date(entry.question.filters.dateRange.end)
-                      }
-                    : undefined
-                }
+                workspaceId: entry.question.filters.workspaceId,
+                documentIds: entry.question.filters.documentIds,
+                dateRange: entry.question.filters.dateRange
+                  ? {
+                    start: new Date(entry.question.filters.dateRange.start),
+                    end: new Date(entry.question.filters.dateRange.end)
+                  }
+                  : undefined
+              }
               : undefined
           },
           answer: entry.answer,

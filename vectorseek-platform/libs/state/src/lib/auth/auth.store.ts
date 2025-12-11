@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, effect } from '@angular/core';
 import { AuthApiSessionDto, AuthSession, AuthTokens, AuthUserProfile } from '@vectorseek/data-access';
 
 export interface AuthState {
@@ -18,7 +18,7 @@ const initialState: AuthState = {
  */
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
-  private readonly state = signal<AuthState>(initialState);
+  private readonly state = signal<AuthState>(this.loadFromStorage());
 
   readonly session = computed(() => this.state().session);
   readonly isAuthenticated = computed(() => !!this.state().session?.raw?.access_token);
@@ -36,6 +36,34 @@ export class AuthStore {
     };
   });
   readonly lastUpdatedAt = computed(() => this.state().lastUpdatedAt);
+
+  constructor() {
+    // Sync state to localStorage whenever it changes
+    effect(() => {
+      const state = this.state();
+      try {
+        if (state.session) {
+          localStorage.setItem('auth_session', JSON.stringify(state));
+        } else {
+          localStorage.removeItem('auth_session');
+        }
+      } catch (e) {
+        console.error('Error saving auth state to localStorage', e);
+      }
+    });
+  }
+
+  private loadFromStorage(): AuthState {
+    try {
+      const stored = localStorage.getItem('auth_session');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error('Error loading auth state from localStorage', e);
+    }
+    return initialState;
+  }
 
   setUser(user: AuthUserProfile | null): void {
     this.state.update((state) => ({ ...state, user, lastUpdatedAt: Date.now() }));

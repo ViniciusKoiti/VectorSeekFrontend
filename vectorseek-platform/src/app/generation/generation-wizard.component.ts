@@ -1,6 +1,7 @@
 import { Component, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatStepperModule, MatStepper } from '@angular/material/stepper';
+import { MatIconModule } from '@angular/material/icon';
 import { GenerationService, GeneratedDocument, GenerationError, Template } from '@vectorseek/data-access';
 
 import { FormStepComponent } from './steps/form-step.component';
@@ -26,6 +27,7 @@ import { FormStepData, TemplateStepData, WizardData } from './generation.validat
   imports: [
     CommonModule,
     MatStepperModule,
+    MatIconModule,
     FormStepComponent,
     TemplateStepComponent,
     ReviewStepComponent,

@@ -163,7 +163,7 @@ export class AuthService {
 
   refresh(payload: RefreshRequest): Observable<RefreshResponse> {
     return this.http
-      .post<AuthApiTokensDto>(AUTH_API_ENDPOINTS.refresh(), payload)
+      .post<AuthApiTokensDto>(AUTH_API_ENDPOINTS.refresh(), { refresh_token: payload.refreshToken })
       .pipe(
         map((response) => this.mapTokens(response)),
         catchError((error) => this.handleError('refresh', error))
@@ -197,7 +197,9 @@ export class AuthService {
       .get<GoogleOAuthCallbackResponse>(AUTH_API_ENDPOINTS.googleOAuthCallback(), {
         params: {
           code: payload.code,
-          state: payload.state
+          state: payload.state,
+          ...(payload.expected_state && { expected_state: payload.expected_state }),
+          ...(payload.redirect_uri && { redirect_uri: payload.redirect_uri })
         }
       })
       .pipe(
@@ -222,7 +224,7 @@ export class AuthService {
       raw: dto
     };
   }
-  
+
   private mapTokens(dto: AuthApiTokensDto): AuthTokens {
     return {
       accessToken: dto.access_token,
@@ -231,9 +233,9 @@ export class AuthService {
       tokenType: dto.token_type
     };
   }
-  
 
-  
+
+
   private mapProfile(dto: AuthApiProfileDto): AuthUserProfile {
     return {
       id: dto.id,
@@ -242,7 +244,7 @@ export class AuthService {
       avatarUrl: dto.avatar_url ?? null
     };
   }
-  
+
   private handleError(action: AuthAction, error: unknown): Observable<never> {
     return throwError(() => this.normalizeError(action, error));
   }
@@ -270,10 +272,10 @@ export class AuthService {
       fieldErrors: payload.details,
       retryAfterSeconds: retryAfterSeconds ?? undefined
     };
-  } 
+  }
   private buildErrorKey(action: AuthAction, status: number, code?: string): string {
     const baseKey = `auth.apiErrors.${action}`;
-    
+
     if (code) {
       return `${baseKey}.${code}`;
     }

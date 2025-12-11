@@ -10,13 +10,11 @@
 
     <!-- Google OAuth Button -->
     <div class="oauth-section">
-      <app-google-oauth-button
-        (authStarted)="onOAuthStarted()"
-        (authError)="onOAuthError($event)"
+      <app-google-oauth-button (authStarted)="onOAuthStarted()" (authError)="onOAuthError($event)"
         [class.disabled]="isSubmitting || isOAuthInProgress">
       </app-google-oauth-button>
 
-      <p class="oauth-hint">Callback local: http://localhost:4200/auth/oauth/google/callback</p>
+
 
       <div class="divider">
         <span>{{ 'auth.login.or_continue_with' | translate }}</span>
@@ -38,28 +36,17 @@
       <!-- Campo Email -->
       <div class="form-field">
         <label for="email">{{ 'auth.login.emailLabel' | translate }}</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          [placeholder]="'auth.login.emailPlaceholder' | translate"
-          [class.invalid]="emailControl.invalid && emailControl.touched"
-          autocomplete="email"
-        />
+        <input id="email" type="email" formControlName="email" [placeholder]="'auth.login.emailPlaceholder' | translate"
+          [class.invalid]="emailControl.invalid && emailControl.touched" autocomplete="email" />
         <app-field-error [control]="emailControl" fieldName="email"></app-field-error>
       </div>
 
       <!-- Campo Senha -->
       <div class="form-field">
         <label for="password">{{ 'auth.login.passwordLabel' | translate }}</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
+        <input id="password" type="password" formControlName="password"
           [placeholder]="'auth.login.passwordPlaceholder' | translate"
-          [class.invalid]="passwordControl.invalid && passwordControl.touched"
-          autocomplete="current-password"
-        />
+          [class.invalid]="passwordControl.invalid && passwordControl.touched" autocomplete="current-password" />
         <app-field-error [control]="passwordControl" fieldName="password"></app-field-error>
       </div>
 

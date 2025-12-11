@@ -121,6 +121,8 @@ export interface GoogleOAuthAuthorizeResponse {
 export interface GoogleOAuthCallbackRequest {
   code: string;
   state: string;
+  expected_state?: string;
+  redirect_uri?: string;
 }
 
 export type GoogleOAuthCallbackResponse = AuthApiSessionDto;

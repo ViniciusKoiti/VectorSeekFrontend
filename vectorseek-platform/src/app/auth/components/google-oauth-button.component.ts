@@ -28,6 +28,8 @@ import {
         width="20"
         height="20"
         viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
         class="google-icon"
         *ngIf="!isLoading"
         aria-hidden="true"
@@ -61,7 +63,7 @@ import {
 
     <div class="error-message" *ngIf="error" role="alert">
       <span class="error-icon" aria-hidden="true">⚠</span>
-      {{ getErrorMessage() }}
+      {{ getErrorMessage() | translate }}
     </div>
   `,
   styles: [`
@@ -223,6 +225,12 @@ export class GoogleOAuthButtonComponent {
         if (!authData?.authorization_url) {
           throw new Error('OAUTH_URL_INVALID');
         }
+
+        // Salvar state para validação no callback
+        if (authData.state) {
+          sessionStorage.setItem('oauth_state', authData.state);
+        }
+
         this.redirectToGoogle(authData.authorization_url);
       },
       error: (error: HttpErrorResponse) => {

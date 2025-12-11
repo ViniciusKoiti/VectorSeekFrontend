@@ -140,7 +140,11 @@ export class DocumentsPageComponent implements OnInit, OnDestroy {
   openUploadDialog(): void {
     const dialogRef = this.dialog.open(DocumentUploadComponent, {
       width: '520px',
-      disableClose: true
+      disableClose: true,
+      data: {
+        workspaceId: this.selectedWorkspaceId,
+        workspaces: this.workspaces()
+      }
     });
 
     dialogRef

@@ -11,8 +11,10 @@ import { provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 import ptBR from '../assets/i18n/pt-BR.json';
+import enUS from '../assets/i18n/en-US.json';
 import { apiUrlInterceptor } from './api-url-interceptor';
 import { authInterceptor } from './auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 /**
  * Loader customizado para traduções
@@ -22,10 +24,13 @@ export class CustomTranslateLoader implements TranslateLoaderService {
   getTranslation(lang: string) {
     // Para produção, poderia carregar dinamicamente via HttpClient
     // Por enquanto, retorna o JSON importado estaticamente
-    if (lang === 'pt-BR') {
+    if (lang === 'pt-BR' || lang === 'pt') {
       return of(ptBR);
     }
-    return of({});
+    if (lang === 'en-US' || lang === 'en') {
+      return of(enUS);
+    }
+    return of(ptBR); // Fallback seguro para qualquer outra língua
   }
 }
 
@@ -33,7 +38,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideHttpClient(withInterceptors([apiUrlInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([apiUrlInterceptor, errorInterceptor, authInterceptor])),
     provideRouter(routes),
     provideAnimations(),
     provideMarkdown(),

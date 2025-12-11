@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 import { MatDialog } from '@angular/material/dialog';
+import { NotificationService } from '../core/services/notification.service';
 import { WorkspacesService } from '@vectorseek/data-access';
 import { Workspace } from '@vectorseek/data-access/lib/workspaces/workspaces.models';
 import { WorkspaceFormDialogComponent, WorkspaceFormDialogResult } from './workspace-form-dialog.component';
@@ -10,14 +11,14 @@ import { WorkspaceDeleteDialogComponent } from './workspace-delete-dialog.compon
 @Component({
   selector: 'app-workspaces-page',
   standalone: true,
-  imports: [CommonModule, MatSnackBarModule],
+  imports: [CommonModule],
   templateUrl: './workspaces-page.component.html',
   styleUrls: ['./workspaces-page.component.css']
 })
 export class WorkspacesPageComponent implements OnInit {
   private readonly workspacesService = inject(WorkspacesService);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly notification = inject(NotificationService);
 
   workspaces = signal<Workspace[]>([]);
   loading = signal(false);
@@ -36,8 +37,8 @@ export class WorkspacesPageComponent implements OnInit {
         this.workspaces.set(items);
         this.loading.set(false);
       },
-      error: (err) => {
-        this.error.set(err.description ?? err.summary ?? 'Não foi possível carregar os workspaces.');
+      error: () => {
+        // Erro tratado pelo interceptor
         this.loading.set(false);
       }
     });
@@ -108,10 +109,7 @@ export class WorkspacesPageComponent implements OnInit {
     this.workspacesService.createWorkspace(payload).subscribe({
       next: (workspace) => {
         this.workspaces.update((current) => [workspace, ...current]);
-        this.showSuccess('Workspace criado com sucesso.');
-      },
-      error: (err) => {
-        this.showError(err.description ?? err.summary);
+        this.notification.success('Workspace criado com sucesso.');
       }
     });
   }
@@ -120,9 +118,8 @@ export class WorkspacesPageComponent implements OnInit {
     this.workspacesService.updateWorkspace(id, payload).subscribe({
       next: (workspace) => {
         this.workspaces.update((current) => current.map((item) => (item.id === workspace.id ? workspace : item)));
-        this.showSuccess('Workspace atualizado com sucesso.');
-      },
-      error: (err) => this.showError(err.description ?? err.summary)
+        this.notification.success('Workspace atualizado com sucesso.');
+      }
     });
   }
 
@@ -130,19 +127,10 @@ export class WorkspacesPageComponent implements OnInit {
     this.workspacesService.deleteWorkspace(id).subscribe({
       next: () => {
         this.workspaces.update((current) => current.filter((item) => item.id !== id));
-        this.showSuccess('Workspace deletado com sucesso.');
-      },
-      error: (err) => this.showError(err.description ?? err.summary)
+        this.notification.success('Workspace deletado com sucesso.');
+      }
     });
   }
 
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fechar', { duration: 3000 });
-  }
 
-  private showError(message: string): void {
-    this.snackBar.open(message ?? 'Erro inesperado.', 'Fechar', {
-      duration: 4000
-    });
-  }
 }

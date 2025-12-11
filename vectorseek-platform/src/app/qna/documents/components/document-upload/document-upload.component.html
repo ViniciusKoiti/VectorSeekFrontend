@@ -87,15 +87,18 @@
       />
     </label>
     <label class="form-field" for="upload-workspace">
-      <span>Workspace ID (opcional)</span>
-      <input
+      <span>Workspace (opcional)</span>
+      <select
         id="upload-workspace"
-        type="text"
         [(ngModel)]="workspaceId"
         [disabled]="isUploading()"
-        placeholder="Informe para associar a um workspace"
-        [attr.aria-label]="'ID do workspace para associar o documento'"
-      />
+        [attr.aria-label]="'Selecione o workspace para associar o documento'"
+      >
+        <option value="">Nenhum (Global)</option>
+        @for (ws of workspaces(); track ws.id) {
+          <option [value]="ws.id">{{ ws.name }}</option>
+        }
+      </select>
     </label>
   </div>
 

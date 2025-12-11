@@ -71,7 +71,7 @@ import {
       align-items: center;
       justify-content: center;
       padding: 2rem;
-      background: var(--background-primary);
+      background: var(--background-base);
     }
 
     .callback-content {
@@ -81,21 +81,26 @@ import {
     }
 
     .callback-state {
-      background: var(--background-surface);
-      border: 1px solid var(--border-color, #e1e5e9);
-      border-radius: 1rem;
+      background: var(--background-elevated);
+      border: 1px solid var(--accent-primary-border);
+      border-radius: 16px;
       padding: 3rem 2rem;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
     }
 
     .callback-state.success {
       border-color: #10b981;
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      background: rgba(16, 185, 129, 0.05);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
     }
 
     .callback-state.error {
       border-color: #ef4444;
-      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      background: rgba(239, 68, 68, 0.05);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
     }
 
     .loading-spinner {
@@ -107,8 +112,8 @@ import {
     .spinner {
       width: 48px;
       height: 48px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #4285f4;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -129,13 +134,15 @@ import {
       margin: 0 0 1rem 0;
       color: var(--text-primary);
       font-size: 1.5rem;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
     p {
       margin: 0 0 2rem 0;
       color: var(--text-secondary);
       line-height: 1.6;
+      font-size: 0.95rem;
     }
 
     .error-actions {
@@ -148,50 +155,34 @@ import {
     .btn-primary,
     .btn-secondary {
       padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      font-weight: 500;
+      border-radius: 8px;
+      font-weight: 600;
       text-decoration: none;
       cursor: pointer;
       border: none;
       transition: all 0.2s ease;
+      font-size: 0.9rem;
     }
 
     .btn-primary {
-      background: #4285f4;
-      color: white;
+      background: var(--accent-primary);
+      color: var(--accent-primary-darker);
     }
 
     .btn-primary:hover {
-      background: #3367d6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--accent-primary-glow);
     }
 
     .btn-secondary {
       background: transparent;
       color: var(--text-primary);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--accent-primary-border);
     }
 
     .btn-secondary:hover {
-      background: var(--background-hover);
-    }
-
-    /* Dark mode */
-    [data-theme="dark"] .callback-state {
-      background: var(--background-surface-dark);
-      border-color: var(--border-color-dark);
-    }
-
-    [data-theme="dark"] .callback-state.success {
-      background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
-    }
-
-    [data-theme="dark"] .callback-state.error {
-      background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
-    }
-
-    [data-theme="dark"] .spinner {
-      border-color: #444;
-      border-top-color: #4285f4;
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-primary);
     }
   `]
 })
@@ -230,18 +221,29 @@ export class OAuthCallbackComponent implements OnInit {
       return;
     }
 
-    const request: GoogleOAuthCallbackRequest = { code, state };
+    const storedState = sessionStorage.getItem('oauth_state');
+    const redirectUri = `${window.location.origin}/auth/oauth/google/callback`;
+
+    const request: GoogleOAuthCallbackRequest = {
+      code,
+      state,
+      expected_state: storedState || undefined,
+      redirect_uri: redirectUri
+    };
+
+    // Limpar state usado
+    sessionStorage.removeItem('oauth_state');
 
     this.authService.googleOAuthCallback(request).subscribe({
       next: (authData: GoogleOAuthCallbackResponse) => {
         this.authStore.setSession({ raw: authData });
-        
+
         this.authService.me().subscribe({
           next: (user) => {
             this.authStore.setUser(user);
             this.isProcessing = false;
             this.isSuccess = true;
-            
+
             setTimeout(() => {
               this.router.navigate(['/app/qna']);
             }, 2000);
